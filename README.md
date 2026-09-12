@@ -1,29 +1,183 @@
-## Authenticated OKX TR private reads (work/okx-auth)
+# Agent Trading Copilot
 
-Owner-local read-only account/Earn adapter; no desktop session or exchange writes.
-Create `.env` beside this README from `.env.example` and fill `OKX_API_KEY`,
-`OKX_SECRET_KEY`, `OKX_PASSPHRASE` using a Read-only TR API key. Never share it.
-From this worktree run `python -B -m agent_trading.account_read` (requires the
-existing optional runtime MCP dependencies and pinned ATK MCP 1.4.6).
-Output: CONNECTED / AUTH_MISSING / ERROR, exact normalized private snapshots.
-Auto Earn comes only from balance flags, not a standalone status tool.
-No credentials are supplied yet: actual owner balances/Earn remain unverified.
-[Setup, allowlist, state contract and limits](docs/specs/okx-private-read-v0.1.md).
-Public API/market runtime, frontend and LIVE behavior remain unchanged.
+A self-hosted, open-source trading **agent runtime** with a mobile-first web
+dashboard and an optional Telegram Mini App. Market data comes from the official
+**OKX Agent Trade Kit (ATK) MCP** server; the deterministic strategy core runs
+locally and every decision is observable.
 
-## Web App control shell (work/webapp)
+> **Scope and safety.** Execution is **PAPER only**. LIVE trading is not
+> implemented and is disabled — there is no exchange write path and no usable
+> live switch. Optional OKX account access is **read-only** and limited to a
+> four-tool allowlist. A working pipeline is not evidence of profitability, and
+> nothing here is financial advice.
 
-This isolated branch adds a mobile-first React/Vite/TypeScript Dashboard and
-Strategy Settings. From this worktree: npm install, then npm run dev.
-npm run build creates dist; npm test runs 10 small checks.
-No backend or Telegram account is needed for local development.
+Türkçe ayrıntılı mimari, sözleşme ve kanıt bölümleri bu rehberin altında yer alır.
 
-Controls and sample decisions are local/demo. LIVE selection is a confirmed
-preview and remains blocked; no real execution, PAPER simulator or bot.
-See [Web App handoff](docs/webapp-shell.md) for integration contracts and limits.
-The backend foundation described below is preserved unchanged.
+---
 
-# Agent Trading
+## What you get
+
+| Surface | What it does |
+|---|---|
+| Web dashboard | Bot status, live OKX market connection, latest deterministic decision, account state, activity feed, Start/Stop |
+| Telegram Mini App | The same dashboard inside Telegram via `/start` → **Open Dashboard** |
+| HTTP API | `/health/live`, `/health/ready`, `/api/v1/bot/*`, `/api/v1/analyses` |
+| Strategy core | Deterministic replay/analysis over real 15m candles, Decimal prices, UTC timestamps |
+
+## Requirements
+
+- **Python 3.11+**
+- **Node.js 22.12+**
+- **OKX ATK MCP, pinned**: `npm install -g @okx_ai/okx-trade-mcp@1.4.6`
+  (the runtime refuses any other package or version)
+
+Public market data needs **no API key**. OKX credentials are optional and only
+enable read-only account/balance display.
+
+## Quick start
+
+```bash
+git clone <your-repo-url> agent-trading && cd agent-trading
+```
+
+**1. Backend**
+
+```bash
+python -m venv .venv
+```
+
+```bash
+.venv/Scripts/python.exe -m pip install -e ".[product,test-product]"
+```
+
+On Linux/macOS use `.venv/bin/python` instead of `.venv/Scripts/python.exe`.
+
+**2. Frontend**
+
+```bash
+npm install
+```
+
+**3. Configuration**
+
+Copy `.env.example` to `.env` and fill in only what you need. **Never commit
+`.env`** — it is gitignored.
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `OKX_API_KEY` / `OKX_SECRET_KEY` / `OKX_PASSPHRASE` | No | Read-only OKX account/balance display |
+| `TELEGRAM_BOT_TOKEN` | No | Enables the Telegram bot |
+| `WEBAPP_URL` | For Telegram | Public **HTTPS** frontend URL used by the Open Dashboard button |
+| `VITE_BACKEND_URL` | No | API base the browser calls (default `http://127.0.0.1:8000`) |
+| `ALLOWED_ORIGINS` | For public use | Extra CORS origins; `localhost:5173` and `127.0.0.1:5173` are always allowed |
+
+**4. Run**
+
+Backend:
+
+```bash
+.venv/Scripts/python.exe -m uvicorn agent_trading.api:create_app --factory --host 127.0.0.1 --port 8000
+```
+
+Frontend, in a second terminal:
+
+```bash
+npm run dev
+```
+
+Open **http://127.0.0.1:5173**. Press **Start Bot** — within a few seconds the
+market card shows `OKX ATK MCP · Connected` and the activity feed logs real
+candle updates. **Stop Bot** halts the engine; the Telegram bot stays alive.
+
+Check the backend directly:
+
+```bash
+curl http://127.0.0.1:8000/health/ready
+```
+
+`status` is `READY` once the repository is available and market data is
+connected. While the engine is stopped, `NOT_READY` with
+`MARKET_DATA_NOT_VALIDATED` is the correct, honest answer.
+
+## Telegram Mini App
+
+Telegram only loads Mini Apps over **HTTPS**, and the browser calls the backend
+**directly** — so both the frontend and the backend need a public HTTPS URL. The
+frontend does not proxy API requests; one tunnel is not enough.
+
+1. Create a bot with [@BotFather](https://t.me/BotFather) and copy its token.
+2. Start two tunnels (install: `winget install --id Cloudflare.cloudflared`):
+
+```bash
+cloudflared tunnel --url http://localhost:5173
+```
+
+```bash
+cloudflared tunnel --url http://localhost:8000
+```
+
+3. Put the generated URLs in `.env`:
+
+```
+TELEGRAM_BOT_TOKEN=<your bot token>
+WEBAPP_URL=https://<frontend>.trycloudflare.com
+VITE_BACKEND_URL=https://<backend>.trycloudflare.com
+ALLOWED_ORIGINS=https://<frontend>.trycloudflare.com
+```
+
+4. **Restart both services.** Vite reads `VITE_BACKEND_URL` at startup, and the
+   backend reads `WEBAPP_URL` / `ALLOWED_ORIGINS` at startup.
+5. Send `/start` to your bot and tap **Open Dashboard**. `/status` returns bot,
+   execution mode, market connection, account auth and strategy state as text.
+
+Quick-tunnel URLs change every restart — update `.env` and restart again.
+
+## Troubleshooting
+
+| Symptom | Cause and fix |
+|---|---|
+| "Control center could not load" | Backend not running, or `VITE_BACKEND_URL` points somewhere unreachable. Verify `/health/live`, then restart the frontend. |
+| Dashboard loads but values never change | The frontend polls every 5s; a blocked or failing backend keeps the last good snapshot. Check the browser console and backend log. |
+| Blocked request / invalid Host via a tunnel | Add your tunnel domain to `server.allowedHosts` in `vite.config.ts` (`.trycloudflare.com` is preconfigured). |
+| CORS error on the public URL | `ALLOWED_ORIGINS` must be the bare frontend origin (scheme + host, no path), then restart the backend. |
+| `ATK_NOT_INSTALLED` / `ATK_PACKAGE_MISMATCH` | Install exactly `@okx_ai/okx-trade-mcp@1.4.6` and make sure `node` is on `PATH`. |
+| Telegram button does nothing | `WEBAPP_URL` must be HTTPS. Telegram rejects `http://localhost`. |
+| Port already in use | Another instance or worktree holds `8000`/`5173`. Stop it, or run on different ports. |
+| Account shows `AUTH_MISSING` | All three OKX variables must be set. `CONNECTED` means a successful read-only read. |
+
+## Tests
+
+```bash
+.venv/Scripts/python.exe -B -m unittest discover -s tests
+```
+
+```bash
+npm test && npm run build
+```
+
+## Reading the dashboard
+
+- **Bot status** — `RUNNING` / `STOPPED`, always with `PAPER` mode.
+- **Market data source** — `OKX ATK MCP` plus real connection state; `Connected`
+  appears only after a real candle update.
+- **Latest decision** — the deterministic strategy outcome. `NO_TRADE` is a real
+  result, not an error or a placeholder.
+- **Account** — `CONNECTED` / `AUTH_MISSING` / `ERROR` from read-only reads.
+- **Activity feed** — timestamped backend events; nothing is simulated.
+
+Strategy settings are stored in your browser and are intentionally decoupled from
+the engine's approved profile; changing them does not retune the strategy core.
+
+## Project docs
+
+Start with [AGENTS.md](AGENTS.md) (shared constitution), then
+[PROJECT_STATE](docs/PROJECT_STATE.md), [HANDOFF](docs/HANDOFF.md) and
+[NEXT_TASK](docs/NEXT_TASK.md). Specifications live in [docs/specs](docs/specs/)
+and design decisions in [docs/DECISIONS](docs/DECISIONS/).
+
+---
+
+# Agent Trading — altyapı ve sözleşmeler (detay)
 
 Açık kaynak, self-hosted otonom trading ajanının başlangıç altyapısı.
 Python 3.11+ gerekir. Replay ve mevcut CLI SHADOW için ek Python paketi gerekmez.
