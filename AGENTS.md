@@ -240,3 +240,16 @@ for this shell only. LIVE warning/confirmation is a local preview, with startup
 blocked and no execution path. Do not confuse demo presets/risk/modules with
 approved trading rules. See docs/webapp-shell.md. After the requested commit,
 stop; no merge/push/tag or other-worktree edits.
+
+## Authorized isolated private read adapter [U-OKX-AUTH-001]
+
+2026-09-12 owner instruction/design approval authorizes only work/okx-auth in
+Agent Trading-auth from adbafa485c900164c95ed0e13fce0d267da8b645. Separate
+product-owned TR authentication via owner-local ignored `.env`, fixed private
+reads for balance/funding/config/savings, normalized Decimal/UTC account/Earn
+snapshots and CONNECTED/AUTH_MISSING/ERROR. Auto Earn is balance-derived flags,
+not an enablement tool. See docs/specs/okx-private-read-v0.1.md and ADR012.
+Never inherit desktop/CLI/OAuth sessions, log secrets/auth headers/raw private
+payloads, expose unauthenticated private HTTP data, place orders or perform any
+exchange write (earn_auto_set, transfer, redeem, purchase included). LIVE stays
+disabled. Test and commit only this task, then STOP; no merge/push/tag.

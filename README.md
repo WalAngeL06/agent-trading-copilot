@@ -1,3 +1,16 @@
+## Authenticated OKX TR private reads (work/okx-auth)
+
+Owner-local read-only account/Earn adapter; no desktop session or exchange writes.
+Create `.env` beside this README from `.env.example` and fill `OKX_API_KEY`,
+`OKX_SECRET_KEY`, `OKX_PASSPHRASE` using a Read-only TR API key. Never share it.
+From this worktree run `python -B -m agent_trading.account_read` (requires the
+existing optional runtime MCP dependencies and pinned ATK MCP 1.4.6).
+Output: CONNECTED / AUTH_MISSING / ERROR, exact normalized private snapshots.
+Auto Earn comes only from balance flags, not a standalone status tool.
+No credentials are supplied yet: actual owner balances/Earn remain unverified.
+[Setup, allowlist, state contract and limits](docs/specs/okx-private-read-v0.1.md).
+Public API/market runtime, frontend and LIVE behavior remain unchanged.
+
 ## Web App control shell (work/webapp)
 
 This isolated branch adds a mobile-first React/Vite/TypeScript Dashboard and

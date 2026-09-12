@@ -82,3 +82,19 @@ and [handoff](webapp-shell.md). Requested commit only; no merge/push/tag.
 |---|---|---|---|
 | [U-OKX-CAP-001] | [U] | User authorized an isolated work/okx-capabilities audit from 9d842077581f51b8264344fb331d1123665955e7; read-only capability checks, coherent commit and stop | No trades, transfers, Earn toggles, LIVE, Swing/frontend/strategy, merge/push/tag |
 | [E-OKX-CAP-001] | [E] | [OKX TR report](research/okx-tr-capabilities-2026-09-12.md) and [sanitized runtime evidence](research/okx-tr-capabilities-2026-09-12.json): connected 1.5.0 and isolated 1.4.6 discovery, 13 successful read tools, Auto Earn flags and Earn demo error 50038 | Capability/connectivity evidence only; remote grants not exposed, local private AUTH_MISSING, writes untested; no strategy or yield validation |
+
+## Authenticated product private reads — 2026-09-12
+
+- [U-OKX-AUTH-001] [U]: owner explicitly authorized work/okx-auth at
+  Agent Trading-auth from adbafa485c900164c95ed0e13fce0d267da8b645 and approved
+  the four-tool read design. Local env credentials, normalized account/Earn,
+  balance-derived Auto Earn, secret-safe failures, full tests and one requested
+  commit only. No desktop fallback, any exchange writes, orders, earn_auto_set,
+  transfers/redeem/purchase, LIVE, merge/push/tag.
+- [E-OKX-AUTH-001] [E]: [private-read contract](specs/okx-private-read-v0.1.md)
+  records 279 passing offline Python tests, actual product AUTH_MISSING with
+  no owner `.env`, and a genuine SDK2.2.0 -> ATK1.4.6 -> TR private balance
+  attempt with an intentionally invalid test key returning ERROR/AUTH_FAILED.
+  No real owner key available; successful owner balances/Earn, least-privilege
+  grant acceptance and yield are unverified. Zero exchange writes. Offline
+  normalization proof is not real-account success or trading validation.
