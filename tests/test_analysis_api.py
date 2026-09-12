@@ -149,7 +149,9 @@ class ApiTests(unittest.TestCase):
     def test_openapi_defines_string_financial_report_and_only_product_routes(self):
         schema = self.client.get("/openapi.json").json()
         self.assertEqual(set(schema["paths"]), {"/health/live", "/health/ready",
-                                               "/api/v1/analyses", "/api/v1/analyses/{analysis_id}"})
+                                               "/api/v1/analyses", "/api/v1/analyses/{analysis_id}",
+                                               "/api/v1/bot/status", "/api/v1/bot/market", "/api/v1/bot/activity",
+                                               "/api/v1/bot/start", "/api/v1/bot/stop"})
         ticker = schema["components"]["schemas"]["Ticker"]["properties"]["last"]
         self.assertEqual(ticker["type"], "string")
         self.assertIn("AnalysisReport", schema["components"]["schemas"])

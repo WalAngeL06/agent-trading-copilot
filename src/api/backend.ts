@@ -2,7 +2,8 @@ import type { TradingControlApi } from './control.ts';
 import type { DashboardSnapshot, StrategyProfile, MarketSummary, DecisionOutcome } from '../types/control.ts';
 import { createDefaultStrategy } from '../types/control.ts';
 
-const API_BASE = 'http://127.0.0.1:8000';
+// Configurable via Vite (e.g. VITE_BACKEND_URL=https://my-backend.ngrok.app)
+const API_BASE = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${url}`, options);
@@ -54,7 +55,7 @@ export class BackendApi implements TradingControlApi {
       },
       strategy,
       market: marketSummary,
-      autoEarn: 'UNKNOWN',
+      autoEarn: statusData.autoEarn === 'ON' ? 'ON' : statusData.autoEarn === 'OFF' ? 'OFF' : 'UNKNOWN',
       events: []
     };
   }

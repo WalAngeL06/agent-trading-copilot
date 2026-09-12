@@ -324,4 +324,6 @@ class VersionedApiTests(unittest.TestCase):
         self.assertNotIn("enum", timeframes.get("propertyNames", {}))
         self.assertIn("strategy_context", report["required"])
         self.assertEqual(set(schema["paths"]), {
-            "/health/live", "/health/ready", "/api/v1/analyses", "/api/v1/analyses/{analysis_id}"})
+            "/health/live", "/health/ready", "/api/v1/analyses", "/api/v1/analyses/{analysis_id}",
+            "/api/v1/bot/status", "/api/v1/bot/market", "/api/v1/bot/activity",
+            "/api/v1/bot/start", "/api/v1/bot/stop"})

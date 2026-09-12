@@ -48,8 +48,9 @@ def create_app(config=None, service=None, bot_config=None, adapter=None):
     @asynccontextmanager
     async def lifespan(app):
         await analysis_service.startup()
+        if bot_service: bot_service.startup()
         yield
-        if bot_service: bot_service.stop()
+        if bot_service: bot_service.shutdown()
 
     app = FastAPI(title="Autonomous Trading Agent Analysis API", version="0.2", lifespan=lifespan)
     app.state.analysis_service = analysis_service
@@ -106,7 +107,10 @@ def create_app(config=None, service=None, bot_config=None, adapter=None):
         if not bot_service: return {"error": "Bot service not configured"}
         return {
             "bot_status": "running" if bot_service.is_running else "stopped",
-            "strategy_state": bot_service.latest_state.get("decision", {}).get("action", "NO_TRADE") if bot_service.latest_state else "UNKNOWN"
+            "strategy_state": bot_service.latest_state.get("decision", {}).get("action", "NO_TRADE") if bot_service.latest_state else "UNKNOWN",
+            "account_auth": bot_service.private_state.get("account_auth", "UNKNOWN"),
+            "autoEarn": bot_service.private_state.get("autoEarn", "UNKNOWN"),
+            "balance": bot_service.private_state.get("balance")
         }
 
     @app.get("/api/v1/bot/market")
