@@ -30,7 +30,12 @@ The existing market card intentionally shows source, connection and decision but
 no price, so `last_price` is fetched and unused; unchanged by request. An
 uncommitted `/dashboard` HTML endpoint in `agent_trading/api.py` arrived from a
 concurrent session, duplicates this frontend and is deliberately not committed.
-No merge, push or tag.
+Then, under a later explicit owner instruction, the README was rewritten with a
+self-hosting and Telegram Mini App guide and the branch was published to the new
+public repository `WalAngeL06/agent-trading-copilot` with `work/final-demo` as its
+default branch. Only that branch was pushed; no merge and no tag. A scan of all 22
+published commits for the live credential values, `.env` additions and tunnel URLs
+came back clean.
 
 ---
 

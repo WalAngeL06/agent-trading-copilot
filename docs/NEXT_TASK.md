@@ -1,8 +1,13 @@
-# Current boundary — STOP after WebApp runtime commit
+# Current boundary — STOP after public publish
 
-2026-09-12. Only the existing frontend's runtime wiring was authorized and is now
-committed. STOP. Do not redesign the UI, add a second dashboard, touch strategy or
-backtest, add charts, enable real-money execution, write the README or push to GitHub.
+2026-09-12. The owner then explicitly authorized the README and a public push,
+superseding the earlier no-README / no-push boundary. Published to
+`https://github.com/WalAngeL06/agent-trading-copilot` (public, default branch
+`work/final-demo`, only that branch pushed). Credential sweep over all 22
+published commits found no secrets, no `.env` and no tunnel URLs.
+
+STOP. Do not redesign the UI, add a second dashboard, touch strategy or backtest,
+add charts, enable real-money execution, push other branches or merge to main.
 
 Open owner-device step: send `/start` to `@agentiic_trading_bot`, tap Open Dashboard
 and confirm the Mini App shows real state. Tunnel URLs are ephemeral; regenerate
