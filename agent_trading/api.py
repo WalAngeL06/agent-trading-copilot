@@ -15,7 +15,8 @@ from .analysis_repository import RepositoryError
 from .analysis_service import AnalysisService, ServiceError
 from .bot_service import BotService
 from .config import Config
-from .okx import OkxMarketAdapter
+from .demo_config import DemoConfig
+from .okx_mcp_runtime import open_atk_mcp
 
 
 _ERROR_MESSAGES = {
@@ -36,45 +37,43 @@ def _error(code, status, analysis_id=None):
         "code": code, "message": _ERROR_MESSAGES[code], "analysis_id": analysis_id}})
 
 
-def create_app(config=None, service=None, bot_config=None, adapter=None):
-    import os
-    env_vars = ["TELEGRAM_BOT_TOKEN", "WEBAPP_URL", "VITE_BACKEND_URL", "OKX_API_KEY", "OKX_SECRET_KEY", "OKX_PASSPHRASE"]
-    print("\n--- ENV VALIDATION ---")
-    for v in env_vars:
-        status = "PRESENT" if os.environ.get(v) else "MISSING"
-        print(f"{v}: {status}")
-    print("----------------------\n")
+def _iso(value):
+    return None if value is None else value.isoformat().replace("+00:00", "Z")
 
+
+def create_app(config=None, service=None, bot_config=None, bot_service=None,
+               mcp_factory=None, demo_config=None):
     analysis_service = service or AnalysisService(config or AnalysisConfig.from_env())
-    try:
-        if bot_config is None: bot_config = Config.from_env()
-        if adapter is None: adapter = OkxMarketAdapter(bot_config.okx_site, bot_config.cli_timeout_seconds, bot_config.node_path, bot_config.okx_cli_path)
-    except Exception:
-        pass # Allow tests to pass without full env config
-    bot_service = BotService(bot_config, adapter) if bot_config and adapter else None
+    demo = demo_config or DemoConfig.from_env()
+    if bot_service is None:
+        runtime_config = analysis_service.config
+        bot_service = BotService(
+            bot_config or Config(symbol=runtime_config.allowed_symbols[0]),
+            mcp_factory=mcp_factory or open_atk_mcp,
+            node_path=runtime_config.node_path,
+            server_path=runtime_config.server_path,
+            mcp_timeout=runtime_config.mcp_timeout_seconds,
+            telegram_token=demo.telegram_bot_token,
+            webapp_url=demo.webapp_url,
+        )
 
     @asynccontextmanager
     async def lifespan(app):
         await analysis_service.startup()
-        if bot_service: bot_service.startup()
-        yield
-        if bot_service: bot_service.shutdown()
+        bot_service.startup()
+        try:
+            yield
+        finally:
+            await bot_service.shutdown()
 
     app = FastAPI(title="Autonomous Trading Agent Analysis API", version="0.2", lifespan=lifespan)
     app.state.analysis_service = analysis_service
+    app.state.bot_service = bot_service
 
     from fastapi.middleware.cors import CORSMiddleware
-    allowed_origin = os.environ.get("WEBAPP_URL", "http://localhost:5173")
-    origins = [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173"
-    ]
-    if allowed_origin not in origins:
-        origins.append(allowed_origin)
-
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,
+        allow_origins=list(demo.allowed_origins),
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -105,15 +104,27 @@ def create_app(config=None, service=None, bot_config=None, adapter=None):
     @app.get("/health/ready")
     async def ready(response: Response):
         result = await analysis_service.readiness()
-        if bot_service:
-            result["market"] = "CONNECTED" if result["status"] == "READY" else "ERROR"
-            result["account"] = bot_service.private_state.get("account_auth", "UNKNOWN")
-            result["telegram"] = "CONNECTED" if bot_service.telegram and bot_service.telegram.running else ("DISABLED" if not bot_service.telegram else "ERROR")
-            result["execution_mode"] = "PAPER"
-            
-            # Decide overall readiness
-            if result["market"] == "ERROR":
-                result["status"] = "NOT_READY"
+        backend_ready = result["repository"] == "AVAILABLE"
+        analysis_market = result["status"] == "READY"
+        market_ready = analysis_market or bot_service.market_connected
+        if bot_service.market_connected and not analysis_market:
+            result["reason_codes"] = [code for code in result["reason_codes"] if code in {
+                "PERSISTENCE_UNAVAILABLE", "LAST_ANALYSIS_FAILED",
+            }]
+        telegram = ("RUNNING" if bot_service.telegram and bot_service.telegram.running
+                    else "DISABLED" if not bot_service.telegram else "ERROR")
+        result.update(
+            backend="READY" if backend_ready else "ERROR",
+            market="CONNECTED" if market_ready else "NOT_VALIDATED",
+            account=bot_service.private_state["account_auth"],
+            telegram=telegram,
+            execution_mode="PAPER",
+            market_source=bot_service.market_source,
+            last_market_update=_iso(bot_service.last_market_update),
+            last_private_update=_iso(bot_service.last_private_update),
+        )
+        result["status"] = ("READY" if backend_ready and market_ready
+                            and not result["reason_codes"] else "NOT_READY")
 
         response.status_code = 200 if result["status"] == "READY" else 503
         return result
@@ -139,23 +150,25 @@ def create_app(config=None, service=None, bot_config=None, adapter=None):
 
     @app.get("/api/v1/bot/status")
     async def bot_status():
-        if not bot_service: return {"error": "Bot service not configured"}
         return {
             "bot_status": "running" if bot_service.is_running else "stopped",
             "strategy_state": bot_service.latest_state.get("decision", {}).get("action", "NO_TRADE") if bot_service.latest_state else "UNKNOWN",
-            "account_auth": bot_service.private_state.get("account_auth", "UNKNOWN"),
-            "autoEarn": bot_service.private_state.get("autoEarn", "UNKNOWN"),
-            "balance": bot_service.private_state.get("balance")
+            "execution_mode": "PAPER",
+            "market_source": bot_service.market_source,
+            "market_connected": bot_service.market_connected,
+            "account_auth": bot_service.private_state["account_auth"],
+            "auto_earn_status": bot_service.private_state["auto_earn_status"],
+            "last_market_update": _iso(bot_service.last_market_update),
+            "last_private_update": _iso(bot_service.last_private_update),
+            "balance": bot_service.private_state["balance"],
         }
 
     @app.get("/api/v1/bot/market")
     async def bot_market():
-        if not bot_service: return {"error": "Bot service not configured"}
         return bot_service.latest_state.get("market_state", {}) if bot_service.latest_state else {}
 
     @app.get("/api/v1/bot/activity")
     async def bot_activity():
-        if not bot_service: return {"error": "Bot service not configured"}
         activity = bot_service.latest_state.get("execution", {}) if bot_service.latest_state else {}
         return {
             **activity,
@@ -164,13 +177,11 @@ def create_app(config=None, service=None, bot_config=None, adapter=None):
 
     @app.post("/api/v1/bot/start")
     async def bot_start():
-        if not bot_service: return {"error": "Bot service not configured"}
         started = bot_service.start()
         return {"status": "started" if started else "already running"}
 
     @app.post("/api/v1/bot/stop")
     async def bot_stop():
-        if not bot_service: return {"error": "Bot service not configured"}
         stopped = bot_service.stop()
         return {"status": "stopped" if stopped else "not running"}
 

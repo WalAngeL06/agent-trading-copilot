@@ -1,4 +1,27 @@
-# Current handoff — modular structure-aware RiskEngine
+# Current handoff — final demo runtime repair
+
+2026-09-12. Worktree `Agent Trading-final`, branch `work/final-demo`, starting
+HEAD `31fded92a018958165b6c28554937fd71b9adc09`. The requested repair is complete
+under commit message `fix: repair final demo runtime wiring`; read the exact hash
+from Git after commit.
+
+BotService is created by the default FastAPI factory and starts Telegram polling
+at application lifecycle startup while the trading engine remains STOPPED.
+Starting the bot opens the existing pinned read-only public ATK MCP session and
+feeds normalized real 15m candles to the unchanged TradingBrain. Private reads
+retain the four-tool allowlist and expose sanitized auth/equity/Auto Earn state.
+Readiness, bot APIs and the frontend use observed state and timestamps. CORS uses
+`ALLOWED_ORIGINS`; mobile Telegram requires public HTTPS frontend and backend
+URLs because the browser calls `VITE_BACKEND_URL` directly.
+
+Fresh checks: 360 Python tests pass; 11 frontend tests pass; frontend build passes;
+default backend startup/liveness passes; real public MCP bot-start smoke reports
+connected OKX data, PAPER and zero trades. `.env` exists locally with empty values
+only and is ignored. No merge/push/tag and no Strategy V1 semantic edits.
+
+---
+
+# Historical handoff — modular structure-aware RiskEngine
 
 2026-09-12. Codex; work/risk-engine in
 C:/Users/Serdar Arif/Desktop/Agent Trading/.worktrees/risk-engine.

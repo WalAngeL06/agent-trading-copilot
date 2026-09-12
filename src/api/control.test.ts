@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createMockApi } from './mock.ts';
+import { BackendApi } from './backend.ts';
 
 test('starts and stops local bot state without invented decisions', async () => {
   const api = createMockApi();
@@ -67,4 +68,33 @@ test('rejects enum arrays from corrupt browser settings instead of coercing them
     assert.equal((await api.getStrategy()).executionMode, 'ANALYZE');
     assert.equal(typeof (await api.getStrategy())[field], 'string');
   }
+});
+
+test('backend dashboard preserves stopped state, real connectivity and NO_TRADE', async () => {
+  const calls: string[] = [];
+  const request = async (url: string | URL | Request) => {
+    const value = String(url); calls.push(value);
+    const body = value.endsWith('/status') ? {
+      bot_status: 'stopped', strategy_state: 'NO_TRADE', execution_mode: 'PAPER',
+      market_source: 'OKX_ATK_MCP', market_connected: true,
+      account_auth: 'AUTH_MISSING', auto_earn_status: 'UNKNOWN',
+    } : value.endsWith('/market') ? {
+      last_price: '100.5', observed_at: '2026-09-12T12:00:00Z',
+    } : { events: [] };
+    return new Response(JSON.stringify(body), { status: 200,
+      headers: { 'Content-Type': 'application/json' } });
+  };
+  const api = new BackendApi(undefined, 'https://backend.example', request as typeof fetch);
+  const dashboard = await api.getDashboard();
+  assert.equal(dashboard.bot.status, 'STOPPED');
+  assert.equal(dashboard.bot.mode, 'PAPER');
+  assert.equal(dashboard.market.connection, 'CONNECTED');
+  assert.equal(dashboard.market.decision, 'NO_TRADE');
+  assert.equal(dashboard.market.lastPrice, '100.5');
+  assert.equal(dashboard.accountAuth, 'AUTH_MISSING');
+  assert.deepEqual(calls, [
+    'https://backend.example/api/v1/bot/status',
+    'https://backend.example/api/v1/bot/market',
+    'https://backend.example/api/v1/bot/activity',
+  ]);
 });

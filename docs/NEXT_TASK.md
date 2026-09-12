@@ -1,4 +1,13 @@
-# Current boundary — STOP after RiskEngine feature commit
+# Current boundary — STOP after final demo runtime repair
+
+2026-09-12. Commit the verified tracked repair as
+`fix: repair final demo runtime wiring`, report the requested evidence, then STOP.
+Do not merge, push, tag, fill credentials, start LIVE execution or modify Strategy
+V1 semantics. The ignored local `.env` remains for the owner to fill manually.
+
+---
+
+# Historical boundary — STOP after RiskEngine feature commit
 
 2026-09-12. [U-RISK-ENGINE-001] authorizes only this isolated RiskEngine from
 e9ff346b151587c8deaf903b9ffc40d289659725 in work/risk-engine.

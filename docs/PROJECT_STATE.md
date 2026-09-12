@@ -1,4 +1,22 @@
-# Current state — configurable structure-aware PAPER risk
+# Current state — final demo runtime wiring repaired
+
+2026-09-12. Codex; `work/final-demo` in `Agent Trading-final`, based on
+`31fded92a018958165b6c28554937fd71b9adc09`. Default FastAPI lifecycle now
+constructs BotService and optional Telegram independently of TradingBrain start.
+The BotService market loop uses the pinned public read-only ATK MCP runtime, not
+the legacy CLI adapter. Private read snapshots map the existing account/Earn
+contracts to sanitized auth, equity summary and Auto Earn state. Readiness and
+the frontend consume observed market/private timestamps and connectivity.
+
+Fresh verification: 360 Python tests, 11 frontend tests and production frontend
+build pass. Default FastAPI startup/liveness and a real public bot-start smoke
+passed with `market_source=OKX_ATK_MCP`, PAPER execution and zero exchange writes.
+Local `.env` was created with empty values only and remains ignored; tracked
+`.env.example` contains placeholders only. No Strategy V1 semantics changed.
+
+---
+
+# Historical state — configurable structure-aware PAPER risk
 
 2026-09-12. Codex; work/risk-engine in
 C:/Users/Serdar Arif/Desktop/Agent Trading/.worktrees/risk-engine.

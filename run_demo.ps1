@@ -8,6 +8,7 @@ $envVars = @(
     "TELEGRAM_BOT_TOKEN",
     "WEBAPP_URL",
     "VITE_BACKEND_URL",
+    "ALLOWED_ORIGINS",
     "OKX_API_KEY",
     "OKX_SECRET_KEY",
     "OKX_PASSPHRASE"
@@ -19,9 +20,9 @@ foreach ($var in $envVars) {
     if (-not $val) { $val = (Get-Content .env -ErrorAction SilentlyContinue | Select-String "^$var=(.*)$").Matches.Groups[1].Value }
     
     if ($val) {
-        Write-Host "$var: PRESENT" -ForegroundColor Green
+        Write-Host "${var}: PRESENT" -ForegroundColor Green
     } else {
-        Write-Host "$var: MISSING" -ForegroundColor Yellow
+        Write-Host "${var}: MISSING" -ForegroundColor Yellow
     }
 }
 
@@ -31,7 +32,10 @@ Write-Host "Options:"
 Write-Host "  A) Cloudflare Tunnel: cloudflared tunnel --url http://localhost:5173"
 Write-Host "  B) Ngrok: ngrok http 5173"
 Write-Host "Set WEBAPP_URL in .env to the generated HTTPS url."
-Write-Host "And pass VITE_BACKEND_URL=https://<your-backend-tunnel> if running backend remotely."
+Write-Host "A physical phone also needs a SECOND HTTPS tunnel for the backend on port 8000."
+Write-Host "Set VITE_BACKEND_URL to that backend tunnel URL."
+Write-Host "Set ALLOWED_ORIGINS to the frontend origin (scheme + host, no path)."
+Write-Host "The frontend does not proxy API requests, so one frontend tunnel is not enough."
 
 Write-Host "`n[3] Starting Services"
 Write-Host "Start Backend in a separate terminal:"

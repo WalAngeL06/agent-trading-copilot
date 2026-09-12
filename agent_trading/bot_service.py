@@ -1,179 +1,242 @@
 import asyncio
 from datetime import datetime, timezone
 import logging
-import os
-from .okx import OkxMarketAdapter, normalize_candles
+
 from .config import Config
-from .trading_brain.runtime import TradingBrain
-from .trading_brain.models import BrainConfig
+from .okx_mcp_runtime import open_atk_mcp
+from .okx_private_config import load_private_config
+from .okx_private_runtime import read_private_snapshots
 from .telegram_bot import TelegramBot
+from .trading_brain.models import BrainConfig
+from .trading_brain.runtime import TradingBrain
+
+
+def _iso(value):
+    if value is None:
+        return None
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
 
 class BotService:
-    def __init__(self, config: Config, adapter: OkxMarketAdapter):
+    """PAPER TradingBrain coordinator backed by explicit read-only MCP adapters."""
+
+    market_source = "OKX_ATK_MCP"
+
+    def __init__(self, config: Config, *, mcp_factory=open_atk_mcp,
+                 node_path=None, server_path=None, mcp_timeout=20,
+                 private_reader=read_private_snapshots,
+                 private_config_loader=load_private_config,
+                 telegram_token="", webapp_url="http://127.0.0.1:5173",
+                 telegram=None):
         self.config = config
-        self.adapter = adapter
+        self.mcp_factory = mcp_factory
+        self.node_path = node_path
+        self.server_path = server_path
+        self.mcp_timeout = mcp_timeout
+        self.private_reader = private_reader
+        self.private_config_loader = private_config_loader
         self.brain = None
         self.task = None
+        self.private_task = None
         self.is_running = False
+        self.market_connected = False
+        self.last_market_update = None
+        self.last_private_update = None
         self.latest_state = {}
-        
-        token = os.environ.get("TELEGRAM_BOT_TOKEN")
-        webapp_url = os.environ.get("WEBAPP_URL", "http://127.0.0.1:5173")
-        self.telegram = TelegramBot(token, webapp_url, status_callback=self._get_telegram_status) if token else None
+        self.telegram = telegram or (TelegramBot(
+            telegram_token, webapp_url, status_callback=self._get_telegram_status)
+            if telegram_token else None)
         self.seen_event_ids = set()
-        self.private_state = {"account_auth": "UNKNOWN", "autoEarn": "UNKNOWN", "balance": None}
+        self.private_state = {
+            "account_auth": "UNKNOWN", "auto_earn_status": "UNKNOWN", "balance": None,
+        }
         self.ui_events = []
 
     def _get_telegram_status(self):
         bot_status = "RUNNING" if self.is_running else "STOPPED"
-        strategy = self.latest_state.get("decision", {}).get("action", "UNKNOWN") if self.latest_state else "UNKNOWN"
-        auth = self.private_state.get("account_auth", "UNKNOWN")
-        earn = self.private_state.get("autoEarn", "UNKNOWN")
+        strategy = (self.latest_state.get("decision", {}).get("action", "UNKNOWN")
+                    if self.latest_state else "UNKNOWN")
+        market = "CONNECTED" if self.market_connected else "DISCONNECTED"
         return (f"Trading Bot: {bot_status}\n"
                 f"Execution Mode: PAPER\n"
-                f"Market Connection: CONNECTED (OKX ATK MCP)\n"
-                f"Account Auth: {auth}\n"
-                f"Auto Earn: {earn}\n"
+                f"Market Connection: {market} (OKX ATK MCP)\n"
+                f"Account Auth: {self.private_state['account_auth']}\n"
+                f"Auto Earn: {self.private_state['auto_earn_status']}\n"
                 f"Strategy State: {strategy}")
 
     def startup(self):
         if self.telegram:
             self.telegram.start()
-        self.private_task = asyncio.create_task(self._private_loop())
+        if self.private_task is None or self.private_task.done():
+            self.private_task = asyncio.create_task(self._private_loop())
 
-    def shutdown(self):
+    async def shutdown(self):
+        market_task = self.task
         self.stop()
-        if self.telegram:
-            self.telegram.stop()
-        if hasattr(self, 'private_task') and self.private_task:
+        tasks = [task for task in (market_task, self.private_task) if task is not None]
+        if self.private_task:
             self.private_task.cancel()
+            self.private_task = None
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
+        if self.telegram:
+            await self.telegram.stop()
 
     def start(self):
         if self.is_running:
             return False
         self.is_running = True
-        
-        brain_config = BrainConfig(target='BOUNDARY')
-        self.brain = TradingBrain(self.config.symbol, '15m', config=brain_config)
+        self.brain = TradingBrain(self.config.symbol, "15m", config=BrainConfig(target="BOUNDARY"))
         self.seen_event_ids = set()
-        
         self.task = asyncio.create_task(self._run_loop())
         return True
 
     def stop(self):
-        if not self.is_running:
+        if not self.is_running and self.task is None:
             return False
         self.is_running = False
+        self.market_connected = False
         if self.task:
             self.task.cancel()
             self.task = None
         return True
 
-    async def _fetch_candles(self, as_of: datetime):
-        def _do_fetch():
-            limit = self.config.bootstrap_limit
-            # We must fetch slightly more to normalize correctly
-            rows = self.adapter.candles(self.config.symbol, '15m', limit + 5)
-            history = normalize_candles(rows, self.config.symbol, '15m', as_of)
-            if not history:
-                raise ValueError("OKX has no closed candles")
-            return history[-limit:]
-        return await asyncio.to_thread(_do_fetch)
+    async def _fetch_candles(self, adapter, as_of: datetime):
+        request_limit = min(self.config.bootstrap_limit + 1, 300)
+        read = await adapter.candles(
+            self.config.symbol, "15m", request_limit, as_of=as_of)
+        if not read.value:
+            raise ValueError("OKX has no closed candles")
+        return tuple(read.value[-self.config.bootstrap_limit:]), read.provenance.response_observed_at
 
     def _check_notifications(self):
-        if not self.telegram or not self.brain: return
-        report = self.brain.report()
-        for event in report.get('events', []):
-            if event.id not in self.seen_event_ids:
-                self.seen_event_ids.add(event.id)
-                if event.kind in ("RANGE_CONFIRMED", "SWEEP", "TRADE_CANDIDATE", "BLOCKED", "PAPER_ORDER_OPENED", "PAPER_ORDER_CLOSED"):
+        if not self.telegram or not self.brain:
+            return
+        for event in self.brain.report().get("events", []):
+            if event.id in self.seen_event_ids:
+                continue
+            self.seen_event_ids.add(event.id)
+            if event.kind in (
+                "RANGE_CONFIRMED", "SWEEP", "TRADE_CANDIDATE", "BLOCKED",
+                "PAPER_ORDER_OPENED", "PAPER_ORDER_CLOSED",
+            ):
+                try:
                     self.telegram.broadcast(f"Notification: {event.kind}")
+                except Exception:
+                    logging.warning("Telegram notification failed")
 
     def _add_ui_event(self, title, detail, tone="neutral"):
         import uuid
-        from datetime import datetime, timezone
         self.ui_events.insert(0, {
             "id": str(uuid.uuid4()),
-            "at": datetime.now(timezone.utc).isoformat(),
+            "at": _iso(datetime.now(timezone.utc)),
             "title": title,
             "detail": detail,
-            "tone": tone
+            "tone": tone,
         })
-        self.ui_events = self.ui_events[:50]  # keep last 50
+        self.ui_events = self.ui_events[:50]
+
+    @staticmethod
+    def _auto_earn_status(flags):
+        states = [state for item in flags for state in (item.auto_lend, item.auto_staking)]
+        if "active" in states:
+            return "ON"
+        if states and all(state in ("off", "unsupported") for state in states):
+            return "OFF"
+        return "UNKNOWN"
 
     async def _update_private_state(self):
-        from .okx_private_config import load_private_config
-        from .okx_private_runtime import read_private_snapshots
-        config = load_private_config(env_file=".env")
+        config = self.private_config_loader(env_file=".env")
+        old_auth = self.private_state["account_auth"]
+        old_earn = self.private_state["auto_earn_status"]
         if not config.ready:
-            self.private_state["account_auth"] = "AUTH_MISSING"
-            return
-        
-        try:
-            res = await read_private_snapshots(config, timeout=5)
-            self.private_state["account_auth"] = res.status
-            self._add_ui_event("OKX Private Auth", f"Status: {res.status}")
-            
-            if res.status == "CONNECTED":
-                # Check Auto Earn
-                earn_val = "UNKNOWN"
-                if res.earn and res.earn.auto_earn is not None:
-                    earn_val = "ON" if res.earn.auto_earn == "active" else "OFF"
-                elif res.account and res.account.flags:
-                    earn_val = "ON" if res.account.flags[0].auto_earn == "active" else "OFF"
-                self.private_state["autoEarn"] = earn_val
-                self._add_ui_event("Auto Earn", earn_val)
-                
-                if res.account and res.account.equity is not None:
-                    self.private_state["balance"] = str(res.account.equity)
-        except Exception as e:
-            logging.error(f"Failed to read private snapshot: {e}")
-            self.private_state["account_auth"] = "ERROR"
-            self._add_ui_event("OKX Private Auth", "ERROR", tone="warning")
+            self.private_state.update(account_auth="AUTH_MISSING", auto_earn_status="UNKNOWN",
+                                      balance=None)
+        else:
+            try:
+                result = await self.private_reader(
+                    config, node_path=self.node_path, server_path=self.server_path,
+                    timeout=self.mcp_timeout)
+                self.private_state["account_auth"] = result.status
+                if result.status == "CONNECTED":
+                    flags = result.earn.auto_earn if result.earn else (
+                        result.account.auto_earn if result.account else ())
+                    self.private_state["auto_earn_status"] = self._auto_earn_status(flags)
+                    self.private_state["balance"] = (
+                        str(result.account.total_equity_usd)
+                        if result.account and result.account.total_equity_usd is not None else None)
+                    self.last_private_update = (
+                        result.earn.observed_at if result.earn else result.account.observed_at)
+                else:
+                    self.private_state.update(auto_earn_status="UNKNOWN", balance=None)
+            except Exception:
+                logging.warning("OKX private read failed")
+                self.private_state.update(account_auth="ERROR", auto_earn_status="UNKNOWN",
+                                          balance=None)
+        if self.private_state["account_auth"] != old_auth:
+            tone = "neutral" if self.private_state["account_auth"] == "CONNECTED" else "warning"
+            self._add_ui_event("OKX private auth", self.private_state["account_auth"], tone)
+        if self.private_state["auto_earn_status"] != old_earn:
+            self._add_ui_event("Auto Earn", self.private_state["auto_earn_status"])
 
     async def _private_loop(self):
         try:
             while True:
                 await self._update_private_state()
-                await asyncio.sleep(60) # check every minute
+                await asyncio.sleep(60)
         except asyncio.CancelledError:
             pass
 
-    def _update_state(self):
-        if not self.brain: return
-        snap = self.brain.snapshot()
+    def _update_state(self, candles):
+        snapshot = self.brain.snapshot()
         self.latest_state = {
-            "decision": {"action": snap.get("pending_plan", {}).get("direction", "NO_TRADE") if snap.get("pending_plan") else "NO_TRADE"},
-            "market_state": {"prices": [snap.get("range", {}).eq if snap.get("range") else 0]},
-            "execution": {"trades": snap.get("trades", [])}
+            "decision": {"action": (snapshot["pending_plan"].direction
+                                      if snapshot.get("pending_plan") else "NO_TRADE")},
+            "market_state": {
+                "symbol": self.config.symbol,
+                "last_price": str(candles[-1].close),
+                "observed_at": _iso(self.last_market_update),
+                "market_source": self.market_source,
+                "market_connected": self.market_connected,
+            },
+            "execution": {"trades": snapshot.get("trades", ())},
         }
+
+    async def _accept_market_read(self, adapter, *, bootstrap):
+        candles, observed_at = await self._fetch_candles(adapter, datetime.now(timezone.utc))
+        self.market_connected = True
+        self.last_market_update = observed_at
+        if bootstrap:
+            self.brain.bootstrap(candles)
+        else:
+            last_processed = self.brain.as_of
+            for candle in candles:
+                if last_processed is None or candle.close_time > last_processed:
+                    self.brain.process(candle)
+        self._update_state(candles)
+        self._add_ui_event("OKX ATK", "candles updated")
+        self._check_notifications()
 
     async def _run_loop(self):
         try:
-            as_of = datetime.now(timezone.utc)
-            candles = await self._fetch_candles(as_of)
-            if candles:
-                self._add_ui_event("OKX ATK", "15m candles updated")
-            self.brain.bootstrap(candles)
-            self._update_state()
-            self._check_notifications()
-            
-            while self.is_running:
-                await asyncio.sleep(self.config.poll_interval_seconds)
-                as_of = datetime.now(timezone.utc)
-                try:
-                    candles = await self._fetch_candles(as_of)
-                    # Feed only new candles
-                    last_processed = self.brain.as_of
-                    for c in candles:
-                        if last_processed is None or c.close_time > last_processed:
-                            self.brain.process(c)
-                    self._update_state()
-                    self._check_notifications()
-                except Exception as e:
-                    logging.error(f"Error in bot loop: {e}")
+            async with self.mcp_factory(
+                node_path=self.node_path, server_path=self.server_path,
+                timeout=self.mcp_timeout) as adapter:
+                await self._accept_market_read(adapter, bootstrap=True)
+                while self.is_running:
+                    await asyncio.sleep(self.config.poll_interval_seconds)
+                    try:
+                        await self._accept_market_read(adapter, bootstrap=False)
+                    except Exception:
+                        self.market_connected = False
+                        self._add_ui_event("OKX ATK", "market read failed", "warning")
+                        logging.warning("Bot market read failed")
         except asyncio.CancelledError:
             pass
-        except Exception as e:
-            logging.error(f"Bot failed to start: {e}")
+        except Exception:
+            self._add_ui_event("OKX ATK", "market connection failed", "warning")
+            logging.warning("Bot market runtime failed")
+        finally:
+            self.market_connected = False
             self.is_running = False
+            self.task = None

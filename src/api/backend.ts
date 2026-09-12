@@ -2,71 +2,81 @@ import type { TradingControlApi } from './control.ts';
 import type { DashboardSnapshot, StrategyProfile, MarketSummary, DecisionOutcome } from '../types/control.ts';
 import { createDefaultStrategy } from '../types/control.ts';
 
-// Configurable via Vite (e.g. VITE_BACKEND_URL=https://my-backend.ngrok.app)
-const API_BASE = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
+const viteEnv = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
+const DEFAULT_API_BASE = viteEnv?.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
 
-async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE}${url}`, options);
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return await response.json() as T;
+interface BotStatusWire {
+  bot_status: 'running' | 'stopped';
+  strategy_state: string;
+  execution_mode: 'PAPER';
+  market_source: 'OKX_ATK_MCP';
+  market_connected: boolean;
+  account_auth: 'CONNECTED' | 'AUTH_MISSING' | 'ERROR' | 'UNKNOWN';
+  auto_earn_status: 'ON' | 'OFF' | 'UNKNOWN';
+}
+
+interface MarketWire {
+  last_price?: string;
+  observed_at?: string;
+}
+
+function decision(value: string): DecisionOutcome | null {
+  return ['NO_TRADE', 'NO_SETUP', 'WAIT', 'TRADE_CANDIDATE', 'BLOCKED', 'EXECUTED'].includes(value)
+    ? value as DecisionOutcome : null;
 }
 
 export class BackendApi implements TradingControlApi {
   readonly kind = 'BACKEND';
   readonly strategyStorage = 'BROWSER';
   private storage: any;
+  private apiBase: string;
+  private request: typeof fetch;
 
-  constructor(storage?: any) {
+  constructor(storage?: any, apiBase = DEFAULT_API_BASE, request: typeof fetch = fetch) {
     this.storage = storage;
+    this.apiBase = apiBase;
+    this.request = request;
+  }
+
+  private async fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
+    const response = await this.request(`${this.apiBase}${url}`, options);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json() as T;
   }
 
   async getDashboard(): Promise<DashboardSnapshot> {
-    const statusPromise = fetchJson<any>('/api/v1/bot/status');
-    const marketPromise = fetchJson<any>('/api/v1/bot/market');
-    const activityPromise = fetchJson<any>('/api/v1/bot/activity').catch(() => ({}));
-    
-    const [statusData, marketData, activityData] = await Promise.all([statusPromise, marketPromise, activityPromise]);
-    
-    let lastPrice = null;
-    let observedAt = null;
-    if (marketData && marketData.prices && marketData.prices.length > 0) {
-      lastPrice = String(marketData.prices[0]);
-    }
-    
+    const [statusData, marketData, activityData] = await Promise.all([
+      this.fetchJson<BotStatusWire>('/api/v1/bot/status'),
+      this.fetchJson<MarketWire>('/api/v1/bot/market'),
+      this.fetchJson<{ events?: any[] }>('/api/v1/bot/activity')
+        .catch((): { events?: any[] } => ({})),
+    ]);
+    const strategy = await this.getStrategy();
     const marketSummary: MarketSummary = {
       symbol: 'BTC-USDT',
-      lastPrice,
-      observedAt,
+      lastPrice: marketData.last_price ?? null,
+      observedAt: marketData.observed_at ?? null,
       source: 'OKX ATK MCP',
-      connection: statusData.bot_status === 'running' ? 'CONNECTED' : 'DISCONNECTED',
+      connection: statusData.market_connected ? 'CONNECTED' : 'DISCONNECTED',
       dataOrigin: 'BACKEND',
-      decision: statusData.strategy_state as DecisionOutcome,
+      decision: decision(statusData.strategy_state),
       decisionReason: statusData.strategy_state || 'Unknown',
     };
-
-    const strategy = await this.getStrategy();
-    
-    const events = (activityData.events || []).map((e: any) => ({
-      id: e.id,
-      at: e.at,
-      title: e.title,
-      detail: e.detail,
-      tone: e.tone || 'neutral',
-      origin: 'BACKEND'
+    const events = (activityData.events || []).map((event: any) => ({
+      id: event.id, at: event.at, title: event.title, detail: event.detail,
+      tone: event.tone || 'neutral', origin: 'BACKEND' as const,
     }));
-
     return {
-      bot: { 
-        status: statusData.bot_status === 'running' ? 'RUNNING' : 'STOPPED', 
-        mode: strategy.executionMode, 
-        startedAt: null 
+      bot: {
+        status: statusData.bot_status === 'running' ? 'RUNNING' : 'STOPPED',
+        mode: statusData.execution_mode,
+        startedAt: null,
       },
       strategy,
       market: marketSummary,
-      autoEarn: statusData.autoEarn === 'ON' ? 'ON' : statusData.autoEarn === 'OFF' ? 'OFF' : 'UNKNOWN',
-      events
+      accountAuth: statusData.account_auth,
+      autoEarn: statusData.auto_earn_status,
+      events,
     };
   }
 
@@ -74,28 +84,25 @@ export class BackendApi implements TradingControlApi {
     if (this.storage) {
       const stored = this.storage.getItem('agent_trading_strategy');
       if (stored) {
-        try {
-          return JSON.parse(stored) as StrategyProfile;
-        } catch { /* return default */ }
+        try { return JSON.parse(stored) as StrategyProfile; }
+        catch { /* return default */ }
       }
     }
     return createDefaultStrategy();
   }
 
   async saveStrategy(profile: StrategyProfile): Promise<StrategyProfile> {
-    if (this.storage) {
-      this.storage.setItem('agent_trading_strategy', JSON.stringify(profile));
-    }
+    if (this.storage) this.storage.setItem('agent_trading_strategy', JSON.stringify(profile));
     return profile;
   }
 
   async startBot(): Promise<DashboardSnapshot> {
-    await fetchJson('/api/v1/bot/start', { method: 'POST' });
+    await this.fetchJson('/api/v1/bot/start', { method: 'POST' });
     return this.getDashboard();
   }
 
   async stopBot(): Promise<DashboardSnapshot> {
-    await fetchJson('/api/v1/bot/stop', { method: 'POST' });
+    await this.fetchJson('/api/v1/bot/stop', { method: 'POST' });
     return this.getDashboard();
   }
 }

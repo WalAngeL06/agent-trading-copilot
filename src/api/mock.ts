@@ -38,7 +38,7 @@ export function createMockApi(storage?: ProfileStorage): TradingControlApi {
       market: { symbol: 'BTC-USDT', lastPrice: null, observedAt: null,
         source: 'OKX ATK MCP', connection: 'DISCONNECTED', dataOrigin: 'MOCK',
         decision: 'NO_SETUP', decisionReason: 'Sample outcome for the UI preview. Strategy engine is not connected.' },
-      autoEarn: 'UNKNOWN', events,
+      accountAuth: 'UNKNOWN', autoEarn: 'UNKNOWN', events,
     });
   }
   return {

@@ -4,7 +4,7 @@ export const TIMEFRAMES = ['1m', '5m', '15m', '30m', '1H', '4H'] as const;
 export type Timeframe = typeof TIMEFRAMES[number];
 export type ConditionId = 'marketStructure' | 'liquiditySweep' | 'manipulation'
   | 'bodyCloseReclaim' | 'premiumDiscount' | 'range';
-export type DecisionOutcome = 'NO_SETUP' | 'WAIT' | 'TRADE_CANDIDATE' | 'BLOCKED' | 'EXECUTED';
+export type DecisionOutcome = 'NO_TRADE' | 'NO_SETUP' | 'WAIT' | 'TRADE_CANDIDATE' | 'BLOCKED' | 'EXECUTED';
 export interface StrategyProfile {
   schemaVersion: 'strategy-profile-local-v1';
   preset: 'SWEEP_REVERSAL' | 'CUSTOM';
@@ -36,6 +36,7 @@ export interface DashboardSnapshot {
   bot: { status: BotStatus; mode: ExecutionMode; startedAt: string | null };
   strategy: StrategyProfile;
   market: MarketSummary;
+  accountAuth: 'CONNECTED' | 'AUTH_MISSING' | 'ERROR' | 'UNKNOWN';
   autoEarn: 'ON' | 'OFF' | 'UNKNOWN';
   events: AgentEvent[];
 }

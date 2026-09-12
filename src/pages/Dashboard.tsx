@@ -3,7 +3,7 @@ import { strategyName } from '../types/control.ts';
 import { Card } from '../components/Card.tsx';
 import { Icon } from '../components/Icon.tsx';
 import { StatusBadge } from '../components/StatusBadge.tsx';
-const decisions: Record<DecisionOutcome, string> = { NO_SETUP: 'NO SETUP', WAIT: 'WAIT',
+const decisions: Record<DecisionOutcome, string> = { NO_TRADE: 'NO TRADE', NO_SETUP: 'NO SETUP', WAIT: 'WAIT',
   TRADE_CANDIDATE: 'TRADE CANDIDATE', BLOCKED: 'BLOCKED', EXECUTED: 'EXECUTED' };
 function timeLabel(at: string): string {
   return new Date(at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
@@ -56,8 +56,8 @@ export function Dashboard({ data, busy, isMock, onStart, onStop, onStrategy }:
         <div className="card-heading"><span className="section-title">OKX Auto Earn</span>
           <StatusBadge tone={data.autoEarn === 'ON' ? 'positive' : 'neutral'}>{data.autoEarn}</StatusBadge></div>
         <h2>Account overview</h2>
-        <p>Account integration is coming soon.</p>
-        <div className="earn-footer"><Icon name="shield" size={16}/><span>No account connected</span></div>
+        <p>Authenticated account reads are read-only.</p>
+        <div className="earn-footer"><Icon name="shield" size={16}/><span>{data.accountAuth}</span></div>
       </Card>
       <Card className="activity-card">
         <div className="card-heading"><span className="section-title">Recent agent activity</span>
