@@ -1,3 +1,37 @@
+# Handoff — trading control Web App shell
+
+Updated: 2026-09-12. Last agent: Codex.
+Work only in Agent Trading-webapp / work/webapp.
+Base: 9d842077581f51b8264344fb331d1123665955e7.
+
+Completed user-authorized Dashboard + Strategy Settings, minimal typed mock API,
+validated browser-local config, optional nonblocking Telegram environment init,
+mobile/desktop styles and lightweight checks. LIVE preview has confirmation
+and warning, and cannot start. No backend/strategy/market/exchange/bot code changed.
+
+Files: package/config/lock/index, src/api, src/types, src/components, src/pages,
+App/main/styles, src/telegram, shell spec/plan/handoff and worktree-local memory.
+Tests/build: npm install and npm run build exit 0, 10 npm test checks pass.
+Browser: both pages and critical controls verified at 390x844/1280x900.
+Important independent review issues fixed and re-reviewed.
+Actual Telegram device launch/authentication remains unverified/unimplemented.
+
+Exact backend gaps and proposals: [webapp-shell](webapp-shell.md).
+Local profiles are UI drafts, not approved strategy definitions or executable risk.
+Real manual analysis already exists at the base but is not wired into this shell.
+Do not map the current backend unconfigured result to the sample NO SETUP label.
+
+Final commit follows this documentation freeze and has message
+feat: add Telegram trading control web app shell. Read its hash/clean status
+from Git/final completion report. No pre-existing uncommitted work was present.
+All completed scoped files are included in that commit; ignored node_modules
+and dist are local build artifacts. No merge, push or tag.
+
+Stop. Await a new integration instruction. Keep other worktrees untouched.
+The prior shared backend checkpoint handoff is retained below as historical context.
+
+---
+
 # Handoff — autonomous analysis contract v0.2 correction
 
 Updated: 2026-09-12. Last agent: Codex.

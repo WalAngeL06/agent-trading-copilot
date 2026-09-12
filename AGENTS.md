@@ -194,3 +194,14 @@ Telegram Mini App UX, bot/interface and frontend tests. Codex owns shared API,
 root integration and shared-memory files, with Claude review. Freeze the shared
 API contract before parallel implementation; **one owner at a time** edits
 trading-intelligence core files. Worktree availability is not Ch.1 permission.
+
+## Authorized isolated frontend shell [U-WEBAPP-SHELL-001]
+
+The 2026-09-12 explicit user instruction authorizes Codex frontend work only in
+Agent Trading-webapp / work/webapp from 9d842077581f51b8264344fb331d1123665955e7.
+Dashboard/Strategy Settings, mock/local config and optional Telegram init are
+implemented; this overrides the earlier automatic-stop/frontend-owner boundary
+for this shell only. LIVE warning/confirmation is a local preview, with startup
+blocked and no execution path. Do not confuse demo presets/risk/modules with
+approved trading rules. See docs/webapp-shell.md. After the requested commit,
+stop; no merge/push/tag or other-worktree edits.

@@ -1,3 +1,24 @@
+# Next task — Web App shell complete; awaiting instruction
+
+Updated: 2026-09-12. Worktree/branch: Agent Trading-webapp / work/webapp.
+Current frontend authority: [U-WEBAPP-SHELL-001].
+
+Stop after the requested frontend checkpoint. Do not auto-start integration,
+strategy algorithms, Swing, execution, bot, authentication or deployment.
+
+When explicitly authorized later, read [shell handoff](webapp-shell.md), the
+local spec and current analysis v0.2 contract. Review/freeze bot lifecycle,
+strategy capabilities/versioned save and event contracts with the backend owner.
+Replace src/api/index.ts's mock factory with a typed adapter. Preserve Decimal
+strings/UTC, original report versions, actual errors/unconfigured outcomes,
+unavailable modules and disabled LIVE execution.
+
+Swing work is independent and is not a prerequisite for this shell.
+The prior backend intelligence next-task record is retained below as history;
+it is not the next instruction for this worktree.
+
+---
+
 # Next task — SWING ENGINE R&D / SPEC
 
 Updated: 2026-09-12. Ch.1 remains incomplete.

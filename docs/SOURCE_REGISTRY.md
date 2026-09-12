@@ -46,3 +46,14 @@ Ch.1 Backend Targets #1/#2 and the contract correction are verified; subsequent 
 by its next user instruction and Ch.1 is not complete.
 Chapter sequence: Ch.0 Base Setup / Product Re-Scope; Ch.1 Product MVP & UX;
 Ch.2 Trading Intelligence; Ch.3 Agent Workflows; Ch.4 Validation & Demo.
+
+## [U-WEBAPP-SHELL-001] — isolated trading control frontend
+
+User instruction, 2026-09-12: React/Vite/TypeScript Dashboard and Strategy Settings
+in Agent Trading-webapp / work/webapp, with typed mock/local data and optional
+Telegram WebApp detection. Authorizes local preset/timeframe/module/risk/mode
+controls and confirmed LIVE preview without execution. Explicitly excludes
+Swing/strategy/market logic, exchange writes, bot, backend persistence and charts.
+Demo defaults and switch availability are UI configuration, not source-confirmed
+strategy predicates or empirical trading validation. Details: [shell spec](specs/webapp-shell-v0.1.md)
+and [handoff](webapp-shell.md). Requested commit only; no merge/push/tag.

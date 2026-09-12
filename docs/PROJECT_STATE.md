@@ -1,3 +1,28 @@
+# Project state — isolated Web App shell
+
+Updated: 2026-09-12. Owner: Codex. Worktree: Agent Trading-webapp.
+Branch: work/webapp. Base: 9d842077581f51b8264344fb331d1123665955e7.
+Authority: [U-WEBAPP-SHELL-001], explicit two-screen frontend instruction.
+
+Dashboard and Strategy Settings are implemented with React/Vite/TypeScript.
+All trading controls/data are local/mock; the optional Telegram SDK initializes
+the WebView shell. No real execution, backend/core edit, bot or chart was added.
+LIVE is a confirmed local preference and is blocked at startup.
+Config is browser-local; bot state/activity reset on reload.
+
+Verified: npm install/build exit 0; 10 Node checks pass; browser checks at
+390x844 and 1280x900 with no horizontal overflow/console errors. Independent
+read-only review findings were fixed and re-reviewed with no important issues.
+See [shell handoff](webapp-shell.md) for files, limits and backend gaps.
+Final checkpoint is the commit containing this record, using the requested
+message; obtain its exact hash/status from Git/final report. No merge/push/tag.
+
+Stop after this shell checkpoint. This worktree's frontend scope does not
+authorize Swing or backend implementation. The backend checkpoint record below
+is preserved as history; frontend/planned claims there are superseded locally.
+
+---
+
 # Project state
 
 Updated: 2026-09-12. Owner: Codex.

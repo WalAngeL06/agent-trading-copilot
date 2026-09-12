@@ -1,3 +1,15 @@
+## Web App control shell (work/webapp)
+
+This isolated branch adds a mobile-first React/Vite/TypeScript Dashboard and
+Strategy Settings. From this worktree: npm install, then npm run dev.
+npm run build creates dist; npm test runs 10 small checks.
+No backend or Telegram account is needed for local development.
+
+Controls and sample decisions are local/demo. LIVE selection is a confirmed
+preview and remains blocked; no real execution, PAPER simulator or bot.
+See [Web App handoff](docs/webapp-shell.md) for integration contracts and limits.
+The backend foundation described below is preserved unchanged.
+
 # Agent Trading
 
 Açık kaynak, self-hosted otonom trading ajanının başlangıç altyapısı.
