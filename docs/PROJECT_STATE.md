@@ -1,3 +1,17 @@
+# Current state — isolated hackathon integration
+
+2026-09-12. Integration branch: `work/hackathon-integration`; worktree:
+`C:/Users/Serdar Arif/Desktop/Agent Trading-integration`. Exact base:
+`50146110f727048677b7d6c6643221f00d77cf22`. User requested cherry-picks
+`75d1200898185b22cb582230f1891a81630b0e3d`, `d6933cf`, `8322fab`, followed
+by full Python and frontend install/build/test verification and clean Git status.
+Documentation conflicts preserve the source records as historical context.
+No new features or behavior changes are authorized. Fresh verification and exact
+HEAD are recorded in the final integration report; inherited counts below are
+historical. STOP after verification; no push/tag. Other worktrees are preserved.
+
+---
+
 # Project state — isolated Web App shell
 
 Updated: 2026-09-12. Owner: Codex. Worktree: Agent Trading-webapp.
@@ -24,6 +38,38 @@ is preserved as history; frontend/planned claims there are superseded locally.
 ---
 
 # Project state
+
+## Current isolated task — OKX capabilities [U-OKX-CAP-001]
+
+2026-09-12, Codex. Capability research completed only on
+`work/okx-capabilities` in `C:/Users/Serdar Arif/Desktop/Agent Trading-okx`,
+from `9d842077581f51b8264344fb331d1123665955e7`.
+[Report](research/okx-tr-capabilities-2026-09-12.md);
+[sanitized discovery/evidence](research/okx-tr-capabilities-2026-09-12.json).
+
+Connected TR MCP 1.5.0 exposes 165 tools; 13 distinct read tools succeeded.
+Trading/funding reads and Earn status are verified on the real connected
+account. USDT Auto Lend is supported but off; Auto Staking is unsupported for
+that observed currency. Flexible/fixed/on-chain holdings lists are empty.
+Spot orders/fills and pending trailing listing succeed. Spot/trailing and Earn
+writes are discovered only, never executed. Simulated Earn read returns 50038.
+Local CLI has no key profiles and no OAuth login; fresh read-only ATK 1.4.6
+SDK discovery returns 31 tools but private modules require auth (AUTH_MISSING).
+
+170 existing tests pass in this worktree, zero failures/errors. The existing
+backend interpreter was reused without installing dependencies, and imports
+were verified to resolve to this OKX checkout. Product source/tests/dependencies
+are unchanged. No account adapter/private endpoint, Swing, strategy, frontend
+or LIVE integration was added. Zero exchange writes/transfers/settings changes.
+Commit only this coherent research; no merge/push/tag. STOP after the commit.
+A future owner-only balance/Earn read contract needs separate approval and
+independent TR read authentication. Connected desktop auth is not product proof.
+
+## Preserved backend checkpoint context
+
+The remainder records the inherited 9d84207 backend state and its prior task;
+it does not authorize that historical next task or any additional work here.
+
 
 Updated: 2026-09-12. Owner: Codex.
 Chapter: **Ch.1 — Product MVP & Backend Foundation**.

@@ -1,0 +1,2296 @@
+{
+  "schema_version": "okx-capability-audit-v1",
+  "date": "2026-09-12",
+  "evidence_id": "E-OKX-CAP-001",
+  "authorization_id": "U-OKX-CAP-001",
+  "branch": "work/okx-capabilities",
+  "worktree": "C:\\Users\\Serdar Arif\\Desktop\\Agent Trading-okx",
+  "base_checkpoint": "9d842077581f51b8264344fb331d1123665955e7",
+  "scope": "Capability research only; no product code, strategy, Swing, frontend or private product adapter changes.",
+  "safety": {
+    "exchange_write_calls": 0,
+    "trade_calls": 0,
+    "fund_transfer_calls": 0,
+    "earn_setting_or_subscription_calls": 0,
+    "application_live_enabled": false,
+    "personal_amounts_and_identifiers_retained": false
+  },
+  "discovery": {
+    "remote_tr": {
+      "source": "Current session ALL_TOOLS runtime tool definitions; system_get_capabilities",
+      "available_tool_count": 165,
+      "tool_names": [
+        "mcp__okx_tr__account_get_asset_balance",
+        "mcp__okx_tr__account_get_balance",
+        "mcp__okx_tr__account_get_bills",
+        "mcp__okx_tr__account_get_bills_archive",
+        "mcp__okx_tr__account_get_config",
+        "mcp__okx_tr__account_get_max_avail_size",
+        "mcp__okx_tr__account_get_max_size",
+        "mcp__okx_tr__account_get_max_withdrawal",
+        "mcp__okx_tr__account_get_positions",
+        "mcp__okx_tr__account_get_positions_history",
+        "mcp__okx_tr__account_get_trade_fee",
+        "mcp__okx_tr__account_set_position_mode",
+        "mcp__okx_tr__account_transfer",
+        "mcp__okx_tr__dca_create_order",
+        "mcp__okx_tr__dca_get_order_details",
+        "mcp__okx_tr__dca_get_orders",
+        "mcp__okx_tr__dca_get_sub_orders",
+        "mcp__okx_tr__dca_stop_order",
+        "mcp__okx_tr__dcd_get_currency_pairs",
+        "mcp__okx_tr__dcd_get_order_state",
+        "mcp__okx_tr__dcd_get_orders",
+        "mcp__okx_tr__dcd_get_products",
+        "mcp__okx_tr__dcd_redeem",
+        "mcp__okx_tr__dcd_subscribe",
+        "mcp__okx_tr__earn_auto_set",
+        "mcp__okx_tr__earn_fixed_purchase",
+        "mcp__okx_tr__earn_fixed_redeem",
+        "mcp__okx_tr__earn_get_fixed_order_list",
+        "mcp__okx_tr__earn_get_flash_earn_projects",
+        "mcp__okx_tr__earn_get_lending_history",
+        "mcp__okx_tr__earn_get_lending_rate_history",
+        "mcp__okx_tr__earn_get_savings_balance",
+        "mcp__okx_tr__earn_savings_purchase",
+        "mcp__okx_tr__earn_savings_redeem",
+        "mcp__okx_tr__earn_set_lending_rate",
+        "mcp__okx_tr__event_amend_order",
+        "mcp__okx_tr__event_browse",
+        "mcp__okx_tr__event_cancel_order",
+        "mcp__okx_tr__event_get_events",
+        "mcp__okx_tr__event_get_fills",
+        "mcp__okx_tr__event_get_markets",
+        "mcp__okx_tr__event_get_orders",
+        "mcp__okx_tr__event_get_series",
+        "mcp__okx_tr__event_place_order",
+        "mcp__okx_tr__futures_amend_algo_order",
+        "mcp__okx_tr__futures_amend_order",
+        "mcp__okx_tr__futures_batch_amend",
+        "mcp__okx_tr__futures_batch_cancel",
+        "mcp__okx_tr__futures_batch_orders",
+        "mcp__okx_tr__futures_cancel_algo_orders",
+        "mcp__okx_tr__futures_cancel_order",
+        "mcp__okx_tr__futures_close_position",
+        "mcp__okx_tr__futures_get_algo_orders",
+        "mcp__okx_tr__futures_get_fills",
+        "mcp__okx_tr__futures_get_leverage",
+        "mcp__okx_tr__futures_get_order",
+        "mcp__okx_tr__futures_get_orders",
+        "mcp__okx_tr__futures_get_positions",
+        "mcp__okx_tr__futures_place_algo_order",
+        "mcp__okx_tr__futures_place_move_stop_order",
+        "mcp__okx_tr__futures_place_order",
+        "mcp__okx_tr__futures_set_leverage",
+        "mcp__okx_tr__grid_amend_order",
+        "mcp__okx_tr__grid_close_position",
+        "mcp__okx_tr__grid_create_order",
+        "mcp__okx_tr__grid_get_liquidate_price",
+        "mcp__okx_tr__grid_get_order_details",
+        "mcp__okx_tr__grid_get_orders",
+        "mcp__okx_tr__grid_get_positions",
+        "mcp__okx_tr__grid_get_sub_orders",
+        "mcp__okx_tr__grid_stop_order",
+        "mcp__okx_tr__market_filter",
+        "mcp__okx_tr__market_filter_oi_change",
+        "mcp__okx_tr__market_get_candles",
+        "mcp__okx_tr__market_get_funding_rate",
+        "mcp__okx_tr__market_get_index_candles",
+        "mcp__okx_tr__market_get_index_ticker",
+        "mcp__okx_tr__market_get_indicator",
+        "mcp__okx_tr__market_get_instruments",
+        "mcp__okx_tr__market_get_instruments_by_category",
+        "mcp__okx_tr__market_get_mark_price",
+        "mcp__okx_tr__market_get_oi_history",
+        "mcp__okx_tr__market_get_open_interest",
+        "mcp__okx_tr__market_get_orderbook",
+        "mcp__okx_tr__market_get_pair_spread",
+        "mcp__okx_tr__market_get_price_limit",
+        "mcp__okx_tr__market_get_stock_tokens",
+        "mcp__okx_tr__market_get_ticker",
+        "mcp__okx_tr__market_get_tickers",
+        "mcp__okx_tr__market_get_trades",
+        "mcp__okx_tr__market_list_indicators",
+        "mcp__okx_tr__news_get_by_coin",
+        "mcp__okx_tr__news_get_coin_sentiment",
+        "mcp__okx_tr__news_get_detail",
+        "mcp__okx_tr__news_get_domains",
+        "mcp__okx_tr__news_get_economic_calendar",
+        "mcp__okx_tr__news_get_latest",
+        "mcp__okx_tr__news_get_sentiment_ranking",
+        "mcp__okx_tr__news_list_calendar_regions",
+        "mcp__okx_tr__news_search",
+        "mcp__okx_tr__onchain_earn_cancel",
+        "mcp__okx_tr__onchain_earn_get_active_orders",
+        "mcp__okx_tr__onchain_earn_get_offers",
+        "mcp__okx_tr__onchain_earn_get_order_history",
+        "mcp__okx_tr__onchain_earn_purchase",
+        "mcp__okx_tr__onchain_earn_redeem",
+        "mcp__okx_tr__option_amend_algo_order",
+        "mcp__okx_tr__option_amend_order",
+        "mcp__okx_tr__option_batch_cancel",
+        "mcp__okx_tr__option_cancel_algo_orders",
+        "mcp__okx_tr__option_cancel_order",
+        "mcp__okx_tr__option_get_algo_orders",
+        "mcp__okx_tr__option_get_fills",
+        "mcp__okx_tr__option_get_greeks",
+        "mcp__okx_tr__option_get_instruments",
+        "mcp__okx_tr__option_get_order",
+        "mcp__okx_tr__option_get_orders",
+        "mcp__okx_tr__option_get_positions",
+        "mcp__okx_tr__option_place_algo_order",
+        "mcp__okx_tr__option_place_order",
+        "mcp__okx_tr__skills_download",
+        "mcp__okx_tr__skills_get_categories",
+        "mcp__okx_tr__skills_search",
+        "mcp__okx_tr__smartmoney_get_performance_by_trader",
+        "mcp__okx_tr__smartmoney_get_signal_overview_by_filter",
+        "mcp__okx_tr__smartmoney_get_signal_overview_by_trader",
+        "mcp__okx_tr__smartmoney_get_signal_trend_by_filter",
+        "mcp__okx_tr__smartmoney_get_signal_trend_by_trader",
+        "mcp__okx_tr__smartmoney_get_trader_orders_history",
+        "mcp__okx_tr__smartmoney_get_trader_positions",
+        "mcp__okx_tr__smartmoney_get_trader_positions_history",
+        "mcp__okx_tr__smartmoney_get_traders_by_filter",
+        "mcp__okx_tr__smartmoney_search_trader",
+        "mcp__okx_tr__spot_amend_algo_order",
+        "mcp__okx_tr__spot_amend_order",
+        "mcp__okx_tr__spot_batch_amend",
+        "mcp__okx_tr__spot_batch_cancel",
+        "mcp__okx_tr__spot_batch_orders",
+        "mcp__okx_tr__spot_cancel_algo_order",
+        "mcp__okx_tr__spot_cancel_order",
+        "mcp__okx_tr__spot_get_algo_orders",
+        "mcp__okx_tr__spot_get_fills",
+        "mcp__okx_tr__spot_get_order",
+        "mcp__okx_tr__spot_get_orders",
+        "mcp__okx_tr__spot_place_algo_order",
+        "mcp__okx_tr__spot_place_order",
+        "mcp__okx_tr__spot_set_leverage",
+        "mcp__okx_tr__swap_amend_algo_order",
+        "mcp__okx_tr__swap_batch_amend",
+        "mcp__okx_tr__swap_batch_cancel",
+        "mcp__okx_tr__swap_batch_orders",
+        "mcp__okx_tr__swap_cancel_algo_orders",
+        "mcp__okx_tr__swap_cancel_order",
+        "mcp__okx_tr__swap_close_position",
+        "mcp__okx_tr__swap_get_algo_orders",
+        "mcp__okx_tr__swap_get_fills",
+        "mcp__okx_tr__swap_get_leverage",
+        "mcp__okx_tr__swap_get_order",
+        "mcp__okx_tr__swap_get_orders",
+        "mcp__okx_tr__swap_get_positions",
+        "mcp__okx_tr__swap_place_algo_order",
+        "mcp__okx_tr__swap_place_move_stop_order",
+        "mcp__okx_tr__swap_place_order",
+        "mcp__okx_tr__swap_set_leverage",
+        "mcp__okx_tr__system_get_capabilities"
+      ],
+      "capabilities": {
+        "server": {
+          "name": "okx-trade-mcp-server",
+          "version": "1.5.0"
+        },
+        "capabilities": {
+          "readOnly": false,
+          "hasAuth": true,
+          "demo": false,
+          "moduleAvailability": {
+            "market": {
+              "status": "enabled"
+            },
+            "spot": {
+              "status": "enabled"
+            },
+            "swap": {
+              "status": "enabled"
+            },
+            "futures": {
+              "status": "enabled"
+            },
+            "option": {
+              "status": "enabled"
+            },
+            "account": {
+              "status": "enabled"
+            },
+            "event": {
+              "status": "enabled"
+            },
+            "news": {
+              "status": "enabled"
+            },
+            "smartmoney": {
+              "status": "enabled"
+            },
+            "earn.savings": {
+              "status": "enabled"
+            },
+            "earn.onchain": {
+              "status": "enabled"
+            },
+            "earn.dcd": {
+              "status": "enabled"
+            },
+            "earn.autoearn": {
+              "status": "enabled"
+            },
+            "earn.flash": {
+              "status": "enabled"
+            },
+            "bot.grid": {
+              "status": "enabled"
+            },
+            "bot.dca": {
+              "status": "enabled"
+            }
+          }
+        },
+        "timestamp": "2026-09-12T11:37:34.123317093Z"
+      },
+      "focus_tool_definitions": [
+        {
+          "name": "mcp__okx_tr__account_get_asset_balance",
+          "description": "Get funding account balance (asset account). Different from account_get_balance which queries the trading account. Optionally includes total asset valuation across all account types (trading, funding, earn, etc.).\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__account_get_asset_balance(args: {\n  // e.g. BTC or BTC,ETH. Omit for all.\n  ccy?: string;\n  // Include total asset valuation breakdown by account type (trading/funding/earn). Default false.\n  showValuation?: boolean;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n  // Currency used to denominate the total asset valuation (e.g. USDT, BTC). Default USDT. Only applies when showValuation=true.\n  valuationCcy?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__account_get_balance",
+          "description": "Get account balance for trading account. Returns balances for all currencies or a specific one.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__account_get_balance(args: {\n  // e.g. BTC or BTC,ETH. Omit for all.\n  ccy?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__account_get_bills",
+          "description": "Get account ledger: fees paid, funding charges, realized PnL, transfers, etc. Default 20 records (last 7 days), max 100.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__account_get_bills(args: {\n  // Pagination: before this bill ID\n  after?: string;\n  // Pagination: after this bill ID\n  before?: string;\n  // Start time (ms)\n  begin?: string;\n  // e.g. USDT\n  ccy?: string;\n  // End time (ms)\n  end?: string;\n  instType?: \"SPOT\" | \"MARGIN\" | \"SWAP\" | \"FUTURES\" | \"OPTION\" | \"EVENTS\";\n  // Max results (default 20)\n  limit?: number;\n  mgnMode?: \"isolated\" | \"cross\";\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n  // 1=transfer,2=trade,3=delivery,4=auto convert,5=liquidation,6=margin transfer,7=interest,8=funding fee,9=adl,10=clawback,11=sys convert,12=strategy transfer,13=ddh\n  type?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__account_get_bills_archive",
+          "description": "Get archived account ledger (bills older than 7 days, up to 3 months). Use account_get_bills for recent 7-day records. Default 20 records, max 100.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__account_get_bills_archive(args: {\n  // Pagination: before this bill ID\n  after?: string;\n  // Pagination: after this bill ID\n  before?: string;\n  // Start time (ms)\n  begin?: string;\n  // e.g. USDT\n  ccy?: string;\n  // End time (ms)\n  end?: string;\n  instType?: \"SPOT\" | \"MARGIN\" | \"SWAP\" | \"FUTURES\" | \"OPTION\";\n  // Max results (default 20)\n  limit?: number;\n  mgnMode?: \"isolated\" | \"cross\";\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n  // 1=transfer,2=trade,3=delivery,4=auto convert,5=liquidation,6=margin transfer,7=interest,8=funding fee,9=adl,10=clawback,11=sys convert,12=strategy transfer,13=ddh\n  type?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__account_get_config",
+          "description": "Get account configuration: position mode (net vs hedge), account level, auto-loan settings, etc. Note: `settleCcy` is the current settlement currency for USDS-margined contracts. `settleCcyList` is the list of available settlement currencies to choose from. These fields only apply to USDS-margined contracts and can be ignored for standard USDT/coin-margined trading.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__account_get_config(args: {\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__account_get_max_avail_size",
+          "description": "Get maximum available size for opening or reducing a position. Different from account_get_max_size which calculates new order size.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__account_get_max_avail_size(args: {\n  // Margin currency. Required for isolated MARGIN mode.\n  ccy?: string;\n  // e.g. BTC-USDT-SWAP or BTC-USDT\n  instId: string;\n  // true=calculate max size for closing position\n  reduceOnly?: boolean;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n  // cash=spot\n  tdMode: \"cross\" | \"isolated\" | \"cash\";\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__account_get_max_size",
+          "description": "Get max buy/sell order size for a SWAP/FUTURES instrument given current balance and leverage. Useful before placing orders.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__account_get_max_size(args: {\n  // Margin currency. Required for isolated mode.\n  ccy?: string;\n  // e.g. BTC-USDT-SWAP\n  instId: string;\n  // Leverage (defaults to account setting)\n  leverage?: string;\n  // Limit order price (omit for market)\n  px?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n  tdMode: \"cross\" | \"isolated\";\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__account_get_max_withdrawal",
+          "description": "Get maximum withdrawable amount for a currency from the trading account. Useful before initiating a transfer or withdrawal.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__account_get_max_withdrawal(args: {\n  // e.g. USDT or BTC,ETH. Omit for all.\n  ccy?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__account_get_positions",
+          "description": "Get current open positions across all instrument types (MARGIN, SWAP, FUTURES, OPTION, EVENTS). Use swap_get_positions for SWAP/FUTURES-only queries.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__account_get_positions(args: {\n  // e.g. BTC-USDT-SWAP\n  instId?: string;\n  instType?: \"MARGIN\" | \"SWAP\" | \"FUTURES\" | \"OPTION\" | \"EVENTS\";\n  posId?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__account_get_positions_history",
+          "description": "Get closed position history for SWAP or FUTURES. Default 20 records, max 100.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__account_get_positions_history(args: {\n  // Pagination: before this timestamp (ms)\n  after?: string;\n  // Pagination: after this timestamp (ms)\n  before?: string;\n  // e.g. BTC-USDT-SWAP\n  instId?: string;\n  // Default SWAP\n  instType?: \"SWAP\" | \"FUTURES\" | \"MARGIN\" | \"OPTION\" | \"EVENTS\";\n  // Max results (default 20)\n  limit?: number;\n  mgnMode?: \"cross\" | \"isolated\";\n  posId?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n  // 1=close long,2=close short,3=liq long,4=liq short,5=ADL long,6=ADL short\n  type?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__account_get_trade_fee",
+          "description": "Get maker/taker fee rates for the account. Useful to understand your fee tier before trading.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__account_get_trade_fee(args: {\n  // e.g. BTC-USDT-SWAP\n  instId?: string;\n  instType: \"SPOT\" | \"MARGIN\" | \"SWAP\" | \"FUTURES\" | \"OPTION\" | \"EVENTS\";\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__account_set_position_mode",
+          "description": "Switch between net position mode and long/short hedge mode. net: one position per instrument (default). long_short_mode: separate long and short positions. [CAUTION] Requires no open positions or pending orders.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__account_set_position_mode(args: {\n  // long_short_mode=hedge; net_mode=one-way\n  posMode: \"long_short_mode\" | \"net_mode\";\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__account_transfer",
+          "description": "Transfer funds between accounts (trading, funding, etc.). [CAUTION] Moves real funds.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__account_transfer(args: {\n  // Transfer amount\n  amt: string;\n  // e.g. USDT\n  ccy: string;\n  // Client ID (max 32 chars)\n  clientId?: string;\n  // Source account: 6=funding, 18=trading (unified)\n  from: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n  // Sub-account name. Required when type=1/2/3\n  subAcct?: string;\n  // Destination account: 6=funding, 18=trading (unified)\n  to: string;\n  // 0=main account (default), 1=main→sub, 2=sub→main, 3=sub→sub\n  type?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__dcd_get_currency_pairs",
+          "description": "Get available DCD currency pairs.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__dcd_get_currency_pairs(args: { [key: string]: unknown; }): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__dcd_get_order_state",
+          "description": "Check DCD order state after subscription (returns ordId + state only). For full order details (productId, strike, yield, settlement info), use dcd_get_orders instead.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__dcd_get_order_state(args: {\n  // Order ID\n  ordId: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__dcd_get_orders",
+          "description": "Get DCD order history. Yields in response are decimal fractions, not percentages.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__dcd_get_orders(args: {\n  // Begin timestamp, Unix ms\n  begin?: string;\n  // Cursor for newer records\n  beginId?: string;\n  // End timestamp, Unix ms\n  end?: string;\n  // Cursor for older records\n  endId?: string;\n  // Default 100\n  limit?: number;\n  // Filter by order ID (overrides other filters)\n  ordId?: string;\n  // e.g. BTC-USDT-260327-77000-C\n  productId?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n  // Filter by state: initial | live | pending_settle | settled | pending_redeem | redeemed | rejected\n  state?: string;\n  // Underlying index, e.g. BTC-USD\n  uly?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__dcd_get_products",
+          "description": "Get DCD products with yield and quota info. Yields in response are decimal fractions, not percentages.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__dcd_get_products(args: {\n  // Base currency, e.g. BTC\n  baseCcy: string;\n  // Option type: C (Call, sell high) or P (Put, buy low)\n  optType: string;\n  // Quote currency, e.g. USDT\n  quoteCcy: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__dcd_redeem",
+          "description": "Redeem a DCD order early. Fetches redeem quote first, then executes. May incur early redemption penalty.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__dcd_redeem(args: {\n  // DCD order ID to redeem\n  ordId: string;\n  // Redeem quote ID. If provided, skips the quote fetch step and uses this quote directly.\n  quoteId?: string;\n  // Whether to use demo trading mode or live trading mode. true = demo trading, false = live trading\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__dcd_subscribe",
+          "description": "Subscribe to a Dual Currency (DCD) product. Fetches a quote first, then executes if minAnnualizedYield threshold is met.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__dcd_subscribe(args: {\n  // Client order ID\n  clOrdId?: string;\n  // Minimum acceptable annualized yield as a percentage, e.g. 5.0 for 5%. Order will be rejected if the quoted yield is below this threshold.\n  minAnnualizedYield?: number;\n  // Currency of the notional size\n  notionalCcy: string;\n  // Notional size of the subscription\n  notionalSz: string;\n  // DCD product ID\n  productId: string;\n  // Whether to use demo trading mode or live trading mode. true = demo trading, false = live trading\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__earn_auto_set",
+          "description": "Enable or disable auto-earn for a currency. earnType='0' for auto-lend+stake (most currencies); earnType='1' for USDG earn (USDG, BUIDL). Use account_get_balance first: if autoLendStatus or autoStakingStatus != 'unsupported', use earnType='0'; for USDG/BUIDL use earnType='1'. [CAUTION] Cannot disable within 24h of enabling.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__earn_auto_set(args: {\n  // turn_on or turn_off\n  action: string;\n  // Currency, e.g. SOL, USDG\n  ccy: string;\n  // 0=auto-lend+stake (default), 1=USDG earn. Omit to use default.\n  earnType?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__earn_fixed_purchase",
+          "description": "Purchase Simple Earn Fixed product, two-step flow. First call (confirm omitted or false): returns purchase preview with product details and risk warning. YOU MUST display the warning field from the preview response to the user VERBATIM before asking for confirmation. Second call (confirm=true): executes the purchase. Only proceed after user explicitly confirms. Orders in pending state can still be cancelled via earn_fixed_redeem; once status changes to earning, funds are LOCKED until maturity and no early redemption is allowed.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__earn_fixed_purchase(args: {\n  // Purchase amount\n  amt: string;\n  // Currency, e.g. USDT\n  ccy: string;\n  // Omit or false to preview; set to true to execute after user confirms\n  confirm?: boolean;\n  // Whether to use demo trading mode or live trading mode. true = demo, false = live\n  simulatedTrading: boolean;\n  // Term, e.g. 90D\n  term: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__earn_fixed_redeem",
+          "description": "Redeem Simple Earn Fixed (定期赚币) order. [CAUTION] Redeems a fixed-term lending order. Always redeems the full order amount. Only orders in 'pending' (匹配中) state can be redeemed — orders in 'earning' state are locked until maturity and cannot be redeemed early. Do NOT use for flexible earn redemption — use earn_savings_redeem instead.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__earn_fixed_redeem(args: {\n  // Request ID of the fixed-term order to redeem\n  reqId: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__earn_get_fixed_order_list",
+          "description": "Get Simple Earn Fixed (定期赚币) lending order list. Returns orders sorted by creation time descending. Use this to check status of fixed-term lending orders (pending/earning/expired/settled/cancelled). Do NOT use for flexible earn balance — use earn_get_savings_balance instead. If the result is empty, do NOT display any fixed-term section in the output.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__earn_get_fixed_order_list(args: {\n  // Currency, e.g. USDT. Omit for all.\n  ccy?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n  // Order state: pending (匹配中), earning (赚币中), expired (逾期), settled (已结算), cancelled (已撤销). Omit for all.\n  state?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__earn_get_flash_earn_projects",
+          "description": "Get Flash Earn projects. Use this to browse upcoming or in-progress Flash Earn opportunities. Do NOT use for purchase or redeem actions — Flash Earn is query-only in this module.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__earn_get_flash_earn_projects(args: {\n  // Status filter. 0=upcoming, 100=in-progress. Defaults to [0,100].\n  status?: Array<number>;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__earn_get_lending_history",
+          "description": "Get personal lending records for Simple Earn (your own lending history). NOT for market rate queries. Returns your lending records with amount, rate, and earnings data.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__earn_get_lending_history(args: {\n  // Pagination: before this record ID\n  after?: string;\n  // Pagination: after this record ID\n  before?: string;\n  // e.g. USDT. Omit for all.\n  ccy?: string;\n  // Max results (default 100)\n  limit?: number;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__earn_get_lending_rate_history",
+          "description": "Query Simple Earn lending rates and fixed-term offers. Use this tool when the user asks about Simple Earn products, current or historical lending rates, or when displaying savings balance with market rate context (市场均利率). Returns lending rate history (lendingRate field, newest-first) AND available fixed-term (定期) offers with APR, term, min amount, and quota — one call gives a complete view of both flexible and fixed options. In fixedOffers: lendQuota = remaining quota (剩余额度), soldOut = whether product is sold out (lendQuota is 0). To get current flexible APY: use limit=1 and read lendingRate.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__earn_get_lending_rate_history(args: {\n  // Pagination: before this timestamp (ms)\n  after?: string;\n  // Pagination: after this timestamp (ms)\n  before?: string;\n  // e.g. USDT. Omit for all.\n  ccy?: string;\n  // Max results (default 7)\n  limit?: number;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__earn_get_savings_balance",
+          "description": "Get Simple Earn (savings/flexible earn) balance. Returns current holdings for all currencies or a specific one. To show market rates alongside balance (市场均利率), call earn_get_lending_rate_history. earn_get_lending_rate_history also returns fixed-term (定期) product offers, so one call gives a complete view of both flexible and fixed options. Do NOT use for fixed-term (定期) order queries — use earn_get_fixed_order_list instead.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__earn_get_savings_balance(args: {\n  // e.g. USDT or BTC. Omit for all.\n  ccy?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__earn_savings_purchase",
+          "description": "Subscribe to OKX Simple Earn (purchase savings). Moves funds from trading account to earn.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__earn_savings_purchase(args: {\n  // Amount to invest\n  amt: string;\n  // Currency to invest, e.g. USDT\n  ccy: string;\n  // Minimum lending rate, e.g. 0.01 for 1%. Defaults to 0.01.\n  rate?: string;\n  // Whether to use demo trading mode or live trading mode. true = demo trading, false = live trading\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__earn_savings_redeem",
+          "description": "Redeem from OKX Simple Earn (withdraw savings back to trading account).\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__earn_savings_redeem(args: {\n  // Amount to redeem\n  amt: string;\n  // Currency to redeem, e.g. USDT\n  ccy: string;\n  // Whether to use demo trading mode or live trading mode. true = demo trading, false = live trading\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__earn_set_lending_rate",
+          "description": "Set lending rate for Simple Earn. [CAUTION] Changes your lending rate preference.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__earn_set_lending_rate(args: {\n  // Currency, e.g. USDT\n  ccy: string;\n  // Minimum lending rate threshold (annual, decimal). e.g. 0.01 = 1%. Only matched when market rate ≥ this value. Keep at 0.01 to maximize matching probability — do NOT raise this to increase yield, as actual yield (lendingRate) is determined by market supply/demand, not this setting.\n  rate: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__futures_place_algo_order",
+          "description": "Place a futures algo order: conditional (TP/SL), oco (TP+SL pair), or move_order_stop (trailing stop).\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__futures_place_algo_order(args: {\n  // Activation price for trailing stop\n  activePx?: string;\n  // Optional 1-16 char alphanumeric AI Builder attribution code. Overrides the OKX order tag.\n  aiBuilderCode?: string;\n  // Callback ratio for trailing stop, e.g. 0.01 for 1%\n  callbackRatio?: string;\n  // Callback spread for trailing stop\n  callbackSpread?: string;\n  // Client-supplied order ID\n  clOrdId?: string;\n  // Instrument ID, e.g. BTC-USDT-240329\n  instId: string;\n  // Algo order type: conditional, oco, or move_order_stop\n  ordType: string;\n  // Position side: long or short (required in hedge mode)\n  posSide?: string;\n  // Whether the order can only reduce the position size\n  reduceOnly?: boolean;\n  // Order side: buy or sell\n  side: string;\n  // true = demo trading, false = live trading\n  simulatedTrading: boolean;\n  // Stop-loss order price; -1 for market order\n  slOrdPx?: string;\n  // Stop-loss trigger price\n  slTriggerPx?: string;\n  // Stop-loss trigger price type: last, index, or mark\n  slTriggerPxType?: string;\n  // Order size in contracts\n  sz: string;\n  // Trade mode: cross or isolated\n  tdMode: string;\n  // Take-profit order price; -1 for market order\n  tpOrdPx?: string;\n  // Take-profit trigger price\n  tpTriggerPx?: string;\n  // Take-profit trigger price type: last, index, or mark\n  tpTriggerPxType?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__futures_place_move_stop_order",
+          "description": "[DEPRECATED] Use futures_place_algo_order with ordType='move_order_stop' instead. Place a futures trailing stop order (move_order_stop algo type).\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__futures_place_move_stop_order(args: {\n  // Activation price; trailing starts when market reaches this price\n  activePx?: string;\n  // Callback ratio for trailing stop, e.g. 0.01 for 1%. Mutually exclusive with callbackSpread\n  callbackRatio?: string;\n  // Callback spread in price units. Mutually exclusive with callbackRatio\n  callbackSpread?: string;\n  // Client-supplied order ID\n  clOrdId?: string;\n  // Instrument ID, e.g. BTC-USDT-240329\n  instId: string;\n  // Position side: long or short (required in hedge mode)\n  posSide?: string;\n  // Whether the order can only reduce the position size\n  reduceOnly?: boolean;\n  // Order side: buy or sell\n  side: string;\n  // true = demo trading, false = live trading\n  simulatedTrading: boolean;\n  // Order size in contracts\n  sz: string;\n  // Trade mode: cross or isolated\n  tdMode: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__onchain_earn_cancel",
+          "description": "Cancel a pending staking/DeFi purchase order. [CAUTION]\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__onchain_earn_cancel(args: {\n  // Order ID\n  ordId: string;\n  // staking|defi\n  protocolType: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__onchain_earn_get_active_orders",
+          "description": "List current active staking/DeFi investments.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__onchain_earn_get_active_orders(args: {\n  // e.g. ETH\n  ccy?: string;\n  // Product ID filter.\n  productId?: string;\n  // staking|defi\n  protocolType?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n  // 8=pending, 13=cancelling, 9=onchain, 1=earning, 2=redeeming\n  state?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__onchain_earn_get_offers",
+          "description": "List staking/DeFi products with APY, terms, and limits. Always show protocol name (protocol field) and earnings currency (earningData[].ccy) when presenting results.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__onchain_earn_get_offers(args: {\n  // e.g. ETH\n  ccy?: string;\n  // Product ID filter.\n  productId?: string;\n  // staking|defi\n  protocolType?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__onchain_earn_get_order_history",
+          "description": "List past staking/DeFi orders including redeemed ones.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__onchain_earn_get_order_history(args: {\n  // Cursor: results older than this order ID.\n  after?: string;\n  // Cursor: results newer than this order ID.\n  before?: string;\n  // e.g. ETH\n  ccy?: string;\n  // Max results (default 100, max 100).\n  limit?: string;\n  // Product ID filter.\n  productId?: string;\n  // staking|defi\n  protocolType?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__onchain_earn_purchase",
+          "description": "Invest in a staking/DeFi product. [CAUTION] Moves real funds.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__onchain_earn_purchase(args: {\n  // Array of {ccy, amt} to invest.\n  investData: Array<{\n  amt: string;\n  // e.g. ETH\n  ccy: string;\n}>;\n  // Product ID\n  productId: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n  // Order tag.\n  tag?: string;\n  // Investment term in days, required for fixed-term products.\n  term?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__onchain_earn_redeem",
+          "description": "Redeem a staking/DeFi investment. [CAUTION] Some products have lock periods, early redemption may incur penalties.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__onchain_earn_redeem(args: {\n  // Allow early exit for fixed-term products, may incur penalties. Default: false.\n  allowEarlyRedeem?: boolean;\n  // Order ID\n  ordId: string;\n  // staking|defi\n  protocolType: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_amend_algo_order",
+          "description": "Amend a pending spot algo order (modify TP/SL prices or size). Also covers TP/SL orders attached when placing the main order — look up algoId via spot_get_algo_orders first.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_amend_algo_order(args: {\n  algoId: string;\n  // e.g. BTC-USDT\n  instId: string;\n  // New SL order price, -1=market\n  newSlOrdPx?: string;\n  // New SL trigger price\n  newSlTriggerPx?: string;\n  // New size in base currency\n  newSz?: string;\n  // New TP order price, -1=market\n  newTpOrdPx?: string;\n  // New TP trigger price\n  newTpTriggerPx?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_amend_order",
+          "description": "Amend an unfilled spot order (modify price or size). To modify attached TP/SL, use the corresponding algo amend tool: spot_amend_algo_order (spot), swap_amend_algo_order (swap), futures_amend_algo_order (futures), option_amend_algo_order (option). Use spot_get_algo_orders to find the algoId for spot orders.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_amend_order(args: {\n  clOrdId?: string;\n  // e.g. BTC-USDT\n  instId: string;\n  // Replacement client order ID\n  newClOrdId?: string;\n  // New price\n  newPx?: string;\n  // New size in base currency\n  newSz?: string;\n  ordId?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_batch_amend",
+          "description": "[CAUTION] Batch amend up to 20 unfilled spot orders.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_batch_amend(args: {\n  // Array (max 20): {instId, ordId?, clOrdId?, newSz?, newPx?}\n  orders: Array<{ [key: string]: unknown; }>;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_batch_cancel",
+          "description": "[CAUTION] Batch cancel up to 20 spot orders.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_batch_cancel(args: {\n  // Array (max 20): {instId, ordId?, clOrdId?}\n  orders: Array<{ [key: string]: unknown; }>;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_batch_orders",
+          "description": "Place, cancel, or amend multiple spot orders in one call. Maximum 20 orders. Use action to specify the operation.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_batch_orders(args: {\n  // Operation to perform: place, cancel, or amend\n  action: string;\n  // Optional 1-16 char alphanumeric AI Builder attribution code. Applies only when action=place.\n  aiBuilderCode?: string;\n  // Array of order objects. For place: each object must contain instId, tdMode, side, ordType, sz, and optionally px, clOrdId, tpTriggerPx, tpOrdPx, tpTriggerPxType, slTriggerPx, slOrdPx, slTriggerPxType. For cancel: each object must contain instId and ordId or clOrdId. For amend: each object must contain instId and ordId or clOrdId, plus newSz or newPx.\n  orders: Array<{ [key: string]: unknown; }>;\n  // true = demo trading, false = live trading\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_cancel_algo_order",
+          "description": "Cancel a spot algo order (TP/SL or trailing stop).\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_cancel_algo_order(args: {\n  // Algo order ID to cancel\n  algoId: string;\n  // Instrument ID, e.g. BTC-USDT\n  instId: string;\n  // true = demo trading, false = live trading\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_cancel_order",
+          "description": "Cancel an unfilled spot order.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_cancel_order(args: {\n  clOrdId?: string;\n  // e.g. BTC-USDT\n  instId: string;\n  ordId?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_get_algo_orders",
+          "description": "Get spot algo orders (TP/SL, OCO, trailing stop). If ordType not specified, returns all types merged.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_get_algo_orders(args: {\n  // Pagination\n  after?: string;\n  // Algo order ID filter\n  algoId?: string;\n  // Pagination\n  before?: string;\n  // Instrument ID filter, e.g. BTC-USDT\n  instId?: string;\n  // Max results per request\n  limit?: number;\n  // Filter by algo type: conditional, oco, or move_order_stop. Omit for all types.\n  ordType?: string;\n  // Whether to use demo trading mode or live trading mode. true = demo trading, false = live trading.\n  simulatedTrading: boolean;\n  // Required when status=history: effective|canceled|order_failed\n  state?: string;\n  // Order status: pending (default) or history\n  status?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_get_fills",
+          "description": "Get spot trade fills (executed trades). Use archive=true for records older than 3 months.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_get_fills(args: {\n  // Pagination: return records before this bill ID\n  after?: string;\n  // true = fetch fills older than 3 months from fills-history endpoint\n  archive?: boolean;\n  // Pagination: return records after this bill ID\n  before?: string;\n  // Filter by start time, Unix timestamp in milliseconds\n  begin?: string;\n  // Filter by end time, Unix timestamp in milliseconds\n  end?: string;\n  // Instrument ID filter, e.g. BTC-USDT\n  instId?: string;\n  // Number of results per request, max 100\n  limit?: number;\n  // Order ID filter\n  ordId?: string;\n  // Whether to use demo trading mode or live trading mode. true = demo trading, false = live trading.\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_get_order",
+          "description": "Get details of a single spot order.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_get_order(args: {\n  // Provide ordId or clOrdId\n  clOrdId?: string;\n  // e.g. BTC-USDT\n  instId: string;\n  // Provide ordId or clOrdId\n  ordId?: string;\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_get_orders",
+          "description": "Get spot orders. Use status=open for pending orders, status=history for last 3 months, status=archive for older records.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_get_orders(args: {\n  // Pagination: return records before this order ID\n  after?: string;\n  // Pagination: return records after this order ID\n  before?: string;\n  // Filter by start time, Unix timestamp in milliseconds\n  begin?: string;\n  // Filter by end time, Unix timestamp in milliseconds\n  end?: string;\n  // Instrument ID filter, e.g. BTC-USDT\n  instId?: string;\n  // Number of results per request, max 100\n  limit?: number;\n  // Order ID filter\n  ordId?: string;\n  // Order type filter\n  ordType?: string;\n  // Whether to use demo trading mode or live trading mode. true = demo trading, false = live trading.\n  simulatedTrading: boolean;\n  // canceled|filled\n  state?: string;\n  // Order status filter: open (default), history, or archive\n  status?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_place_algo_order",
+          "description": "Place a spot algo order: conditional (single TP/SL), oco (TP+SL pair), or move_order_stop (trailing stop).\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_place_algo_order(args: {\n  // Activation price for trailing stop\n  activePx?: string;\n  // Optional 1-16 char alphanumeric AI Builder attribution code. Overrides the OKX order tag.\n  aiBuilderCode?: string;\n  // Callback ratio for trailing stop, e.g. 0.01 for 1%\n  callbackRatio?: string;\n  // Callback spread for trailing stop\n  callbackSpread?: string;\n  // Client-supplied order ID\n  clOrdId?: string;\n  // Instrument ID, e.g. BTC-USDT\n  instId: string;\n  // Algo order type: conditional, oco, or move_order_stop\n  ordType: string;\n  // Order side: buy or sell\n  side: string;\n  // true = demo trading, false = live trading\n  simulatedTrading: boolean;\n  // Stop-loss order price; -1 for market order\n  slOrdPx?: string;\n  // Stop-loss trigger price\n  slTriggerPx?: string;\n  // Stop-loss trigger price type: last, index, or mark\n  slTriggerPxType?: string;\n  // Order size in base currency\n  sz: string;\n  // Trade mode. Defaults to cash for spot\n  tdMode?: string;\n  // Take-profit order price; -1 for market order\n  tpOrdPx?: string;\n  // Take-profit trigger price\n  tpTriggerPx?: string;\n  // Take-profit trigger price type: last, index, or mark\n  tpTriggerPxType?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_place_order",
+          "description": "[CAUTION: places a real order] Place a spot order. Supports limit, market, post_only, fok, ioc order types. Attach TP/SL via tpTriggerPx/slTriggerPx params.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_place_order(args: {\n  // Optional 1-16 char alphanumeric AI Builder attribution code. Overrides the OKX order tag.\n  aiBuilderCode?: string;\n  // Client order ID (max 32 chars)\n  clOrdId?: string;\n  // Instrument ID, e.g. BTC-USDT\n  instId: string;\n  // Order type: market(no px)|limit(px req)|post_only(maker)|fok(all-or-cancel)|ioc(partial)\n  ordType: string;\n  // Required for limit/post_only/fok/ioc\n  px?: string;\n  // Order side: buy or sell\n  side: string;\n  // Whether to use demo trading mode or live trading mode. true = demo trading, false = live trading.\n  simulatedTrading: boolean;\n  // SL order price, -1=market\n  slOrdPx?: string;\n  // SL trigger price\n  slTriggerPx?: string;\n  // SL trigger price source: last(default)|index|mark\n  slTriggerPxType?: string;\n  // Self-trade prevention: cancel_maker|cancel_taker|cancel_both\n  stpMode?: string;\n  // Buy market: quote amount; all others: base amount\n  sz: string;\n  // Trade mode: cash (spot), cross, or isolated\n  tdMode: string;\n  // Size unit. base_ccy(default): sz in base (e.g. BTC), quote_ccy: sz in quote (e.g. USDT)\n  tgtCcy?: string;\n  // condition(default)=trigger-based TP; limit=immediate limit order (no tpTriggerPx needed)\n  tpOrdKind?: string;\n  // TP order price, -1=market\n  tpOrdPx?: string;\n  // TP trigger price\n  tpTriggerPx?: string;\n  // TP trigger price source: last(default)|index|mark\n  tpTriggerPxType?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__spot_set_leverage",
+          "description": "Set leverage for SPOT margin trading. Provide exactly ONE of instId (pair-level) or ccy (currency-level cross, requires borrow-enabled account / multi-ccy / portfolio margin). [CAUTION] Changes risk parameters.\nScenarios:\n  • instId + mgnMode=isolated → pair-level isolated margin\n  • instId + mgnMode=cross    → pair-level cross margin (contract-mode account)\n  • ccy    + mgnMode=cross    → currency-level cross margin (spot-with-borrow / multi-ccy / portfolio margin)\nWhen ccy is supplied, mgnMode MUST be cross. posSide is never applicable to spot margin.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__spot_set_leverage(args: {\n  // Margin currency, e.g. BTC. Required only for currency-level cross margin (borrow-enabled / multi-ccy / portfolio margin). Mutually exclusive with instId.\n  ccy?: string;\n  // Spot pair, e.g. BTC-USDT. Provide instId OR ccy, not both.\n  instId?: string;\n  // Leverage multiplier as a positive number string, e.g. '3'. Max depends on the pair (query market_get_instruments → lever) or the account policy for ccy-level.\n  lever: string;\n  // cross or isolated. Must be cross when ccy is supplied.\n  mgnMode: \"cross\" | \"isolated\";\n  // Set true for simulated (demo) trading. Default: false (live).\n  simulatedTrading: boolean;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__swap_place_algo_order",
+          "description": "Place a swap algo order: conditional (TP/SL), oco (TP+SL pair), or move_order_stop (trailing stop).\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__swap_place_algo_order(args: {\n  // Activation price for trailing stop\n  activePx?: string;\n  // Optional 1-16 char alphanumeric AI Builder attribution code. Overrides the OKX order tag.\n  aiBuilderCode?: string;\n  // Callback ratio for trailing stop, e.g. 0.01 for 1%\n  callbackRatio?: string;\n  // Callback spread for trailing stop\n  callbackSpread?: string;\n  // Client-supplied order ID\n  clOrdId?: string;\n  // Instrument ID, e.g. BTC-USDT-SWAP\n  instId: string;\n  // Algo order type: conditional, oco, or move_order_stop\n  ordType: string;\n  // Position side: long or short (required in hedge mode)\n  posSide?: string;\n  // Whether the order can only reduce the position size\n  reduceOnly?: boolean;\n  // Order side: buy or sell\n  side: string;\n  // true = demo trading, false = live trading\n  simulatedTrading: boolean;\n  // Stop-loss order price; -1 for market order\n  slOrdPx?: string;\n  // Stop-loss trigger price\n  slTriggerPx?: string;\n  // Stop-loss trigger price type: last, index, or mark\n  slTriggerPxType?: string;\n  // Order size in contracts\n  sz: string;\n  // Trade mode: cross or isolated\n  tdMode: string;\n  // Take-profit order price; -1 for market order\n  tpOrdPx?: string;\n  // Take-profit trigger price\n  tpTriggerPx?: string;\n  // Take-profit trigger price type: last, index, or mark\n  tpTriggerPxType?: string;\n}): Promise<CallToolResult>; };\n```"
+        },
+        {
+          "name": "mcp__okx_tr__swap_place_move_stop_order",
+          "description": "[DEPRECATED] Use swap_place_algo_order with ordType='move_order_stop' instead. Place a swap trailing stop order (move_order_stop algo type).\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__okx_tr__swap_place_move_stop_order(args: {\n  // Activation price; trailing starts when market reaches this price\n  activePx?: string;\n  // Callback ratio for trailing stop, e.g. 0.01 for 1%. Mutually exclusive with callbackSpread\n  callbackRatio?: string;\n  // Callback spread in price units. Mutually exclusive with callbackRatio\n  callbackSpread?: string;\n  // Client-supplied order ID\n  clOrdId?: string;\n  // Instrument ID, e.g. BTC-USDT-SWAP\n  instId: string;\n  // Position side: long or short (required in hedge mode)\n  posSide?: string;\n  // Whether the order can only reduce the position size\n  reduceOnly?: boolean;\n  // Order side: buy or sell\n  side: string;\n  // true = demo trading, false = live trading\n  simulatedTrading: boolean;\n  // Order size in contracts\n  sz: string;\n  // Trade mode: cross or isolated\n  tdMode: string;\n}): Promise<CallToolResult>; };\n```"
+        }
+      ]
+    },
+    "other_desktop_market_only": {
+      "source": "system_get_capabilities and current runtime definitions",
+      "tool_names": [
+        "mcp__okx_trade_kit__market_filter",
+        "mcp__okx_trade_kit__market_filter_oi_change",
+        "mcp__okx_trade_kit__market_get_candles",
+        "mcp__okx_trade_kit__market_get_funding_rate",
+        "mcp__okx_trade_kit__market_get_index_candles",
+        "mcp__okx_trade_kit__market_get_index_ticker",
+        "mcp__okx_trade_kit__market_get_indicator",
+        "mcp__okx_trade_kit__market_get_instruments",
+        "mcp__okx_trade_kit__market_get_instruments_by_category",
+        "mcp__okx_trade_kit__market_get_mark_price",
+        "mcp__okx_trade_kit__market_get_oi_history",
+        "mcp__okx_trade_kit__market_get_open_interest",
+        "mcp__okx_trade_kit__market_get_orderbook",
+        "mcp__okx_trade_kit__market_get_pair_spread",
+        "mcp__okx_trade_kit__market_get_price_limit",
+        "mcp__okx_trade_kit__market_get_stock_tokens",
+        "mcp__okx_trade_kit__market_get_ticker",
+        "mcp__okx_trade_kit__market_get_tickers",
+        "mcp__okx_trade_kit__market_get_trades",
+        "mcp__okx_trade_kit__market_list_indicators",
+        "mcp__okx_trade_kit__system_get_capabilities"
+      ],
+      "capabilities": {
+        "tool": "system_get_capabilities",
+        "ok": true,
+        "data": {
+          "server": {
+            "name": "okx-trade-mcp",
+            "version": "1.4.6"
+          },
+          "capabilities": {
+            "readOnly": true,
+            "hasAuth": false,
+            "demo": false,
+            "moduleAvailability": {
+              "market": {
+                "status": "enabled"
+              },
+              "spot": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "swap": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "futures": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "option": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "account": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "event": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "news": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "smartmoney": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "earn.savings": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "earn.onchain": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "earn.dcd": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "earn.autoearn": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "earn.flash": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "bot.grid": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "bot.dca": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "skills": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              }
+            }
+          }
+        },
+        "capabilities": {
+          "readOnly": true,
+          "hasAuth": false,
+          "demo": false,
+          "moduleAvailability": {
+            "market": {
+              "status": "enabled"
+            },
+            "spot": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "swap": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "futures": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "option": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "account": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "event": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "news": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "smartmoney": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "earn.savings": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "earn.onchain": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "earn.dcd": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "earn.autoearn": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "earn.flash": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "bot.grid": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "bot.dca": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            },
+            "skills": {
+              "status": "disabled",
+              "reasonCode": "MODULE_FILTERED"
+            }
+          }
+        },
+        "timestamp": "2026-09-12T11:37:41.117Z"
+      }
+    },
+    "local_read_only": {
+      "serverVersion": "1.4.6",
+      "protocolVersion": "2025-11-25",
+      "site": "tr",
+      "launchModules": [
+        "account",
+        "spot",
+        "earn"
+      ],
+      "readOnly": true,
+      "emptyHome": true,
+      "toolCount": 31,
+      "tools": [
+        {
+          "name": "spot_get_orders",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "open",
+                  "history",
+                  "archive"
+                ]
+              },
+              "instId": {
+                "type": "string",
+                "description": "Instrument ID filter"
+              },
+              "ordType": {
+                "type": "string",
+                "description": "Order type filter"
+              },
+              "state": {
+                "type": "string",
+                "description": "canceled|filled"
+              },
+              "after": {
+                "type": "string",
+                "description": "Cursor: older than this order ID"
+              },
+              "before": {
+                "type": "string",
+                "description": "Cursor: newer than this order ID"
+              },
+              "begin": {
+                "type": "string",
+                "description": "Start time (ms)"
+              },
+              "end": {
+                "type": "string",
+                "description": "End time (ms)"
+              },
+              "limit": {
+                "type": "number",
+                "description": "Max results (default 100)"
+              }
+            }
+          },
+          "annotations": {
+            "title": "Spot Get Orders",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "spot_get_algo_orders",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "history"
+                ],
+                "description": "pending=active (default), history=completed"
+              },
+              "instId": {
+                "type": "string",
+                "description": "Instrument ID filter"
+              },
+              "ordType": {
+                "type": "string",
+                "enum": [
+                  "conditional",
+                  "oco",
+                  "move_order_stop"
+                ],
+                "description": "Filter by type"
+              },
+              "after": {
+                "type": "string",
+                "description": "Cursor: older than this algo ID"
+              },
+              "before": {
+                "type": "string",
+                "description": "Cursor: newer than this algo ID"
+              },
+              "limit": {
+                "type": "number",
+                "description": "Max results (default 100)"
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "effective",
+                  "canceled",
+                  "order_failed"
+                ],
+                "description": "Required for history. effective=triggered, canceled, order_failed. Default: effective."
+              }
+            }
+          },
+          "annotations": {
+            "title": "Spot Get Algo Orders",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "spot_get_fills",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "archive": {
+                "type": "boolean",
+                "description": "true=up to 3mo, false=3d (default)"
+              },
+              "instId": {
+                "type": "string",
+                "description": "Instrument ID filter"
+              },
+              "ordId": {
+                "type": "string",
+                "description": "Order ID filter"
+              },
+              "after": {
+                "type": "string",
+                "description": "Cursor: older than this bill ID"
+              },
+              "before": {
+                "type": "string",
+                "description": "Cursor: newer than this bill ID"
+              },
+              "begin": {
+                "type": "string",
+                "description": "Start time (ms)"
+              },
+              "end": {
+                "type": "string",
+                "description": "End time (ms)"
+              },
+              "limit": {
+                "type": "number",
+                "description": "Max results (default 100 or 20 for archive)"
+              }
+            }
+          },
+          "annotations": {
+            "title": "Spot Get Fills",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "spot_get_order",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "instId": {
+                "type": "string",
+                "description": "e.g. BTC-USDT"
+              },
+              "ordId": {
+                "type": "string",
+                "description": "Provide ordId or clOrdId"
+              },
+              "clOrdId": {
+                "type": "string",
+                "description": "Provide ordId or clOrdId"
+              }
+            },
+            "required": [
+              "instId"
+            ]
+          },
+          "annotations": {
+            "title": "Spot Get Order",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "account_get_balance",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ccy": {
+                "type": "string",
+                "description": "e.g. BTC or BTC,ETH. Omit for all."
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Trading Account Balance",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "account_get_max_size",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "instId": {
+                "type": "string",
+                "description": "e.g. BTC-USDT-SWAP"
+              },
+              "tdMode": {
+                "type": "string",
+                "enum": [
+                  "cross",
+                  "isolated"
+                ]
+              },
+              "px": {
+                "type": "string",
+                "description": "Limit order price (omit for market)"
+              },
+              "leverage": {
+                "type": "string",
+                "description": "Leverage (defaults to account setting)"
+              },
+              "ccy": {
+                "type": "string",
+                "description": "Margin currency. Required for isolated mode."
+              }
+            },
+            "required": [
+              "instId",
+              "tdMode"
+            ]
+          },
+          "annotations": {
+            "title": "Get Max Order Size",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "account_get_asset_balance",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ccy": {
+                "type": "string",
+                "description": "e.g. BTC or BTC,ETH. Omit for all."
+              },
+              "showValuation": {
+                "type": "boolean",
+                "description": "Include total asset valuation breakdown by account type (trading/funding/earn). Default false."
+              },
+              "valuationCcy": {
+                "type": "string",
+                "description": "Currency used to denominate the total asset valuation (e.g. USDT, BTC). Default USDT. Only applies when showValuation=true."
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Funding Account Balance",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "account_get_bills",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "instType": {
+                "type": "string",
+                "enum": [
+                  "SPOT",
+                  "MARGIN",
+                  "SWAP",
+                  "FUTURES",
+                  "OPTION",
+                  "EVENTS"
+                ]
+              },
+              "ccy": {
+                "type": "string",
+                "description": "e.g. USDT"
+              },
+              "mgnMode": {
+                "type": "string",
+                "enum": [
+                  "isolated",
+                  "cross"
+                ]
+              },
+              "type": {
+                "type": "string",
+                "description": "1=transfer,2=trade,3=delivery,4=auto convert,5=liquidation,6=margin transfer,7=interest,8=funding fee,9=adl,10=clawback,11=sys convert,12=strategy transfer,13=ddh"
+              },
+              "after": {
+                "type": "string",
+                "description": "Pagination: before this bill ID"
+              },
+              "before": {
+                "type": "string",
+                "description": "Pagination: after this bill ID"
+              },
+              "begin": {
+                "type": "string",
+                "description": "Start time (ms)"
+              },
+              "end": {
+                "type": "string",
+                "description": "End time (ms)"
+              },
+              "limit": {
+                "type": "number",
+                "description": "Max results (default 20)"
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Account Bills",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "account_get_positions_history",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "instType": {
+                "type": "string",
+                "enum": [
+                  "SWAP",
+                  "FUTURES",
+                  "MARGIN",
+                  "OPTION",
+                  "EVENTS"
+                ],
+                "description": "Default SWAP"
+              },
+              "instId": {
+                "type": "string",
+                "description": "e.g. BTC-USDT-SWAP"
+              },
+              "mgnMode": {
+                "type": "string",
+                "enum": [
+                  "cross",
+                  "isolated"
+                ]
+              },
+              "type": {
+                "type": "string",
+                "description": "1=close long,2=close short,3=liq long,4=liq short,5=ADL long,6=ADL short"
+              },
+              "posId": {
+                "type": "string"
+              },
+              "after": {
+                "type": "string",
+                "description": "Pagination: before this timestamp (ms)"
+              },
+              "before": {
+                "type": "string",
+                "description": "Pagination: after this timestamp (ms)"
+              },
+              "limit": {
+                "type": "number",
+                "description": "Max results (default 20)"
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Closed Positions History",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "account_get_trade_fee",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "instType": {
+                "type": "string",
+                "enum": [
+                  "SPOT",
+                  "MARGIN",
+                  "SWAP",
+                  "FUTURES",
+                  "OPTION",
+                  "EVENTS"
+                ]
+              },
+              "instId": {
+                "type": "string",
+                "description": "e.g. BTC-USDT-SWAP"
+              }
+            },
+            "required": [
+              "instType"
+            ]
+          },
+          "annotations": {
+            "title": "Get Trade Fee Tier",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "account_get_config",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          },
+          "annotations": {
+            "title": "Get Account Configuration",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "account_get_max_withdrawal",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ccy": {
+                "type": "string",
+                "description": "e.g. USDT or BTC,ETH. Omit for all."
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Max Withdrawable Amount",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "account_get_max_avail_size",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "instId": {
+                "type": "string",
+                "description": "e.g. BTC-USDT-SWAP or BTC-USDT"
+              },
+              "tdMode": {
+                "type": "string",
+                "enum": [
+                  "cross",
+                  "isolated",
+                  "cash"
+                ],
+                "description": "cash=spot"
+              },
+              "ccy": {
+                "type": "string",
+                "description": "Margin currency. Required for isolated MARGIN mode."
+              },
+              "reduceOnly": {
+                "type": "boolean",
+                "description": "true=calculate max size for closing position"
+              }
+            },
+            "required": [
+              "instId",
+              "tdMode"
+            ]
+          },
+          "annotations": {
+            "title": "Get Max Available Position Size",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "account_get_positions",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "instType": {
+                "type": "string",
+                "enum": [
+                  "MARGIN",
+                  "SWAP",
+                  "FUTURES",
+                  "OPTION",
+                  "EVENTS"
+                ]
+              },
+              "instId": {
+                "type": "string",
+                "description": "e.g. BTC-USDT-SWAP"
+              },
+              "posId": {
+                "type": "string"
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Current Positions",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "account_get_bills_archive",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "instType": {
+                "type": "string",
+                "enum": [
+                  "SPOT",
+                  "MARGIN",
+                  "SWAP",
+                  "FUTURES",
+                  "OPTION"
+                ]
+              },
+              "ccy": {
+                "type": "string",
+                "description": "e.g. USDT"
+              },
+              "mgnMode": {
+                "type": "string",
+                "enum": [
+                  "isolated",
+                  "cross"
+                ]
+              },
+              "type": {
+                "type": "string",
+                "description": "1=transfer,2=trade,3=delivery,4=auto convert,5=liquidation,6=margin transfer,7=interest,8=funding fee,9=adl,10=clawback,11=sys convert,12=strategy transfer,13=ddh"
+              },
+              "after": {
+                "type": "string",
+                "description": "Pagination: before this bill ID"
+              },
+              "before": {
+                "type": "string",
+                "description": "Pagination: after this bill ID"
+              },
+              "begin": {
+                "type": "string",
+                "description": "Start time (ms)"
+              },
+              "end": {
+                "type": "string",
+                "description": "End time (ms)"
+              },
+              "limit": {
+                "type": "number",
+                "description": "Max results (default 20)"
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Archived Account Bills",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "account_get_balance_all",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ccy": {
+                "type": "string",
+                "description": "Filter by currency, comma-separated (e.g. BTC,ETH). Omit for all. Applied to trading + funding queries only."
+              },
+              "accounts": {
+                "type": "string",
+                "description": "Comma-separated accounts to query: 'trading','funding'. Default 'trading,funding'."
+              },
+              "showValuation": {
+                "type": "boolean",
+                "description": "Include cross-account asset valuation. Default true."
+              },
+              "valuationCcy": {
+                "type": "string",
+                "description": "Currency for valuation (e.g. USDT, BTC). Default USDT. Only effective when showValuation=true."
+              },
+              "preferParallel": {
+                "type": "boolean",
+                "description": "Skip the server-side aggregate endpoint and query trading/funding/valuation directly in parallel. Default false. Use when you need the per-account valuation breakdown or a non-USD valuation currency."
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Aggregate Balance Snapshot",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "earn_get_savings_balance",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ccy": {
+                "type": "string",
+                "description": "e.g. USDT or BTC. Omit for all."
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Simple Earn Balance",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "earn_get_fixed_order_list",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ccy": {
+                "type": "string",
+                "description": "Currency, e.g. USDT. Omit for all."
+              },
+              "state": {
+                "type": "string",
+                "description": "Order state: pending (匹配中), earning (赚币中), expired (逾期), settled (已结算), cancelled (已撤销). Omit for all."
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Fixed-Term Earn Orders",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "earn_get_lending_history",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ccy": {
+                "type": "string",
+                "description": "e.g. USDT. Omit for all."
+              },
+              "after": {
+                "type": "string",
+                "description": "Pagination: before this record ID"
+              },
+              "before": {
+                "type": "string",
+                "description": "Pagination: after this record ID"
+              },
+              "limit": {
+                "type": "number",
+                "description": "Max results (default 100)"
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Lending History",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "earn_get_lending_rate_history",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ccy": {
+                "type": "string",
+                "description": "e.g. USDT. Omit for all."
+              },
+              "after": {
+                "type": "string",
+                "description": "Pagination: before this timestamp (ms)"
+              },
+              "before": {
+                "type": "string",
+                "description": "Pagination: after this timestamp (ms)"
+              },
+              "limit": {
+                "type": "number",
+                "description": "Max results (default 7)"
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Lending Rates & Offers",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "earn_get_fixed_earn_products",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ccy": {
+                "type": "string",
+                "description": "e.g. USDT. Omit for all currencies."
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Fixed-Term Earn Products",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "onchain_earn_get_offers",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "productId": {
+                "type": "string",
+                "description": "Product ID filter."
+              },
+              "protocolType": {
+                "type": "string",
+                "description": "staking|defi"
+              },
+              "ccy": {
+                "type": "string",
+                "description": "e.g. ETH"
+              }
+            }
+          },
+          "annotations": {
+            "title": "On-chain Earn List Offers",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "onchain_earn_get_active_orders",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "productId": {
+                "type": "string",
+                "description": "Product ID filter."
+              },
+              "protocolType": {
+                "type": "string",
+                "description": "staking|defi"
+              },
+              "ccy": {
+                "type": "string",
+                "description": "e.g. ETH"
+              },
+              "state": {
+                "type": "string",
+                "description": "8=pending, 13=cancelling, 9=onchain, 1=earning, 2=redeeming"
+              }
+            }
+          },
+          "annotations": {
+            "title": "On-chain Earn Active Orders",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "onchain_earn_get_order_history",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "productId": {
+                "type": "string",
+                "description": "Product ID filter."
+              },
+              "protocolType": {
+                "type": "string",
+                "description": "staking|defi"
+              },
+              "ccy": {
+                "type": "string",
+                "description": "e.g. ETH"
+              },
+              "after": {
+                "type": "string",
+                "description": "Cursor: results older than this order ID."
+              },
+              "before": {
+                "type": "string",
+                "description": "Cursor: results newer than this order ID."
+              },
+              "limit": {
+                "type": "string",
+                "description": "Max results (default 100, max 100)."
+              }
+            }
+          },
+          "annotations": {
+            "title": "On-chain Earn Order History",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "dcd_get_currency_pairs",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          },
+          "annotations": {
+            "title": "Dual Investment List Currency Pairs",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "dcd_get_products",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "baseCcy": {
+                "type": "string",
+                "description": "Base currency, e.g. BTC"
+              },
+              "quoteCcy": {
+                "type": "string",
+                "description": "Quote currency, e.g. USDT"
+              },
+              "optType": {
+                "type": "string",
+                "description": "Option type: C (Call, sell high) or P (Put, buy low)"
+              }
+            },
+            "required": [
+              "baseCcy",
+              "quoteCcy",
+              "optType"
+            ]
+          },
+          "annotations": {
+            "title": "Dual Investment List Products",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "dcd_get_order_state",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ordId": {
+                "type": "string",
+                "description": "Order ID"
+              }
+            },
+            "required": [
+              "ordId"
+            ]
+          },
+          "annotations": {
+            "title": "Dual Investment Get Order State",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "dcd_get_orders",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ordId": {
+                "type": "string",
+                "description": "Filter by order ID (overrides other filters)"
+              },
+              "productId": {
+                "type": "string",
+                "description": "e.g. BTC-USDT-260327-77000-C"
+              },
+              "uly": {
+                "type": "string",
+                "description": "Underlying index, e.g. BTC-USD"
+              },
+              "state": {
+                "type": "string",
+                "description": "Filter by state: initial | live | pending_settle | settled | pending_redeem | redeemed | rejected"
+              },
+              "beginId": {
+                "type": "string",
+                "description": "Cursor for newer records"
+              },
+              "endId": {
+                "type": "string",
+                "description": "Cursor for older records"
+              },
+              "begin": {
+                "type": "string",
+                "description": "Begin timestamp, Unix ms"
+              },
+              "end": {
+                "type": "string",
+                "description": "End timestamp, Unix ms"
+              },
+              "limit": {
+                "type": "number",
+                "description": "Default 100"
+              }
+            }
+          },
+          "annotations": {
+            "title": "Dual Investment Get Order History",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "earn_get_flash_earn_projects",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Status filter. 0=upcoming, 100=in-progress. Defaults to [0,100]."
+              }
+            }
+          },
+          "annotations": {
+            "title": "Flash Earn List Projects",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "trade_get_history",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "limit": {
+                "type": "number",
+                "description": "Max results (default 20)"
+              },
+              "tool": {
+                "type": "string",
+                "description": "e.g. swap_place_order"
+              },
+              "level": {
+                "type": "string",
+                "enum": [
+                  "INFO",
+                  "WARN",
+                  "ERROR",
+                  "DEBUG"
+                ]
+              },
+              "since": {
+                "type": "string",
+                "description": "ISO 8601 timestamp lower bound"
+              }
+            }
+          },
+          "annotations": {
+            "title": "Get Tool-Call Audit Log",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": true
+          }
+        },
+        {
+          "name": "system_get_capabilities",
+          "inputSchema": {
+            "type": "object",
+            "additionalProperties": false
+          },
+          "annotations": {
+            "title": "Server Capabilities Snapshot",
+            "read_only_hint": true,
+            "destructive_hint": false,
+            "idempotent_hint": true,
+            "open_world_hint": false
+          }
+        }
+      ],
+      "capabilities": [
+        {
+          "tool": "system_get_capabilities",
+          "ok": true,
+          "data": {
+            "server": {
+              "name": "okx-trade-mcp",
+              "version": "1.4.6"
+            },
+            "capabilities": {
+              "readOnly": true,
+              "hasAuth": false,
+              "demo": false,
+              "moduleAvailability": {
+                "market": {
+                  "status": "disabled",
+                  "reasonCode": "MODULE_FILTERED"
+                },
+                "spot": {
+                  "status": "requires_auth",
+                  "reasonCode": "AUTH_MISSING"
+                },
+                "swap": {
+                  "status": "disabled",
+                  "reasonCode": "MODULE_FILTERED"
+                },
+                "futures": {
+                  "status": "disabled",
+                  "reasonCode": "MODULE_FILTERED"
+                },
+                "option": {
+                  "status": "disabled",
+                  "reasonCode": "MODULE_FILTERED"
+                },
+                "account": {
+                  "status": "requires_auth",
+                  "reasonCode": "AUTH_MISSING"
+                },
+                "event": {
+                  "status": "disabled",
+                  "reasonCode": "MODULE_FILTERED"
+                },
+                "news": {
+                  "status": "disabled",
+                  "reasonCode": "MODULE_FILTERED"
+                },
+                "smartmoney": {
+                  "status": "disabled",
+                  "reasonCode": "MODULE_FILTERED"
+                },
+                "earn.savings": {
+                  "status": "requires_auth",
+                  "reasonCode": "AUTH_MISSING"
+                },
+                "earn.onchain": {
+                  "status": "requires_auth",
+                  "reasonCode": "AUTH_MISSING"
+                },
+                "earn.dcd": {
+                  "status": "requires_auth",
+                  "reasonCode": "AUTH_MISSING"
+                },
+                "earn.autoearn": {
+                  "status": "requires_auth",
+                  "reasonCode": "AUTH_MISSING"
+                },
+                "earn.flash": {
+                  "status": "requires_auth",
+                  "reasonCode": "AUTH_MISSING"
+                },
+                "bot.grid": {
+                  "status": "disabled",
+                  "reasonCode": "MODULE_FILTERED"
+                },
+                "bot.dca": {
+                  "status": "disabled",
+                  "reasonCode": "MODULE_FILTERED"
+                },
+                "skills": {
+                  "status": "disabled",
+                  "reasonCode": "MODULE_FILTERED"
+                }
+              }
+            }
+          },
+          "capabilities": {
+            "readOnly": true,
+            "hasAuth": false,
+            "demo": false,
+            "moduleAvailability": {
+              "market": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "spot": {
+                "status": "requires_auth",
+                "reasonCode": "AUTH_MISSING"
+              },
+              "swap": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "futures": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "option": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "account": {
+                "status": "requires_auth",
+                "reasonCode": "AUTH_MISSING"
+              },
+              "event": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "news": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "smartmoney": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "earn.savings": {
+                "status": "requires_auth",
+                "reasonCode": "AUTH_MISSING"
+              },
+              "earn.onchain": {
+                "status": "requires_auth",
+                "reasonCode": "AUTH_MISSING"
+              },
+              "earn.dcd": {
+                "status": "requires_auth",
+                "reasonCode": "AUTH_MISSING"
+              },
+              "earn.autoearn": {
+                "status": "requires_auth",
+                "reasonCode": "AUTH_MISSING"
+              },
+              "earn.flash": {
+                "status": "requires_auth",
+                "reasonCode": "AUTH_MISSING"
+              },
+              "bot.grid": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "bot.dca": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              },
+              "skills": {
+                "status": "disabled",
+                "reasonCode": "MODULE_FILTERED"
+              }
+            }
+          },
+          "timestamp": "2026-09-12T11:41:43.118Z"
+        }
+      ]
+    },
+    "cli_catalog": {
+      "version": "1.4.6",
+      "totalTools": 166,
+      "scope": [
+        {
+          "path": "okx account balance",
+          "toolName": "account_get_balance"
+        },
+        {
+          "path": "okx account balance-all",
+          "toolName": "account_get_balance_all"
+        },
+        {
+          "path": "okx account asset-balance",
+          "toolName": "account_get_asset_balance"
+        },
+        {
+          "path": "okx account positions",
+          "toolName": "account_get_positions"
+        },
+        {
+          "path": "okx account positions-history",
+          "toolName": "account_get_positions_history"
+        },
+        {
+          "path": "okx account bills",
+          "toolName": "account_get_bills"
+        },
+        {
+          "path": "okx account fees",
+          "toolName": "account_get_trade_fee"
+        },
+        {
+          "path": "okx account config",
+          "toolName": "account_get_config"
+        },
+        {
+          "path": "okx account set-position-mode",
+          "toolName": "account_set_position_mode"
+        },
+        {
+          "path": "okx account max-size",
+          "toolName": "account_get_max_size"
+        },
+        {
+          "path": "okx account max-avail-size",
+          "toolName": "account_get_max_avail_size"
+        },
+        {
+          "path": "okx account max-withdrawal",
+          "toolName": "account_get_max_withdrawal"
+        },
+        {
+          "path": "okx account transfer",
+          "toolName": "account_transfer"
+        },
+        {
+          "path": "okx account audit",
+          "toolName": "trade_get_history"
+        },
+        {
+          "path": "okx spot orders",
+          "toolName": "spot_get_orders"
+        },
+        {
+          "path": "okx spot get",
+          "toolName": "spot_get_order"
+        },
+        {
+          "path": "okx spot fills",
+          "toolName": "spot_get_fills"
+        },
+        {
+          "path": "okx spot place",
+          "toolName": "spot_place_order"
+        },
+        {
+          "path": "okx spot amend",
+          "toolName": "spot_amend_order"
+        },
+        {
+          "path": "okx spot cancel",
+          "toolName": "spot_cancel_order"
+        },
+        {
+          "path": "okx spot batch",
+          "toolName": "spot_batch_orders"
+        },
+        {
+          "path": "okx spot leverage",
+          "toolName": "spot_set_leverage"
+        },
+        {
+          "path": "okx spot algo orders",
+          "toolName": "spot_get_algo_orders"
+        },
+        {
+          "path": "okx spot algo place",
+          "toolName": "spot_place_algo_order"
+        },
+        {
+          "path": "okx spot algo trail",
+          "toolName": "spot_place_algo_order"
+        },
+        {
+          "path": "okx spot algo amend",
+          "toolName": "spot_amend_algo_order"
+        },
+        {
+          "path": "okx spot algo cancel",
+          "toolName": "spot_cancel_algo_order"
+        },
+        {
+          "path": "okx earn savings balance",
+          "toolName": "earn_get_savings_balance"
+        },
+        {
+          "path": "okx earn savings purchase",
+          "toolName": "earn_savings_purchase"
+        },
+        {
+          "path": "okx earn savings redeem",
+          "toolName": "earn_savings_redeem"
+        },
+        {
+          "path": "okx earn savings set-rate",
+          "toolName": "earn_set_lending_rate"
+        },
+        {
+          "path": "okx earn savings lending-history",
+          "toolName": "earn_get_lending_history"
+        },
+        {
+          "path": "okx earn savings rate-history",
+          "toolName": "earn_get_lending_rate_history"
+        },
+        {
+          "path": "okx earn savings fixed-products",
+          "toolName": "earn_get_fixed_earn_products"
+        },
+        {
+          "path": "okx earn savings fixed-orders",
+          "toolName": "earn_get_fixed_order_list"
+        },
+        {
+          "path": "okx earn savings fixed-purchase",
+          "toolName": "earn_fixed_purchase"
+        },
+        {
+          "path": "okx earn savings fixed-redeem",
+          "toolName": "earn_fixed_redeem"
+        },
+        {
+          "path": "okx earn onchain offers",
+          "toolName": "onchain_earn_get_offers"
+        },
+        {
+          "path": "okx earn onchain purchase",
+          "toolName": "onchain_earn_purchase"
+        },
+        {
+          "path": "okx earn onchain redeem",
+          "toolName": "onchain_earn_redeem"
+        },
+        {
+          "path": "okx earn onchain cancel",
+          "toolName": "onchain_earn_cancel"
+        },
+        {
+          "path": "okx earn onchain orders",
+          "toolName": "onchain_earn_get_active_orders"
+        },
+        {
+          "path": "okx earn onchain history",
+          "toolName": "onchain_earn_get_order_history"
+        },
+        {
+          "path": "okx earn auto-earn status",
+          "toolName": null
+        },
+        {
+          "path": "okx earn auto-earn on",
+          "toolName": "earn_auto_set"
+        },
+        {
+          "path": "okx earn auto-earn off",
+          "toolName": "earn_auto_set"
+        },
+        {
+          "path": "okx earn flash-earn projects",
+          "toolName": "earn_get_flash_earn_projects"
+        },
+        {
+          "path": "okx earn dcd pairs",
+          "toolName": "dcd_get_currency_pairs"
+        },
+        {
+          "path": "okx earn dcd products",
+          "toolName": "dcd_get_products"
+        },
+        {
+          "path": "okx earn dcd quote-and-buy",
+          "toolName": "dcd_subscribe"
+        },
+        {
+          "path": "okx earn dcd redeem-execute",
+          "toolName": "dcd_redeem"
+        },
+        {
+          "path": "okx earn dcd order",
+          "toolName": "dcd_get_order_state"
+        },
+        {
+          "path": "okx earn dcd orders",
+          "toolName": "dcd_get_orders"
+        }
+      ]
+    }
+  },
+  "authentication": {
+    "connected_tr": {
+      "hasAuth": true,
+      "private_reads_verified": true,
+      "grant_scopes": "Not exposed by available runtime tools",
+      "credential_method": "Not exposed; connector authentication is independent of CLI"
+    },
+    "cli": {
+      "version": "1.4.6 (a5dedf45)",
+      "configured_profiles": 0,
+      "api_key_present": false,
+      "oauth_status": "not_logged_in",
+      "site_placeholder": "global (not evidence of a selected site)",
+      "login_attempted": false
+    },
+    "product_private_auth": {
+      "status": "AUTH_MISSING in isolated local MCP",
+      "implemented": false
+    }
+  },
+  "read_checks": [
+    {
+      "tool": "mcp__okx_tr__account_get_asset_balance",
+      "args": {
+        "simulatedTrading": false,
+        "showValuation": false
+      },
+      "isError": false,
+      "code": "0",
+      "message": "",
+      "rowCount": 0,
+      "currencies": []
+    },
+    {
+      "tool": "mcp__okx_tr__account_get_balance",
+      "args": {
+        "simulatedTrading": false
+      },
+      "isError": false,
+      "code": "0",
+      "message": "",
+      "rowCount": 1,
+      "autoEarnFlags": [
+        {
+          "ccy": "USDT",
+          "autoLendStatus": "off",
+          "autoStakingStatus": "unsupported"
+        }
+      ]
+    },
+    {
+      "tool": "mcp__okx_tr__account_get_config",
+      "args": {
+        "simulatedTrading": false
+      },
+      "isError": false,
+      "code": "0",
+      "message": "",
+      "rowCount": 1,
+      "configuration": [
+        {
+          "perm": "",
+          "acctLv": "1",
+          "posMode": "net_mode",
+          "autoLoan": false,
+          "enableSpotBorrow": false
+        }
+      ]
+    },
+    {
+      "tool": "mcp__okx_tr__account_get_trade_fee",
+      "args": {
+        "simulatedTrading": false,
+        "instType": "SPOT",
+        "instId": "BTC-USDT"
+      },
+      "isError": false,
+      "code": "0",
+      "message": "",
+      "rowCount": 1
+    },
+    {
+      "tool": "mcp__okx_tr__earn_get_fixed_order_list",
+      "args": {
+        "simulatedTrading": false
+      },
+      "isError": false,
+      "code": "0",
+      "message": "",
+      "rowCount": 0
+    },
+    {
+      "tool": "mcp__okx_tr__earn_get_flash_earn_projects",
+      "args": {
+        "status": [
+          0,
+          100
+        ]
+      },
+      "isError": false,
+      "code": "0",
+      "message": "",
+      "rowCount": 1
+    },
+    {
+      "tool": "mcp__okx_tr__earn_get_lending_history",
+      "args": {
+        "simulatedTrading": false,
+        "ccy": "USDT",
+        "limit": 1
+      },
+      "isError": false,
+      "code": "0",
+      "message": "",
+      "rowCount": 0
+    },
+    {
+      "tool": "mcp__okx_tr__earn_get_lending_rate_history",
+      "args": {
+        "ccy": "USDT",
+        "limit": 1
+      },
+      "isError": false,
+      "code": "0",
+      "message": "",
+      "rowCount": 1,
+      "dataShape": "array"
+    },
+    {
+      "tool": "mcp__okx_tr__earn_get_savings_balance",
+      "args": {
+        "simulatedTrading": false
+      },
+      "isError": false,
+      "code": "0",
+      "message": "",
+      "rowCount": 0,
+      "currencies": []
+    },
+    {
+      "tool": "mcp__okx_tr__onchain_earn_get_active_orders",
+      "args": {
+        "simulatedTrading": false
+      },
+      "isError": false,
+      "code": "0",
+      "message": "",
+      "rowCount": 0
+    },
+    {
+      "tool": "mcp__okx_tr__spot_get_algo_orders",
+      "args": {
+        "simulatedTrading": false,
+        "ordType": "move_order_stop",
+        "status": "pending",
+        "instId": "BTC-USDT",
+        "limit": 1
+      },
+      "isError": false,
+      "code": "0",
+      "message": "",
+      "rowCount": 0
+    },
+    {
+      "tool": "mcp__okx_tr__spot_get_fills",
+      "args": {
+        "simulatedTrading": false,
+        "instId": "BTC-USDT",
+        "limit": 1
+      },
+      "isError": false,
+      "code": "0",
+      "message": "",
+      "rowCount": 0
+    },
+    {
+      "tool": "mcp__okx_tr__spot_get_orders",
+      "args": {
+        "simulatedTrading": false,
+        "status": "open",
+        "instId": "BTC-USDT",
+        "limit": 1
+      },
+      "isError": false,
+      "code": "0",
+      "message": "",
+      "rowCount": 0
+    }
+  ],
+  "simulated_earn_read": {
+    "tool": "mcp__okx_tr__earn_get_savings_balance",
+    "args": {
+      "simulatedTrading": true
+    },
+    "isError": false,
+    "code": "50038",
+    "message": "This feature is unavailable in demo trading",
+    "rowCount": 0
+  },
+  "limitations": [
+    "Connected desktop private reads do not establish authenticated product-runtime integration.",
+    "Write capabilities are discovered only, never executed; read access does not prove trade permission.",
+    "Empty successful lists do not prove unavailable products, zero total assets, or absent history outside the filter.",
+    "Remote 1.5.0 and local 1.4.6 have different tool surfaces and schemas; rediscover before integration.",
+    "Read-only flash and offers endpoints can require authentication despite lacking a simulatedTrading argument."
+  ]
+}

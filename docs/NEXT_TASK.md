@@ -1,3 +1,13 @@
+# Current next task — STOP after integration verification
+
+2026-09-12. Only the requested three-commit integration and verification are
+authorized on `work/hackathon-integration`. Run full Python tests, frontend
+`npm install`, `npm run build`, `npm test`, and verify clean Git status. Report
+HEAD, source/included commits and results, then STOP. No new features, push/tag
+or automatic continuation of the historical source-branch plans below.
+
+---
+
 # Next task — Web App shell complete; awaiting instruction
 
 Updated: 2026-09-12. Worktree/branch: Agent Trading-webapp / work/webapp.
@@ -18,6 +28,35 @@ The prior backend intelligence next-task record is retained below as history;
 it is not the next instruction for this worktree.
 
 ---
+
+---
+
+# Next task — STOP after OKX capability audit
+
+## Current branch boundary [U-OKX-CAP-001]
+
+2026-09-12. `work/okx-capabilities` in Agent Trading-okx was created from
+`9d842077581f51b8264344fb331d1123665955e7` for capability research only.
+[Results](research/okx-tr-capabilities-2026-09-12.md);
+[exact runtime names and evidence](research/okx-tr-capabilities-2026-09-12.json).
+
+Commit `research: verify OKX account earn and execution capabilities`, then
+STOP. No merge/push/tag or automatic integration. No Swing, strategy, frontend,
+trades, fund movement, Earn enablement or LIVE work is authorized here.
+
+A possible separately approved next integration is an owner-only read contract
+for trading/funding balance, savings balance and balance-derived Auto Earn
+flags. Independent TR authentication is required: connected desktop reads work,
+local CLI and fresh self-hosted MCP have no private auth. Read-only server mode,
+an explicit client allowlist, schema discovery, exact Decimal/UTC handling,
+private-log sanitization and nonzero OKX-code gates precede a real-account read
+proof. Earn simulation returned 50038; do not promise simulated Earn or tested
+write support.
+
+## Preserved backend next-task context
+
+The historical checkpoint plan below is preserved as context and must not
+auto-start from this capability branch.
 
 # Next task — SWING ENGINE R&D / SPEC
 

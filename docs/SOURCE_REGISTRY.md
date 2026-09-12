@@ -57,3 +57,10 @@ Swing/strategy/market logic, exchange writes, bot, backend persistence and chart
 Demo defaults and switch availability are UI configuration, not source-confirmed
 strategy predicates or empirical trading validation. Details: [shell spec](specs/webapp-shell-v0.1.md)
 and [handoff](webapp-shell.md). Requested commit only; no merge/push/tag.
+
+## OKX capability research — 2026-09-12
+
+| ID | Tag | Record | Status / limits |
+|---|---|---|---|
+| [U-OKX-CAP-001] | [U] | User authorized an isolated work/okx-capabilities audit from 9d842077581f51b8264344fb331d1123665955e7; read-only capability checks, coherent commit and stop | No trades, transfers, Earn toggles, LIVE, Swing/frontend/strategy, merge/push/tag |
+| [E-OKX-CAP-001] | [E] | [OKX TR report](research/okx-tr-capabilities-2026-09-12.md) and [sanitized runtime evidence](research/okx-tr-capabilities-2026-09-12.json): connected 1.5.0 and isolated 1.4.6 discovery, 13 successful read tools, Auto Earn flags and Earn demo error 50038 | Capability/connectivity evidence only; remote grants not exposed, local private AUTH_MISSING, writes untested; no strategy or yield validation |

@@ -1,3 +1,16 @@
+# Current handoff — hackathon integration
+
+2026-09-12. User-authorized integration only in `work/hackathon-integration`
+at `C:/Users/Serdar Arif/Desktop/Agent Trading-integration`, based on
+`50146110f727048677b7d6c6643221f00d77cf22`. Apply `75d1200`, `d6933cf`,
+and `8322fab` in that order. Documentation conflicts preserve both source
+records below as historical context; their branch-specific permissions do not
+authorize new work here. No new feature or behavior change. Run the full Python
+suite, frontend install/build/tests and verify clean Git status; exact HEAD and
+fresh results belong in the final integration report. STOP afterward. No push/tag.
+
+---
+
 # Handoff — trading control Web App shell
 
 Updated: 2026-09-12. Last agent: Codex.
@@ -31,6 +44,49 @@ Stop. Await a new integration instruction. Keep other worktrees untouched.
 The prior shared backend checkpoint handoff is retained below as historical context.
 
 ---
+
+---
+
+# Handoff — OKX TR capability audit
+
+## Current handoff — 2026-09-12
+
+Last agent: Codex. User authorization [U-OKX-CAP-001].
+Only `work/okx-capabilities` / `C:/Users/Serdar Arif/Desktop/Agent Trading-okx`.
+Clean starting checkpoint: `9d842077581f51b8264344fb331d1123665955e7`.
+Target commit: `research: verify OKX account earn and execution capabilities`;
+read its actual hash from Git/final report.
+
+[Capability matrix](research/okx-tr-capabilities-2026-09-12.md) and
+[exact discovery/evidence](research/okx-tr-capabilities-2026-09-12.json) record
+165 connected TR tools, 31 fresh local read-only tools, auth requirements,
+schema differences and 13 successful real-account/catalog read tools.
+USDT Auto Lend off / Auto Staking unsupported; Earn holdings/orders empty.
+Simulated Earn is unavailable (50038). Spot order/fill/trailing reads succeed;
+write support is exposed and untested. Remote auth works for reads, but grant
+scope/method is not exposed; CLI is unauthenticated and local private MCP reports
+AUTH_MISSING. Product account integration is still absent.
+
+Changed files are research report + sanitized JSON, PROJECT_STATE, HANDOFF,
+NEXT_TASK and SOURCE_REGISTRY. No pre-existing dirty files; no product code,
+tests, dependencies, Swing, frontend, strategy or runtime configuration changes.
+No other worktree was edited. Temporary local probe home was cleaned up.
+Zero trades/order writes/transfers/Earn toggles. LIVE stays disabled.
+
+Full offline suite: 170 tests passed, zero failures/errors, exit 0. Executed
+from the OKX checkout with bytecode disabled and
+`C:/Users/Serdar Arif/Desktop/Agent Trading-backend/.venv/Scripts/python.exe`;
+the package import resolved to Agent Trading-okx. No dependencies were installed.
+Documentation/evidence references and JSON counts/statuses were checked.
+
+STOP after the coherent research commit. No merge, push, tag or integration.
+Safe next task, only if separately approved: owner-only balance/Earn read
+contract and independent TR read authentication, pinned/discovered MCP schemas,
+client allowlist, nonzero exchange-code failure gates and sanitized exact values.
+
+## Preserved backend checkpoint handoff
+
+The remainder is inherited backend history, not this task's current permission.
 
 # Handoff — autonomous analysis contract v0.2 correction
 
