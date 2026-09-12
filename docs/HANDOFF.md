@@ -1,3 +1,39 @@
+# Current handoff — WebApp runtime operational
+
+2026-09-12. Worktree `Agent Trading-final`, branch `work/final-demo`, parent
+`60c8474`. The existing React/Vite frontend already lived in this worktree and was
+reused unchanged in design; only runtime wiring was repaired.
+
+Three runtime defects fixed. `BackendApi` stored native `fetch` as an instance
+member and invoked it as `this.request(...)`, so every dashboard load threw
+`TypeError: Illegal invocation` and the shell showed "Control center could not
+load"; the constructor now wraps it, preserving test injection. `App` had no
+refresh at all, so a running agent never updated; a silent 5s poll now refreshes
+the snapshot and pauses while a bot action is busy or a strategy form is dirty.
+`vite.config.ts` allows `.trycloudflare.com` so the dev server answers tunnelled
+Host headers. No UI redesign, strategy, backtest or execution change.
+
+Verified live: `npm install`, `npm run build`, 11 frontend tests, 360 Python tests.
+Local and public HTTPS flows both load real state — bot STOPPED/RUNNING, PAPER,
+`market_source=OKX_ATK_MCP`, `market_connected=true` after start with real 15m
+candle updates, `account_auth=CONNECTED` with a real balance, live activity feed,
+STOP returning to stopped with Telegram still RUNNING. No mock states.
+
+Two cloudflared quick tunnels (frontend 5173, backend 8000) are ephemeral; `.env`
+holds their URLs in `WEBAPP_URL` / `VITE_BACKEND_URL` / `ALLOWED_ORIGINS` and stays
+ignored. Restart the frontend after changing `VITE_BACKEND_URL` and the backend
+after `WEBAPP_URL` / `ALLOWED_ORIGINS`. Telegram bot `@agentiic_trading_bot`
+answers `getMe` and polls with the HTTPS WebApp URL; sending `/start` and tapping
+Open Dashboard inside Telegram remains an owner-device step, not machine-verified.
+
+The existing market card intentionally shows source, connection and decision but
+no price, so `last_price` is fetched and unused; unchanged by request. An
+uncommitted `/dashboard` HTML endpoint in `agent_trading/api.py` arrived from a
+concurrent session, duplicates this frontend and is deliberately not committed.
+No merge, push or tag.
+
+---
+
 # Current handoff — final demo runtime repair
 
 2026-09-12. Worktree `Agent Trading-final`, branch `work/final-demo`, starting

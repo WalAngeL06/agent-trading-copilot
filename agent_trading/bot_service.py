@@ -137,12 +137,9 @@ class BotService:
         self.ui_events = self.ui_events[:50]
 
     @staticmethod
-    def _auto_earn_status(flags):
-        states = [state for item in flags for state in (item.auto_lend, item.auto_staking)]
-        if "active" in states:
-            return "ON"
-        if states and all(state in ("off", "unsupported") for state in states):
-            return "OFF"
+    def _auto_earn_status(_flags):
+        # The balance flags describe generic per-currency auto-lend/staking,
+        # not the OKX TR Lira Earn setting shown in the app.
         return "UNKNOWN"
 
     async def _update_private_state(self):

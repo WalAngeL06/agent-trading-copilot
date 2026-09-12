@@ -32,10 +32,11 @@ export class BackendApi implements TradingControlApi {
   private apiBase: string;
   private request: typeof fetch;
 
-  constructor(storage?: any, apiBase = DEFAULT_API_BASE, request: typeof fetch = fetch) {
+  constructor(storage?: any, apiBase = DEFAULT_API_BASE, request?: typeof fetch) {
     this.storage = storage;
     this.apiBase = apiBase;
-    this.request = request;
+    // Native fetch must keep its global receiver; calling it as this.request would throw.
+    this.request = request ?? ((input, init) => fetch(input, init));
   }
 
   private async fetchJson<T>(url: string, options?: RequestInit): Promise<T> {

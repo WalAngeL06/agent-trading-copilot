@@ -1,3 +1,17 @@
+# Current boundary — STOP after WebApp runtime commit
+
+2026-09-12. Only the existing frontend's runtime wiring was authorized and is now
+committed. STOP. Do not redesign the UI, add a second dashboard, touch strategy or
+backtest, add charts, enable real-money execution, write the README or push to GitHub.
+
+Open owner-device step: send `/start` to `@agentiic_trading_bot`, tap Open Dashboard
+and confirm the Mini App shows real state. Tunnel URLs are ephemeral; regenerate
+them and rewrite `.env` plus restart both services before any later demo.
+Decide separately whether the concurrent `/dashboard` endpoint in
+`agent_trading/api.py` is kept or discarded; it is currently uncommitted.
+
+---
+
 # Current boundary — STOP after final demo runtime repair
 
 2026-09-12. Commit the verified tracked repair as

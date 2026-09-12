@@ -86,7 +86,7 @@ class DemoIntegrationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(bot.latest_state["market_state"]["last_price"], "100.5")
         await bot.shutdown()
 
-    async def test_private_read_maps_real_snapshot_fields_without_enabling_writes(self):
+    async def test_private_read_does_not_relabel_generic_auto_lend_as_lira_auto_earn(self):
         flags = (AutoEarnState("USDT", "active", "unsupported"),)
         account = AccountSnapshot(NOW, NOW, (), (), Decimal("123.45"),
                                   AccountConfiguration("1", "net_mode", None, None), flags)
@@ -101,10 +101,10 @@ class DemoIntegrationTests(unittest.IsolatedAsyncioTestCase):
         await bot._update_private_state()
 
         self.assertEqual(bot.private_state["account_auth"], "CONNECTED")
-        self.assertEqual(bot.private_state["auto_earn_status"], "ON")
+        self.assertEqual(bot.private_state["auto_earn_status"], "UNKNOWN")
         self.assertEqual(bot.private_state["balance"], "123.45")
         self.assertEqual(bot.last_private_update, NOW)
-        self.assertEqual(bot.ui_events[0]["title"], "Auto Earn")
+        self.assertNotIn("Auto Earn", [event["title"] for event in bot.ui_events])
 
 
 class TelegramTests(unittest.TestCase):

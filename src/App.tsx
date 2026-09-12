@@ -23,6 +23,15 @@ export function App({ api, environment }:
     finally { setLoading(false); }
   }, [api]);
   useEffect(() => { void load(); }, [load]);
+  const refresh = useCallback(async () => {
+    // Silent live refresh: keep the last good snapshot when a poll fails.
+    try { setData(await api.getDashboard()); } catch { /* keep current state */ }
+  }, [api]);
+  useEffect(() => {
+    if (busy || dirty) return;
+    const timer = window.setInterval(() => { void refresh(); }, 5000);
+    return () => window.clearInterval(timer);
+  }, [refresh, busy, dirty]);
   useEffect(() => {
     if (!dirty) return;
     const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ''; };
