@@ -129,6 +129,30 @@ class PrivateAdapterTests(unittest.IsolatedAsyncioTestCase):
         await self.adapter.discover()
         return await self.adapter.snapshot()
 
+    async def test_pinned_atk_method_qualified_get_endpoints_normalize(self):
+        # ATK 1.4.6 preserves `${method} ${path}` in normalizeResponse.
+        for name, endpoint in zip(TOOLS, ENDPOINTS):
+            response = self.client.responses[name]
+            response.structured_content["data"]["endpoint"] = "GET " + endpoint
+            response.content[0].text = json.dumps(response.structured_content)
+        result = await self.read()
+        self.assertEqual(result.status, "CONNECTED")
+        self.assertEqual(result.account.trading[0].balance, Decimal("100.000000000000000001"))
+        self.assertEqual(result.account.auto_earn[0].auto_lend, "off")
+        self.assertEqual(result.earn.savings[0].amount, Decimal("2.000000000000000001"))
+
+    async def test_method_qualified_endpoint_rejects_wrong_method_or_route(self):
+        for endpoint in ("POST /api/v5/account/balance", "GET /api/v5/asset/transfer",
+                         "get /api/v5/account/balance", "GET /api/v5/account/balance?ccy=BTC"):
+            with self.subTest(endpoint=endpoint):
+                self.client = PrivateClient()
+                self.adapter = self.module.OkxPrivateReadAdapter(self.client, clock=lambda: NOW)
+                response = self.client.responses[TOOLS[0]]
+                response.structured_content["data"]["endpoint"] = endpoint
+                response.content[0].text = json.dumps(response.structured_content)
+                result = await self.read()
+                self.assertEqual((result.status, result.error_code), ("ERROR", "MALFORMED_RESPONSE"))
+
     async def test_success_normalizes_account_earn_decimal_utc_and_configuration(self):
         result = await self.read()
         self.assertEqual(result.status, "CONNECTED")

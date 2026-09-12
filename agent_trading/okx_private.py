@@ -111,7 +111,12 @@ def _payload(response, name):
             raise PrivateReadError("MCP_UNAVAILABLE")
         _business_failure(code if isinstance(code, str) else None)
     data = payload.get("data")
-    if not isinstance(data, dict) or data.get("endpoint") != _ENDPOINTS[name]:
+    # Pinned ATK's normalizeResponse preserves the method-qualified endpoint.
+    # Accept only the exact approved GET route (or the existing bare-path form),
+    # never arbitrary methods, whitespace, query strings, or write endpoints.
+    endpoint = _ENDPOINTS[name]
+    if (not isinstance(data, dict)
+            or data.get("endpoint") not in (endpoint, "GET " + endpoint)):
         raise ValueError
     # Pinned ATK handlers normally consume the REST code; if it is present it
     # must be zero regardless of MCP is_error/ok. Never inspect/echo messages.
