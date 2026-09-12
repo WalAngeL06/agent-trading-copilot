@@ -1,0 +1,6 @@
+{
+  "mode": "replay",
+  "history_limit": 512,
+  "data_path": "examples/candles.jsonl",
+  "output_path": "runs/replay.jsonl"
+}
