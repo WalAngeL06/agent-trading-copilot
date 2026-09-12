@@ -1,121 +1,193 @@
 # Project state
 
-Updated: 2026-09-12. Owner of this handoff: Codex. This file records current
-facts; earlier foundation/Phase 1 reports are historical snapshots.
+Updated: 2026-09-12. Owner: Codex.
+Chapter: **Ch.0 — Base Setup / Product Re-Scope**.
+Status: **Product scope frozen; documentation/Git closure only. Ch.1 not started.**
+
+## Approved product and rubric
+
+The project continues as an **open-source, self-hosted, agentic market
+intelligence / trading copilot** [U-PRODUCT-001]. Preserve the deterministic
+core. A shared React/Vite/TypeScript Web/Mini App, thin Telegram bot, FastAPI,
+bounded orchestration, actual runtime ATK MCP, SQLite/JSONL and deterministic
+explanation are planned. Telegram and LLM enhancement are optional.
+Authoritative scope: [product-mvp-v0.1](specs/product-mvp-v0.1.md).
+
+| User-confirmed hackathon criterion [U-RUBRIC-001] | Weight |
+|---|---|
+| Functional Utility & Value | 30% |
+| User Experience & Interaction | 30% |
+| ATK MCP Integration Depth | 20% |
+| System Reliability & Safety | 10% |
+| Innovation & Uniqueness | 10% |
+
+P0 delivers usable BTC analysis/API, actual runtime MCP, chart/shared UI,
+history, template explanation, Telegram launcher and easy Compose installation.
+P0.5 before the final demo requires one approved, meaningful deterministic
+intelligence slice; simply renaming STRATEGY_NOT_CONFIGURED to WAIT does not count.
+P1 adds ETH, specified watches/notifications and approved Range/Deviation.
+P2 may add authenticated balance, replay UI, proper shadow positions and our
+own MCP server. LIVE, full portfolio management, SMT/SSMT, Quarterly Theory,
+Momentum/Distribution and framework migration are outside the current MVP.
 
 ## Git / safe checkpoints
 
-Current branch: **strategy-v0.1**.
-Current HEAD: `667135804a30d8e998d3fc49f0fb2dce236f4a20`.
+Integration branch: **strategy-v0.1**.
+Base of this closure: `364a3a7d50024520065e74a9c9e9da899d4e3897`.
+The Ch.0 closure checkpoint is the documentation commit containing this state
+record, with message `chore: freeze hackathon product scope and ch0 plan`.
+Read its exact hash from Git and the final closure report; do not mistake the
+base hash above for the new current HEAD.
 
-| Annotated checkpoint tag | Commit |
+| Historical checkpoint | Commit |
 |---|---|
-| foundation-v0.1 | `e4f2fdf6b4bb7dc2be1fd4912a342814c7c8f283` |
-| shadow-foundation-v0.2 | `667135804a30d8e998d3fc49f0fb2dce236f4a20` |
+| foundation-v0.1 — annotated tag | `e4f2fdf6b4bb7dc2be1fd4912a342814c7c8f283` |
+| shadow-foundation-v0.2 — annotated tag | `667135804a30d8e998d3fc49f0fb2dce236f4a20` |
+| Shared project-memory checkpoint — commit, no new tag | `364a3a7d50024520065e74a9c9e9da899d4e3897` |
 
-Both tags are preserved. Phase 1 was accepted and committed. The current
-strategy branch starts from v0.2. No remote or push exists. Documentation is
-currently uncommitted; exact paths are listed in [HANDOFF](HANDOFF.md). Do not
-treat these worktree-only docs as present in the checkpoint tag.
+The shared-memory files and Market Structure draft were committed at 364a3a7;
+the older "uncommitted docs" state is historical and superseded. Existing tags
+remain preserved. No push/remote exists. This closure creates no tag.
+
+Only after the Ch.0 commit succeeds and integration status is clean, create
+`work/copilot-backend` and `work/copilot-ux` from that exact checkpoint:
+- Backend: `C:/Users/Serdar Arif/Desktop/Agent Trading-backend`.
+- UX: `C:/Users/Serdar Arif/Desktop/Agent Trading-ux`.
+
+These operations follow this document's commit. Verify the actual hash,
+branch/path, checkout cleanliness and same starting commit with `git status`,
+`git log -3 --oneline` and `git worktree list --porcelain`; the final closure
+report records their completion. Preserve/report existing branches/worktrees
+instead of recreating or destroying them. Both checkouts stay untouched.
+Root integration remains at `C:/Users/Serdar Arif/Desktop/Agent Trading`.
 
 ## Test status and invocation
 
-Latest verified system checkpoint: **36 tests passing**. Fresh verification
-after shared-memory setup on 2026-09-12: **36 tests passed, 0 failures/errors**
-with `py -B -m unittest discover -s tests -v` (exit 0).
-No Python, tests, dependencies or runtime configuration changed.
-Infrastructure tests do not empirically validate DD strategy rules.
+Last verified baseline: **36 existing tests passing**, 0 failures/errors, on
+2026-09-12 at the shared-memory checkpoint.
+Fresh Ch.0 closure verification on 2026-09-12: **36 tests passed, zero
+failures/errors**, exit 0, with `py -B -m unittest discover -s tests -v`.
+Only documentation and Git setup are changed; application, tests, dependencies
+and runtime configuration are preserved. Infrastructure tests are not empirical
+validation of DD strategy behavior or evidence of product-runtime MCP.
 
-Full suite, project root:
+Full suite from the root:
 
-```powershell
-py -B -m unittest discover -s tests -v
-```
+`py -B -m unittest discover -s tests -v`
 
-On this Windows host the interpreter used in verified runs is:
+Set `PYTHONDONTWRITEBYTECODE=1` for subprocesses during this docs-only closure.
+If the launcher is unavailable, use the verified local interpreter:
 
-```powershell
-& 'C:\Users\Serdar Arif\AppData\Local\Programs\Python\Python314\python.exe' -B -m unittest discover -s tests -v
-```
+`C:/Users/Serdar Arif/AppData/Local/Programs/Python/Python314/python.exe`
 
-Python 3.11+ is the project's requirement; the path above is a host-specific
+Python 3.11+ remains the project requirement; this path is a host-specific
 fallback, not a portable dependency. Linux/macOS can use `python3`.
 
-## Implemented
+## Implemented — preserved foundation
 
 - Deterministic incremental replay; Decimal prices/quantities and UTC times.
-- Immutable MarketSnapshot and bounded symbol/timeframe-separated histories.
-- Official OKX Agent Trade Kit public market-data CLI integration: allowlisted
-  ticker, candles and orderbook reads; exact normalization and closed filtering.
-- Real BTC-USDT historical bootstrap and configurable 4H / 1H / 15m MTF
-  snapshot; bootstrap builds context without calling the decision chain.
-- SHADOW mode, including bounded/continuous polling; intent-only execution.
-- Detector / decision / acceptance / risk / execution placeholders; default
-  NO_TRADE / STRATEGY_NOT_CONFIGURED → NO_ACTION.
-- JSONL explainability/error logs, schema_version=2; logs ignored in `runs/`.
-- Zero real-order path in the current application flow. External CLI/MCP tools
-  can have separate trade permissions; those are not wired to this execution.
+- Immutable MarketSnapshot; bounded symbol/timeframe-separated histories.
+- Official ATK public-market **CLI** adapter: ticker, candles and orderbook,
+  exact normalization, closed filtering and allowlisted reads.
+- Real BTC-USDT bootstrap, configurable 4H / 1H / 15m snapshots; bootstrap does
+  not call the decision chain.
+- SHADOW bounded/continuous polling; intent-only execution, zero real-order path.
+- Unconfigured detectors/router/acceptance/risk; default
+  `NO_TRADE / STRATEGY_NOT_CONFIGURED → NO_ACTION`.
+- Structured JSONL explainability/error logs, schema_version=2, ignored in `runs/`.
 
 ## Not implemented
 
-- Real strategy or MarketStructureEngine.
-- RangeDetector, DeviationDetector, ManipulationDetector, Momentum/Distribution.
-- Real Acceptance rules or a production Risk model.
-- Position Manager, live execution or fill/PnL accounting.
-- Complete backtest framework or adaptive WindowScanner.
-- Strategy-specific HTF/Premium/Discount context, comprehensive stale-data
-  policy, automatic retry/backfill or WebSocket ingestion.
+- Product-runtime MCP client/adapter, FastAPI, agent orchestration or explanation.
+- Web/Mini App, Telegram bot, SQLite, Docker Compose or product quickstart.
+- Real strategy, MarketStructureEngine, Range/Deviation/Manipulation detectors.
+- Momentum/Distribution, strategy HTF/Premium/Discount context, real Acceptance
+  rules, production Risk/sizing, Position Manager, fill/PnL accounting or LIVE.
+- Full backtest, adaptive WindowScanner, comprehensive freshness/recovery,
+  automatic retry/backfill, WebSocket ingestion or calendar/session bars.
 
-## Current strategy work and clarifications
+## Strategy/source history and preserved gates
 
-[market-structure-v0.1](specs/market-structure-v0.1.md) exists as an uncommitted
-formal draft. The 21 supplied DD rules are **source-confirmed**, not validated
-by our own backtest/data. MarketStructureEngine is intentionally blocked by
-N-1–N-7: swing confirmation, meaningful/responsible swings, initialization and
-retention, protection/transitions, structural scale/boundaries, EQ inputs and
-deterministic event/time representation. No algorithm was chosen to fill them.
+[market-structure-v0.1](specs/market-structure-v0.1.md) is a committed formal
+draft with 21 user-attested DD rules [D-DD-MSB-001]. They are **source-confirmed**,
+not empirically validated. N-1–N-7 remain open: swing confirmation, meaningful/
+responsible swings, causal initialization/retention, protection/transitions,
+scale/boundaries, EQ inputs/lifecycle and event/time representation.
+N-8 is setup-integration work; N-9/N-10 are deferred quality/rejection work.
+Product scope approval does not resolve these algorithms.
 
-**[U-PD-001] — confirmed user clarification:** Premium/Discount is
-confirmation/context, not an independent entry trigger. EQ may react or be
-crossed; reaction/reclaim is not automatically required. A specific approved
-setup may define its own requirement. This clarification does not silently
-remove DD's ordinary HTF Premium/Discount side blocks; Acceptance integration
-still needs its own specification.
+[U-PD-001]: Premium/Discount is context/confirmation, not an entry trigger.
+EQ reaction/reclaim is not universally mandatory. Preserve DD ordinary HTF
+side blocks; context alone cannot create an entry, acceptance or risk approval.
 
-Market Structure is persistent derived state/context, not merely a boolean
-pattern. This is a documented future design decision; the current Python
-PatternResult API has not been replaced. BreakQuality / Deviation /
-Manipulation are separate future specs. See [DECISIONS](DECISIONS/) and
-[SOURCE_REGISTRY](SOURCE_REGISTRY.md).
+Market Structure remains planned persistent derived state, not just a boolean
+pattern; the current PatternResult API has not been replaced. Separate
+BreakQuality, Deviation and Manipulation specifications remain future work.
+See [SOURCE_REGISTRY](SOURCE_REGISTRY.md) and ADRs 001–005 under [DECISIONS](DECISIONS/).
 
-## Source priority
+Intended first intelligence: Market Structure → Range → Deviation → LTF
+confirmation/context. Range is still the next **strategy source-ingestion**
+topic; no confirmed Range source/spec exists. Original longer-term source
+priority is retained: Market Structure, Range, Deviation, Manipulation,
+Momentum/Distribution, Liquidity/Target, Acceptance, Risk and Microstructure.
+Postponed topics are history, not permission to build them during this MVP.
 
-1. Market Structure — initial draft exists; core decisions unresolved.
-2. Range — **highest-priority next source-ingestion/specification task**.
-3. Deviation.
-4. Manipulation.
-5. Momentum / Distribution.
-6. Liquidity / Target.
-7. Acceptance.
-8. Risk.
-9. Microstructure.
+Incoming ecosystem [research](research/agentic-market-intelligence-ecosystem-2026-09-12.md)
+from the parallel Kaynak Tarama task is preserved as [R-COPILOT-001]. Its library,
+deployment and compatibility proposals remain references, not approved scope,
+installed dependencies, a completed runtime integration or new DD semantics.
 
-This setup task stops after documentation. [NEXT_TASK](NEXT_TASK.md) does not
-authorize automatic strategy implementation or fabricated Range rules.
+## Product boundaries and responsibilities
 
-## Runtime evidence / known limits
+Actual product-runtime MCP is mandatory; desktop Codex/Claude access and current
+CLI probes are not its proof. Validate application → MCP client → toolkit →
+real ticker/MTF candles/orderbook → normalized core input early in Ch.1.
 
-Phase 1's actual ticker, 3-timeframe historical candle and orderbook probes
-succeeded; account read via CLI lacked credentials. OAuth MCP login is separate
-from CLI authentication. Those are historical results, not a fresh account
-session check. Do not read credential stores to populate handoff docs.
+Preferred explanation: deterministic report → template explanation → optional
+LLM enhancement. LLMs cannot determine/override prices, structural state,
+deterministic strategy results, risk approval or execution authorization.
+READ-ONLY/SHADOW defaults; no usable LIVE toggle. Self-hosting targets one easy
+start command, not necessarily one container; Telegram stays optional.
+See new ADRs [006](DECISIONS/006-open-source-self-hosting-first.md),
+[007](DECISIONS/007-runtime-atk-mcp.md), [008](DECISIONS/008-llm-decision-boundary.md)
+and [009](DECISIONS/009-telegram-as-interface.md).
 
-[Phase 1 report](shadow-phase1.md) contains the smoke evidence. Local ignored
-logs `runs/shadow-phase1-20260912.jsonl` and
-`runs/shadow-poll-20260912.jsonl` demonstrate bootstrap/NO_TRADE/NO_ACTION with
-100 closed candles per timeframe and zero orders. They are host-local evidence,
-not files another checkout can assume are present. No PnL proof exists.
+Codex: backend, runtime MCP adapter, FastAPI, core integration, persistence,
+backend tests and Compose/integration/shared-memory ownership.
+Claude: React/Vite/TypeScript frontend, Mini App UX, Telegram bot/interface and
+frontend tests. Shared API contract precedes parallel implementation.
+Trading-intelligence core files have one owner at a time.
 
-Public polling stops on malformed/missing required series, gaps or conflicting
-retained closed candles; no automatic recovery or partial-candle semantics.
-Fixed intraday bars are supported; calendar/session bars are not yet specified.
+## Ch.0 exit / chapter model
+
+This is the pre-commit document-freeze checklist. The final two operations
+are verified afterward through Git metadata and the final closure report.
+
+- [x] Deterministic foundation checkpoint.
+- [x] Real OKX shadow-data pipeline.
+- [x] Shared Codex/Claude memory system.
+- [x] Product direction approved.
+- [x] Hackathon MVP scope frozen.
+- [x] Product architecture documented.
+- [x] Agent responsibilities defined.
+- [ ] Final Ch.0 checkpoint commit.
+- [ ] Clean worktrees created from that checkpoint.
+
+Ch.0 — Base Setup / Product Re-Scope; Ch.1 — Product MVP & UX;
+Ch.2 — Trading Intelligence; Ch.3 — Agent Workflows; Ch.4 — Validation & Demo.
+**Ch.1 has not started and requires explicit user approval after closure review.**
+[NEXT_TASK](NEXT_TASK.md) describes future tasks, not an instruction to auto-start.
+
+## Historical runtime evidence / limits
+
+Phase 1 ticker, three-timeframe candle and orderbook CLI probes succeeded;
+account read lacked CLI credentials. OAuth MCP login is separate from CLI
+authentication. These are historical results, not a fresh product-runtime MCP
+or account-session verification. Do not read credential stores for handoff.
+
+[Phase 1 report](shadow-phase1.md) records the evidence. Ignored local
+`runs/shadow-phase1-20260912.jsonl` and `runs/shadow-poll-20260912.jsonl`
+show bootstrap with 100 closed candles/timeframe and NO_TRADE/NO_ACTION.
+They are host-local, not available in a new worktree, and provide no PnL proof.
+Polling stops on malformed/missing required series, gaps or conflicting retained
+closed candles. There is no automatic recovery or partial-candle strategy.

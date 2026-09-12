@@ -1,99 +1,130 @@
-# Handoff — reusable current-state template
+# Handoff — Ch.0 product-scope closure
 
-Replace the values under these same fields at each safe handoff. Preserve
-pre-existing work, list uncommitted paths explicitly, and distinguish fresh
-verification from historical evidence. PROJECT_STATE is the current fact
-record; NEXT_TASK defines the next authorized boundary.
+Updated: 2026-09-12. Keep these fields reusable for later safe handoffs.
+Current user instructions prevail; do not infer implementation permission
+from prepared worktrees or this document.
 
 ## LAST AGENT
 
-Codex. Updated: 2026-09-12.
+Codex. Formal Ch.0 documentation/Git closure; no product implementation.
 
-## CURRENT BRANCH
+## CURRENT BRANCH / CHECKPOINT
 
-`strategy-v0.1`; HEAD `667135804a30d8e998d3fc49f0fb2dce236f4a20`.
-Existing `foundation-v0.1` and `shadow-foundation-v0.2` tags remain unchanged.
+Integration: `strategy-v0.1` in `C:/Users/Serdar Arif/Desktop/Agent Trading`.
+Base: `364a3a7d50024520065e74a9c9e9da899d4e3897`.
+Closure checkpoint: the commit containing this document with message
+`chore: freeze hackathon product scope and ch0 plan`.
+Its exact hash is in Git and the final closure report; this document does not
+embed its own future commit hash. Preserve foundation-v0.1 and
+shadow-foundation-v0.2; create no additional tag, remote or push.
 
 ## LAST COMPLETED WORK
 
-- Previous specification task: created
-  `docs/specs/market-structure-v0.1.md`; no Python was changed.
-- Current handoff setup: added shared constitution, both agent bootstrap
-  guides, state/next-task/source records, five ADRs and actionable OSS notes.
-- The pre-existing `docs/research/open-source-kaynak-taramasi-2026-09-12.md`
-  was inspected and preserved. It was already untracked before this task.
+- Preserved the deterministic/MTF/real-OKX CLI SHADOW foundation.
+- Recorded approved open-source/self-hosted copilot direction and new rubric.
+- Created [product-mvp-v0.1](specs/product-mvp-v0.1.md), scope P0/P0.5/P1/P2,
+  shared Web/Mini App architecture, user journeys, safety and demo acceptance.
+- Added ADRs 006–009 for self-hosting, actual runtime MCP, LLM boundary and
+  Telegram optionality; updated shared memory/source records.
+- Kept the committed DD Market Structure draft, ADRs 001–005 and research history.
+- Checkpoint commit/test/worktree operations follow this document freeze;
+  inspect their actual final state in Git and the closure report.
 
 ## FILES CHANGED / UNCOMMITTED WORK
 
-The following docs are worktree-only and uncommitted. No completed-docs commit
-was created because the current task explicitly says **do not commit**.
+Ten authored/updated Ch.0 documentation files and one incoming research
+document belong to this checkpoint:
 
-| Path | Handoff status |
+| File | Change |
 |---|---|
-| `AGENTS.md` | New in current setup |
-| `CLAUDE.md` | New in current setup |
-| `CODEX.md` | New in current setup |
-| `docs/PROJECT_STATE.md` | New in current setup |
-| `docs/HANDOFF.md` | New in current setup; this reusable current handoff |
-| `docs/NEXT_TASK.md` | New in current setup |
-| `docs/SOURCE_REGISTRY.md` | New in current setup |
-| `docs/DECISIONS/001-okx-agent-trade-kit.md` | New in current setup |
-| `docs/DECISIONS/002-shadow-before-live.md` | New in current setup |
-| `docs/DECISIONS/003-premium-discount-context.md` | New in current setup |
-| `docs/DECISIONS/004-market-structure-state.md` | New in current setup |
-| `docs/DECISIONS/005-spec-first-strategy.md` | New in current setup |
-| `docs/research/open-source-notes.md` | New in current setup |
-| `docs/specs/market-structure-v0.1.md` | Pre-existing uncommitted spec; user context/EQ clarification added in current setup |
-| `docs/research/open-source-kaynak-taramasi-2026-09-12.md` | Pre-existing untracked research; unchanged |
+| AGENTS.md | Updated shared product constitution, scope and responsibilities |
+| docs/PROJECT_STATE.md | Updated actual/target state, history and closure gates |
+| docs/HANDOFF.md | Updated this handoff |
+| docs/NEXT_TASK.md | Future Ch.1 contract/runtime-MCP work; explicit approval gate |
+| docs/SOURCE_REGISTRY.md | Added confirmed product/rubric provenance, preserved old sources |
+| docs/specs/product-mvp-v0.1.md | New approved MVP scope |
+| docs/DECISIONS/006-open-source-self-hosting-first.md | New ADR |
+| docs/DECISIONS/007-runtime-atk-mcp.md | New ADR |
+| docs/DECISIONS/008-llm-decision-boundary.md | New ADR |
+| docs/DECISIONS/009-telegram-as-interface.md | New ADR |
+| docs/research/agentic-market-intelligence-ecosystem-2026-09-12.md | Incoming ecosystem research from the parallel Kaynak Tarama task; preserved without editing |
 
-`docs/specs/` and `docs/research/` were reused; `docs/DECISIONS/` was added.
-Do not assume untracked docs are present in another checkout/worktree.
-No extra worktree, remote or push was created.
+All fifteen files from the previous shared-memory task were committed at
+364a3a7. Earlier claims that they were worktree-only/uncommitted are superseded.
+This closure commits its ten docs plus the completed incoming research;
+use `git status` to verify the final
+clean state rather than carrying forward historical uncommitted-file lists.
+CLAUDE.md/CODEX.md still delegate to AGENTS.md and remain unchanged.
+No Python, test, dependency, runtime configuration or strategy-spec file changes.
+The incoming research is reference material [R-COPILOT-001], not product-scope
+approval, an installed dependency set or permission to invent trading rules.
 
 ## CURRENT TEST STATUS
 
-No Python code changed during the spec or shared-memory setup.
-Last verified system checkpoint: **36 passing tests**.
-Fresh verification after documentation setup on 2026-09-12:
-**36 tests passed, 0 failures/errors**, command
-`py -B -m unittest discover -s tests -v`, exit 0.
-Use PROJECT_STATE's test command/fallback. These are infrastructure tests,
-not empirical DD validation.
+Previous verified baseline: 36 existing tests passing, zero failures/errors.
+Fresh Ch.0 closure verification on 2026-09-12: **36 tests passed, zero
+failures/errors**, exit 0; the full existing suite was rerun before the commit.
+Full command: `py -B -m unittest discover -s tests -v`.
+Interpreter fallback and bytecode suppression are in PROJECT_STATE.
+Passing infrastructure tests do not validate a strategy, product-runtime MCP,
+UI or financial performance. The final closure report gives the fresh result.
 
 ## IMPORTANT DECISIONS
 
-- Market Structure is state/context, not just a boolean pattern; no current
-  Python API was rewritten to implement that decision.
-- BreakQuality / Deviation / Manipulation remain separate future specs.
-- Source-confirmed DD rules are not yet empirical validation.
-- Premium/Discount is confirmation/context, not an independent entry trigger.
-- EQ reaction/reclaim is not globally mandatory; specific approved setups
-  may define it. Preserve ordinary HTF side-block semantics separately.
-- OKX Agent Trade Kit stays primary; SHADOW precedes explicitly authorized live.
-- Formal specs precede strategy implementation. See DECISIONS and SOURCE_REGISTRY.
+- Preserve core; open-source/self-hosted copilot, Telegram optional.
+- Utility 30%, UX 30%, ATK MCP 20%, Reliability 10%, Innovation 10%.
+- One shared React/Vite/TypeScript Web/Mini App; thin API-based Telegram bot.
+- Actual product-runtime MCP is mandatory and not currently implemented;
+  verify public ticker/4H/1H/15m candles/orderbook early in Ch.1.
+- Useful template explanation without LLM. Optional LLM cannot determine/
+  override prices, structure, strategy result, risk or execution authorization.
+- P0.5 before final demo needs an approved, honest intelligence slice; placeholder
+  relabeling is not completion.
+- Premium/Discount remains context; EQ reaction/reclaim is not universally
+  mandatory; preserve DD ordinary side blocks.
+- READ-ONLY/SHADOW first; LIVE and full portfolio/advanced theories are outside MVP.
+- One easy Compose start command is the target, not necessarily one container.
 
-## UNRESOLVED
+## UNRESOLVED / KNOWN LIMITS
 
-N-1–N-7 in [market-structure-v0.1](specs/market-structure-v0.1.md) are core engine
-gates: confirmation, meaningful/responsible swings, initialization/retention,
-protection/transitions, scale/boundaries, EQ inputs/lifecycle and event/time
-representation. N-8 is a setup-integration gate; N-9–N-10 are deferred quality
-and rejection work. No deterministic algorithm or numeric threshold was chosen.
+No completed strategy. MarketStructureEngine N-1–N-7 remain open; no confirmed
+Range material is registered. P0.5 algorithm and fixtures must be explicitly
+approved before intelligence coding. No FastAPI, frontend, runtime MCP client,
+SQLite, deployment files, position model, fill/PnL accounting or LIVE is built.
+Existing CLI/OAuth evidence does not prove application-runtime MCP.
+The shared API contract is a first Ch.1 deliverable, not already finalized here.
 
-Confirmed DD Range inputs are not yet registered. NEXT_TASK records required
-source ingestion; do not manufacture a Range spec from the OSS note.
+## WORKTREES / RESPONSIBILITY
+
+After the clean documentation checkpoint commit, prepare these exact branches
+from that checkpoint, leaving them clean and untouched:
+- Codex/backend: `work/copilot-backend`,
+  `C:/Users/Serdar Arif/Desktop/Agent Trading-backend`.
+- Claude/UX: `work/copilot-ux`,
+  `C:/Users/Serdar Arif/Desktop/Agent Trading-ux`.
+
+These setup actions happen after this text is committed. Inspect
+`git worktree list --porcelain`, branch HEADs and each checkout's status;
+the final report records actual paths/hashes. If an existing branch/worktree is
+found, inspect/report it instead of recreating/destroying it.
+
+Codex owns backend/MCP/FastAPI/core/persistence/backend tests/Compose and shared
+contract/root integration/memory. Claude owns frontend/Mini App/bot/interface
+and frontend tests. Define/review shared API before parallel work.
+One owner edits trading-intelligence core files at a time; do not share a
+working directory. Merge/cherry-pick reviewed commits and verify the integration.
 
 ## DO NOT
 
-- Implement MarketStructureEngine yet or silently bypass N-1–N-7.
-- Invent pivot counts, thresholds, confidence or trend scores.
-- Treat Premium/Discount or EQ reaction as a universal entry setup.
-- Enable live execution, add frameworks/dependencies, commit automatically,
-  push, create a remote or create extra worktrees for this setup.
+Do not start Ch.1, install packages, implement features, modify Python behavior,
+invent trading rules, bypass DD gates, relabel unavailable intelligence,
+enable LIVE, expose secrets, create a tag/remote or push during this closure.
+Do not edit either new worktree after checkout.
 
 ## NEXT
 
-Continue source ingestion, with **Range** the highest-priority next spec.
-Read AGENTS → PROJECT_STATE → HANDOFF → NEXT_TASK → relevant spec before work.
-This setup stops and waits; Range implementation requires its own approved
-specification and resolved deterministic decisions.
+**Stop for user review of formal Ch.0 closure.**
+Only after explicit approval: read AGENTS → PROJECT_STATE → HANDOFF → NEXT_TASK →
+product spec; inspect Git/worktree status; define the shared API contract, then
+prove actual runtime MCP → real public market data → normalized core input.
+The frontend may proceed in parallel only after the contract is reviewed.

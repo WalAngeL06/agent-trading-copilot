@@ -13,11 +13,53 @@ Read the current state first: [PROJECT_STATE](docs/PROJECT_STATE.md), then
 
 ## Project goal
 
-Build a deterministic, explainable agent for the Agentic Trading Hackathon
-using OKX Agent Trade Kit and multi-timeframe market structure. Keep pattern
-detection, context, decisions, acceptance, risk, execution and position
-management separated. Validate in SHADOW before explicitly authorized live
-execution. A functioning data pipeline is not strategy or profitability proof.
+Evolve the preserved deterministic foundation into an **open-source,
+self-hosted, agentic market intelligence / trading copilot**. Telegram is an
+optional interface: shared Web/Mini App, REST API and future agent interfaces
+use the same core. Keep pattern detection, context, decisions, acceptance, risk,
+execution and position management separated. READ-ONLY / SHADOW first;
+**LIVE execution is outside the current hackathon MVP**. A functioning data
+pipeline is not strategy or profitability proof. Approved scope:
+[product-mvp-v0.1](docs/specs/product-mvp-v0.1.md), [U-PRODUCT-001].
+
+## Approved product priorities and chapter boundary
+
+| Hackathon criterion | Weight |
+|---|---|
+| Functional Utility & Value | 30% |
+| User Experience & Interaction | 30% |
+| ATK MCP Integration Depth | 20% |
+| System Reliability & Safety | 10% |
+| Innovation & Uniqueness | 10% |
+
+These are user-confirmed weights [U-RUBRIC-001]. Prioritize a usable BTC
+report/API and shared mobile/web UX, with early **actual product-runtime MCP**
+validation. Development-tool MCP connections and current CLI success do not
+count as product-runtime integration. Target one easy self-hosting start
+command with Docker Compose; it need not mean one container. Telegram and an
+LLM must remain optional.
+
+Preferred explanation boundary: deterministic report → deterministic/template
+explanation → optional LLM enhancement. LLMs may orchestrate validated reads
+and explain but never determine/override prices, structural state, deterministic
+strategy results, risk approval or execution authorization. See ADRs
+[006](docs/DECISIONS/006-open-source-self-hosting-first.md),
+[007](docs/DECISIONS/007-runtime-atk-mcp.md),
+[008](docs/DECISIONS/008-llm-decision-boundary.md),
+[009](docs/DECISIONS/009-telegram-as-interface.md).
+
+P0.5 before the final demo requires at least one approved, narrow, meaningful
+deterministic intelligence slice; no fake signals or relabelled placeholders.
+The current strategy is not completed. First intended intelligence is Market
+Structure → Range → Deviation → LTF confirmation/context, with existing spec
+gates preserved. Advanced models/theories and portfolio management are deferred.
+
+Chapter model: Ch.0 — Base Setup / Product Re-Scope; Ch.1 — Product MVP & UX;
+Ch.2 — Trading Intelligence; Ch.3 — Agent Workflows; Ch.4 — Validation & Demo.
+This task closes Ch.0 documentation and Git setup only. Ch.0 exit requires the
+approved/frozen scope, architecture, responsibilities, a passing existing suite,
+checkpoint commit and two clean worktrees from that checkpoint. **Do not begin
+Ch.1 until the user reviews and explicitly approves this closure.**
 
 ## Architecture: current vs intended
 
@@ -34,6 +76,10 @@ execution. A functioning data pipeline is not strategy or profitability proof.
 | Execution | Replay disabled; SHADOW records intent only, with no exchange order client |
 | Position Management | Not implemented |
 | Logging | Structured JSONL, schema_version=2; new file for each run |
+| Product-runtime ATK MCP | Mandatory Ch.1 validation; not implemented in the current application |
+| FastAPI / agent orchestration / product explanation | Planned; not implemented |
+| Shared React/Vite/TypeScript Web/Mini App and Telegram bot | Planned; not implemented; Telegram optional |
+| SQLite / Docker Compose / self-hosting quickstart | Planned; not implemented |
 
 The intended chain is data → snapshot/state/patterns → context → decision →
 acceptance → risk → execution → position management, with logging throughout.
@@ -49,7 +95,8 @@ Do not silently rewrite the architecture or represent planned modules as done.
   SMC or a library's defaults for DD semantics.
 - Keep trading logic, risk logic and execution separate. No live execution
   without explicit user authorization; external CLI/MCP trade permissions do
-  not authorize application live trading.
+  not authorize application live trading. LIVE remains outside this MVP;
+  no usable live toggle or exchange write path may be added as an MVP feature.
 - No look-ahead: only closed candles unless partial-candle semantics are
   explicitly specified. Keep `swing_time` and `confirmed_at` distinct and
   expose evidence only when knowable at `as_of`.
@@ -76,8 +123,10 @@ Do not silently rewrite the architecture or represent planned modules as done.
   No push or remote creation is currently authorized.
 - Document major decisions in [DECISIONS](docs/DECISIONS/), and update HANDOFF,
   PROJECT_STATE when state changes, and NEXT_TASK at each safe completion.
-- Source ingestion is the current strategy work; Range is next. The Market
-  Structure draft remains blocked. This does not authorize implementation.
+- Next product work is the shared API contract and actual runtime MCP proof,
+  only after explicit Ch.1 approval. Range remains the next strategy-source
+  ingestion topic; the Market Structure draft stays blocked by N-1–N-7.
+  A product scope approval does not fill missing trading algorithms.
 
 ## Source tagging
 
@@ -108,5 +157,15 @@ When switching Codex ↔ Claude:
 
 If agents work simultaneously, use separate Git worktrees **and branches**;
 never the same working directory. Merge/cherry-pick only reviewed commits.
-No extra worktree is requested for the current documentation task. Preserve
-the current branch and existing checkpoint tags.
+`strategy-v0.1` remains the integration branch. This closure explicitly creates
+`work/copilot-backend` and `work/copilot-ux` in sibling worktrees only after its
+documentation checkpoint commit and clean status. Both start from that exact
+commit and stay untouched; preserve/report existing branches/worktrees instead
+of recreating or destroying them. No tag, push or remote creation is authorized.
+
+Codex owns backend, runtime MCP adapter, FastAPI, core integration, persistence,
+backend tests and Compose/integration. Claude owns React/Vite/TypeScript,
+Telegram Mini App UX, bot/interface and frontend tests. Codex owns shared API,
+root integration and shared-memory files, with Claude review. Freeze the shared
+API contract before parallel implementation; **one owner at a time** edits
+trading-intelligence core files. Worktree availability is not Ch.1 permission.
