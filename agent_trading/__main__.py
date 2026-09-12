@@ -8,10 +8,12 @@ from .config import Config
 from .data import read_candles
 from .engine import ReplayEngine
 from .journal import JsonlJournal
+from .okx import OkxMarketAdapter
+from .shadow import run_shadow
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Trading foundation: offline replay, no orders")
+    parser = argparse.ArgumentParser(description="Trading foundation: replay or OKX shadow, no orders")
     parser.add_argument("--config", type=Path, default=Path("config.example.json"))
     parser.add_argument("--output", type=Path, help="New output file (must not already exist)")
     args = parser.parse_args()
@@ -20,10 +22,22 @@ def main() -> int:
         config = Config.load(config_path)
         source = config_path.parent / config.data_path
         destination = args.output or config_path.parent / config.output_path
-        if not source.is_file():
+        if config.mode == "replay" and not source.is_file():
             raise ValueError(f"input file does not exist: {source}")
         with JsonlJournal(destination) as journal:
             engine = ReplayEngine(config, journal=journal)
+            if config.mode == "shadow":
+                try:
+                    adapter = OkxMarketAdapter(config.okx_site, config.cli_timeout_seconds,
+                                               config.node_path, config.okx_cli_path)
+                    result = run_shadow(engine, adapter)
+                except (ValueError, OSError, RuntimeError) as exc:
+                    engine.fail(exc, stage="market_data")
+                    raise
+                print(f"Shadow complete: {config.symbol}, {result['market_state']['counts']}, "
+                      f"{result['decision']['action']}, {result['execution']['action']}, "
+                      f"0 orders. Log: {destination}")
+                return 0
             count = 0
             iterator = iter(read_candles(source))
             while True:
@@ -45,8 +59,11 @@ def main() -> int:
         print(f"Replay complete: {count} candles, {count} NO_TRADE, 0 orders. Log: {destination}")
         return 0
     except (ValueError, OSError, RuntimeError) as exc:
-        print(f"Replay failed: {exc}", file=sys.stderr)
+        print(f"Run failed: {exc}", file=sys.stderr)
         return 1
+    except KeyboardInterrupt:
+        print("Run stopped by user; 0 orders.")
+        return 130
 
 
 if __name__ == "__main__":

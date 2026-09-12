@@ -4,6 +4,8 @@ from dataclasses import dataclass, fields, is_dataclass
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from enum import Enum
+from collections.abc import Mapping
+from types import MappingProxyType
 from typing import Any
 
 
@@ -47,6 +49,9 @@ class Candle:
     @classmethod
     def from_dict(cls, row: dict) -> "Candle":
         try:
+            if any(isinstance(row[field], float)
+                   for field in ("open", "high", "low", "close", "volume")):
+                raise ValueError("float inputs are unsafe; use Decimal or decimal strings")
             return cls(symbol=row["symbol"], timeframe=row["timeframe"],
                        close_time=utc_time(row["close_time"]),
                        open=Decimal(str(row["open"])), high=Decimal(str(row["high"])),
@@ -54,6 +59,40 @@ class Candle:
                        volume=Decimal(str(row["volume"])), closed=row["closed"])
         except (KeyError, TypeError, AttributeError, InvalidOperation) as exc:
             raise ValueError("invalid candle payload") from exc
+
+
+@dataclass(frozen=True)
+class MarketSnapshot:
+    symbol: str
+    as_of: datetime
+    histories: Mapping[str, tuple[Candle, ...]]
+
+    def __post_init__(self):
+        if not isinstance(self.symbol, str) or not self.symbol.strip():
+            raise ValueError("snapshot symbol must be nonempty")
+        if self.as_of.tzinfo is None or self.as_of.utcoffset() is None:
+            raise ValueError("snapshot as_of must include a timezone")
+        object.__setattr__(self, "as_of", self.as_of.astimezone(timezone.utc))
+        if not isinstance(self.histories, Mapping):
+            raise ValueError("snapshot histories must be a mapping")
+        copied = {}
+        for tf, items in sorted(self.histories.items()):
+            if not isinstance(tf, str) or not tf.strip():
+                raise ValueError("snapshot timeframe must be nonempty")
+            history = tuple(items)
+            previous = None
+            for candle in history:
+                if not isinstance(candle, Candle) or candle.closed is not True:
+                    raise ValueError("snapshot supports only closed Candle instances")
+                if candle.symbol != self.symbol or candle.timeframe != tf:
+                    raise ValueError("snapshot symbol/timeframe mismatch")
+                if candle.close_time > self.as_of:
+                    raise ValueError("snapshot cannot expose future candles")
+                if previous is not None and candle.close_time <= previous:
+                    raise ValueError("snapshot series must be strictly chronological")
+                previous = candle.close_time
+            copied[tf] = history
+        object.__setattr__(self, "histories", MappingProxyType(copied))
 
 
 class PatternStatus(str, Enum):
@@ -77,6 +116,7 @@ class PatternResult:
     source_ids: tuple[str, ...] = ()
     score: Decimal | None = None
     score_method: str | None = None
+    timeframe: str | None = None
 
     def __post_init__(self):
         if not self.name or not isinstance(self.status, PatternStatus):
@@ -88,6 +128,8 @@ class PatternResult:
                 raise ValueError("start_time must be aware and no later than detected_at")
         if self.window is not None and (type(self.window) is not int or self.window <= 0):
             raise ValueError("window must be a positive integer")
+        if self.timeframe is not None and (not isinstance(self.timeframe, str) or not self.timeframe.strip()):
+            raise ValueError("pattern timeframe must be nonempty when supplied")
         if self.score is not None:
             if not isinstance(self.score, Decimal) or not self.score.is_finite() or not self.score_method:
                 raise ValueError("score requires a finite Decimal and a named method")
@@ -102,7 +144,7 @@ def to_jsonable(value: Any) -> Any:
         return str(value)
     if is_dataclass(value) and not isinstance(value, type):
         return {field.name: to_jsonable(getattr(value, field.name)) for field in fields(value)}
-    if isinstance(value, dict):
+    if isinstance(value, Mapping):
         return {key: to_jsonable(item) for key, item in value.items()}
     if isinstance(value, (tuple, list)):
         return [to_jsonable(item) for item in value]

@@ -1,0 +1,12 @@
+{
+  "mode": "shadow",
+  "symbol": "BTC-USDT",
+  "timeframes": ["4H", "1H", "15m"],
+  "history_limit": 512,
+  "bootstrap_limit": 100,
+  "shadow_cycles": 1,
+  "poll_interval_seconds": 15,
+  "cli_timeout_seconds": 30,
+  "okx_site": "tr",
+  "output_path": "runs/shadow.jsonl"
+}

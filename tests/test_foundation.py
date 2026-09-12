@@ -8,7 +8,8 @@ import tempfile
 import unittest
 
 from agent_trading.config import Config
-from agent_trading.components import AcceptanceEngine, RiskEngine, DisabledExecution
+from agent_trading.components import (AcceptanceEngine, RiskEngine, DisabledExecution,
+                                      SingleTimeframeDetectorAdapter)
 from agent_trading.data import read_candles
 from agent_trading.engine import ReplayEngine
 from agent_trading.journal import JsonlJournal
@@ -47,7 +48,7 @@ class FoundationTests(unittest.TestCase):
                                      history[-1].close_time + timedelta(minutes=1))
 
         with self.assertRaises(ValueError):
-            ReplayEngine(Config(), detectors=[FutureDetector()]).process(candle())
+            ReplayEngine(Config(), detectors=[SingleTimeframeDetectorAdapter(FutureDetector(), "1m")]).process(candle())
 
     def test_timezone_is_normalized_without_rounding_prices(self):
         result = ReplayEngine(Config()).process(candle(
@@ -94,7 +95,7 @@ class FoundationTests(unittest.TestCase):
                 return PatternResult(self.name, PatternStatus.NOT_DETECTED,
                                      history[-1].close_time)
 
-        engine = ReplayEngine(Config(history_limit=2), detectors=[Recorder()])
+        engine = ReplayEngine(Config(history_limit=2), detectors=[SingleTimeframeDetectorAdapter(Recorder(), "1m")])
         for minute in [1, 2, 3]:
             engine.process(candle(minute))
         self.assertEqual(seen, [[1], [1, 2], [2, 3]])
@@ -148,7 +149,7 @@ class FoundationTests(unittest.TestCase):
         for value in [0, -1, True, 1.5]:
             with self.subTest(value=value), self.assertRaises(ValueError):
                 Config(history_limit=value)
-        for mode in ["live", "shadow", "backtest"]:
+        for mode in ["live", "backtest"]:
             with self.subTest(mode=mode), self.assertRaises(ValueError):
                 Config(mode=mode)
 
