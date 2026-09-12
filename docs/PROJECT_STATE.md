@@ -2,25 +2,26 @@
 
 Updated: 2026-09-12. Owner: Codex.
 Chapter: **Ch.1 — Product MVP & UX**.
-Status: **Backend Target #1 runtime MCP gate VERIFIED; Ch.1 incomplete.**
+Status: **Backend Target #2 analysis service/API/persistence VERIFIED; Ch.1 incomplete.**
 
-The user's explicit [U-MCP-GATE-001] instruction starts Ch.1 in the backend
-worktree and prioritizes this narrow gate before the shared API contract.
-Python product code → official MCP SDK 2.2.0 → installed ATK MCP 1.4.6 → real
-OKX TR ticker/15m candles/orderbook → exact normalized domain facts and a
-candle-only snapshot succeeded on 2026-09-12. Protocol: `2025-11-25`.
-Evidence, discovered tools and compatibility details:
-[runtime-atk-mcp-gate](runtime-atk-mcp-gate.md).
-Stop after the target's backend commit; no later implementation is authorized
-by this instruction. Integration and UX remain untouched.
+Target #1 completed at `cd686755cc1a01d032510806331ccf79267ed5af`.
+The user's [U-ANALYSIS-API-001] explicitly authorized Target #2 in the backend
+worktree. A frozen report contract, bounded public AnalysisService, thin
+FastAPI, stdlib SQLite immutable history/real timeline and deterministic
+explanation now wrap the preserved core/MCP adapter.
+Real BTC ticker +4H/1H/15m +book -> causal core -> report/audit/SQLite succeeded;
+fresh repository/API retrieval verified. [Real product evidence](product-analysis-smoke.md).
+No trading algorithms, execution permissions, UX or deployment added.
+Stop after `feat: add persisted market analysis API`; do not auto-start Target #3.
+Integration and UX remain untouched at Ch.0.
 
 ## Approved product and rubric
 
 The project continues as an **open-source, self-hosted, agentic market
 intelligence / trading copilot** [U-PRODUCT-001]. Preserve the deterministic
-core. A shared React/Vite/TypeScript Web/Mini App, thin Telegram bot, FastAPI,
-bounded orchestration, actual runtime ATK MCP, SQLite/JSONL and deterministic
-explanation are planned. Telegram and LLM enhancement are optional.
+core. Public MCP/analysis/FastAPI/SQLite/JSONL/template backend now exists;
+shared React/Vite/TypeScript Web/Mini App, thin optional Telegram, agent workflows,
+LLM enhancement and Compose delivery remain planned.
 Authoritative scope: [product-mvp-v0.1](specs/product-mvp-v0.1.md).
 
 | User-confirmed hackathon criterion [U-RUBRIC-001] | Weight |
@@ -66,36 +67,51 @@ checkpoint before this target:
 - UX: `C:/Users/Serdar Arif/Desktop/Agent Trading-ux`.
 
 Current work is exclusively on `work/copilot-backend`, descended from that
-checkpoint. Its next commit is `feat: add runtime OKX ATK MCP market adapter`;
-read the exact hash from Git/final target report. Root integration remains at
+checkpoint. Target #1 commit is cd686755cc1a01d032510806331ccf79267ed5af;
+the next target commit is `feat: add persisted market analysis API`.
+Read its exact hash from Git/final target report. Root integration remains at
 `C:/Users/Serdar Arif/Desktop/Agent Trading`; integration and UX branch HEADs
 remain at Ch.0. No merge/push/tag/remote creation. Preserve both worktrees.
 
 ## Test status and invocation
 
-Last verified baseline: **36 existing tests passing**, 0 failures/errors, on
-2026-09-12 at the shared-memory checkpoint.
-Fresh Ch.0 closure verification on 2026-09-12: **36 tests passed, zero
-failures/errors**, exit 0, with `py -B -m unittest discover -s tests -v`.
-Fresh Ch.1 target verification: **79 tests passed**, zero failures/errors,
-exit 0: 36 preserved tests + 43 deterministic MCP tests. Normal suite needs no
-SDK, ATK, Node, credentials or network. A separate real smoke passed all three
-required reads. Infrastructure tests are not empirical validation of DD
-strategy behavior; runtime MCP is established by the separate live evidence.
+Historical Ch.0 baseline36 and Target #1 baseline79 remain preserved.
+Fresh Target #2 verification: **79 old +71 new =150 passing**, zero failures/errors,
+exit0. New: 12 repository +37 service +18 API +4 product smoke.
+Tests keep normalization/domain/core/audit/SQLite/HTTP real and fake only
+external SDK transport. They need no Node, ATK, credentials, internet or live MCP.
+The complete product suite uses optional FastAPI/HTTPX test dependencies installed
+once in ignored .venv; host/global Python remains unchanged. Base CLI/replay
+still need no Python dependencies. No empirical strategy validation is claimed.
 
-Full suite from the root:
+Full suite from backend root, after `pip install -e '.[product,test-product]'`:
 
-`py -B -m unittest discover -s tests -v`
+`./.venv/Scripts/python.exe -B -m unittest discover -s tests -v`
 
-Use `-B` / `PYTHONDONTWRITEBYTECODE=1` to suppress application bytecode.
-If the launcher is unavailable, use the verified local interpreter:
+Linux/macOS: .venv/bin/python (real platform smoke pending).
+Suppress application bytecode with -B. py launcher is currently unavailable in
+the sandbox profile; verified host fallback to create/use a virtual environment:
 
 `C:/Users/Serdar Arif/AppData/Local/Programs/Python/Python314/python.exe`
 
-Python 3.11+ remains the project requirement; this path is a host-specific
-fallback, not a portable dependency. Linux/macOS can use `python3`.
+Python >=3.11 remains portable requirement; fallback path is host-specific.
+Dependency check passed. Real smoke completed separately with exact public
+provenance and no orders; normal offline tests do not establish real connectivity.
 
-## Implemented — preserved foundation
+## Implemented — product backend and preserved foundation
+
+- Frozen analysis-report-v0.1/API and strict financial-string OpenAPI schemas.
+- Serialized/bounded public AnalysisService with independent initial-cutoff
+  freshness, latest closed15m decision_as_of and causal HTF trimming.
+- Five FastAPI analysis/history/health endpoints, typed errors, neutral failed
+  decision and no raw MCP payload/request echo.
+- Stdlib SQLite DELETE history/events, atomic idempotency/reservation/finalization,
+  startup interruption recovery, exact subsecond ordering and unique core audit.
+- Honest unavailable intelligence, actual acceptance/risk/current core reasons,
+  entirely report-derived deterministic explanation.
+- Separate real full-MTF/core/report/SQLite product smoke and API retrieval verified.
+- Request-driven readiness with local storage probe, no network GET, expiry and
+  failure invalidation; explicit POST validates initial/recovery prerequisites.
 
 - Deterministic incremental replay; Decimal prices/quantities and UTC times.
 - Immutable MarketSnapshot; bounded symbol/timeframe-separated histories.
@@ -118,10 +134,11 @@ fallback, not a portable dependency. Linux/macOS can use `python3`.
 
 ## Not implemented
 
-- FastAPI, agent orchestration or product explanation/report.
-- MCP wiring into the existing synchronous SHADOW command or a full MTF
-  analysis/report workflow; the CLI SHADOW adapter remains the current default.
-- Web/Mini App, Telegram bot, SQLite, Docker Compose or product quickstart.
+- Agent workflows or LLM explanation enhancement.
+- MCP wiring into the existing synchronous CLI SHADOW command; product MTF/API
+  uses real MCP separately and preserves the CLI default.
+- Web/Mini App, Telegram bot, full chart-history extension, Docker Compose or
+  deployment quickstart. Local backend API setup is documented in README.
 - Real strategy, MarketStructureEngine, Range/Deviation/Manipulation detectors.
 - Momentum/Distribution, strategy HTF/Premium/Discount context, real Acceptance
   rules, production Risk/sizing, Position Manager, fill/PnL accounting or LIVE.
@@ -164,8 +181,8 @@ combination alone is now verified for this narrow public runtime gate.
 
 Actual product-runtime MCP is mandatory; desktop Codex/Claude access and CLI
 probes are not its proof. The narrow backend gate now verifies application →
-MCP client → toolkit → real ticker/15m candles/orderbook → normalized facts and
-snapshot. Full 4H/1H/15m report integration remains a later deliverable.
+MCP client → toolkit → real ticker/4H/1H/15m/orderbook → normalized causal core
+→ report/SQLite/API. A functioning pipeline is not strategy validation.
 
 Preferred explanation: deterministic report → template explanation → optional
 LLM enhancement. LLMs cannot determine/override prices, structural state,
@@ -198,8 +215,8 @@ Ch.0 historical exit checklist, now verified through Git metadata and baseline:
 
 Ch.0 — Base Setup / Product Re-Scope; Ch.1 — Product MVP & UX;
 Ch.2 — Trading Intelligence; Ch.3 — Agent Workflows; Ch.4 — Validation & Demo.
-**Ch.1 started with explicit approval for Backend Target #1 only; its runtime
-MCP gate is verified. Ch.1 is not complete.** [NEXT_TASK](NEXT_TASK.md) describes
+**Ch.1 Backend Targets #1 and #2 are verified under their separate explicit
+authorizations. Ch.1 is not complete.** [NEXT_TASK](NEXT_TASK.md) describes
 future work, not permission to auto-start after the requested commit.
 
 ## Historical runtime evidence / limits

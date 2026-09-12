@@ -58,11 +58,13 @@ Chapter model: Ch.0 — Base Setup / Product Re-Scope; Ch.1 — Product MVP & UX
 Ch.2 — Trading Intelligence; Ch.3 — Agent Workflows; Ch.4 — Validation & Demo.
 Ch.0 closed at `24e1f465a886e2941a8ce2fce8fb51d53b643405`, with the frozen scope,
 architecture, responsibilities, 36 passing tests and two clean sibling worktrees.
-The user explicitly started Ch.1 with [U-MCP-GATE-001], approving **Backend
-Target #1: runtime MCP gate only**, before the shared API contract. That narrow
-gate is verified; see [evidence](docs/runtime-atk-mcp-gate.md). Ch.1 is not complete.
-Stop after the requested backend commit; subsequent implementation needs its
-next user instruction. No API/UX/intelligence scope is implied by this gate.
+The user explicitly started Ch.1 with [U-MCP-GATE-001]; Target #1 passed and
+committed at cd686755cc1a01d032510806331ccf79267ed5af. Then
+[U-ANALYSIS-API-001] authorized **Backend Target #2: analysis service/API/SQLite**.
+Its frozen [contract](docs/specs/analysis-api-v0.1.md), real full-MTF product
+[smoke](docs/product-analysis-smoke.md), immutable history and thin API are
+verified. Ch.1 remains incomplete. Stop after the requested backend commit;
+no subsequent intelligence/UX/deployment scope is implied.
 
 ## Architecture: current vs intended
 
@@ -79,10 +81,11 @@ next user instruction. No API/UX/intelligence scope is implied by this gate.
 | Execution | Replay disabled; SHADOW records intent only, with no exchange order client |
 | Position Management | Not implemented |
 | Logging | Structured JSONL, schema_version=2; new file for each run |
-| Product-runtime ATK MCP | Verified narrow Python SDK 2.2.0 → ATK 1.4.6 TR market-only/read-only smoke; full report/MTF integration pending |
-| FastAPI / agent orchestration / product explanation | Planned; not implemented |
+| Product-runtime ATK MCP | Verified SDK 2.2.0 → ATK 1.4.6 TR public ticker/4H/1H/15m/book → causal core/report/SQLite; CLI remains separate |
+| FastAPI / analysis service / explanation | Implemented thin five-route API, serialized bounded service and deterministic report-derived template; agent/LLM workflows pending |
 | Shared React/Vite/TypeScript Web/Mini App and Telegram bot | Planned; not implemented; Telegram optional |
-| SQLite / Docker Compose / self-hosting quickstart | Planned; not implemented |
+| SQLite / product history | Implemented stdlib DELETE rollback history/real events, atomic finalization/idempotency and startup interruption recovery; core JSONL preserved |
+| Docker Compose / deployment quickstart | Planned; local backend API setup exists, deployment not implemented |
 
 The intended chain is data → snapshot/state/patterns → context → decision →
 acceptance → risk → execution → position management, with logging throughout.
@@ -118,16 +121,18 @@ Do not silently rewrite the architecture or represent planned modules as done.
 - Read the relevant spec before coding; do not implement unresolved assumptions.
 - Run relevant tests before and after meaningful code/contract changes. For
   docs-only work, verify references/state and run the suite when feasible.
-- Full suite from the project root: `py -B -m unittest discover -s tests -v`
-  (use `python3` outside Windows). If the launcher is unavailable, use the
-  configured Python path documented in PROJECT_STATE; do not change source
-  or install dependencies just to repair the invocation.
+- Full suite from backend root: `./.venv/Scripts/python.exe -B -m unittest discover -s tests -v`
+  (use .venv/bin/python outside Windows), with optional test-product dependencies
+  installed once. The suite is offline; base CLI/replay remain dependency-free.
+  Launcher/interpreter fallback is documented in PROJECT_STATE; do not change
+  source or install global dependencies merely to repair invocation.
 - Keep commits small and task-scoped. Honor an explicit no-commit instruction.
   No push or remote creation is currently authorized.
 - Document major decisions in [DECISIONS](docs/DECISIONS/), and update HANDOFF,
   PROJECT_STATE when state changes, and NEXT_TASK at each safe completion.
-- Next product work is the shared API contract, with Claude review, after the
-  user's next instruction. The narrow runtime MCP proof is verified. Range remains the next strategy-source
+- Next product work is the bounded closed-candle chart/history extension, with
+  Claude review of frozen v0.1 and the extension, after the user's next instruction.
+  Full public runtime analysis/report/API/persistence is verified. Range remains the next strategy-source
   ingestion topic; the Market Structure draft stays blocked by N-1–N-7.
   A product scope approval does not fill missing trading algorithms.
 

@@ -7,13 +7,14 @@ Base checkpoint: `364a3a7d50024520065e74a9c9e9da899d4e3897`.
 Sources: [U-PRODUCT-001] and [U-RUBRIC-001], the user's formal Ch.0 closure
 instruction; see [SOURCE_REGISTRY](../SOURCE_REGISTRY.md).
 
-This freezes product requirements, not trading algorithms or an API schema.
-The tables/checklists below preserve the historical Ch.0 snapshot. The user
-subsequently started Ch.1 with [U-MCP-GATE-001], approving Backend Target #1
-before the shared API contract. Only the narrow runtime MCP market adapter/smoke
-is now verified; see its [spec](runtime-atk-mcp-gate.md) and
-[evidence](../runtime-atk-mcp-gate.md). Other product work remains planned;
-neither this gate nor these historical checklists mark Ch.1 complete.
+This freezes product requirements, not trading algorithms. Historical Ch.0
+tables/checklists below are preserved. Target #1 runtime gate completed at
+cd686755cc1a01d032510806331ccf79267ed5af. Explicit [U-ANALYSIS-API-001]
+subsequently authorized Target #2: [frozen analysis API](analysis-api-v0.1.md),
+bounded real public MTF/core service, SQLite/report/history and deterministic
+explanation are now verified; [real product evidence](../product-analysis-smoke.md).
+Shared UX/Telegram/deployment, P0.5 intelligence and other planned modules are
+still pending. **Ch.1 is incomplete.** Stop after the target's requested commit.
 
 ## A. Product vision
 

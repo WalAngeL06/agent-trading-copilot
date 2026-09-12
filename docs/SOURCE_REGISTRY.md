@@ -14,6 +14,8 @@ Agent-authored summaries and external libraries do not become DD strategy truth.
 | [R-COPILOT-001] | [R] External engineering research | Agentic Market Intelligence ecosystem | RESEARCH REFERENCE | N/A | Incoming [ecosystem report](research/agentic-market-intelligence-ecosystem-2026-09-12.md), 2026-09-12, parallel Kaynak Tarama task. Preserved without editing during closure. Proposed package versions, framework/deployment choices and compatibility claims are not an installed/tested product stack, approved scope or DD semantics. |
 | [U-MCP-GATE-001] | [U] Explicit user implementation authorization | Ch.1 Backend Target #1: runtime ATK MCP integration gate | CONFIRMED PROJECT REQUIREMENT | N/A — runtime requirement, not a trading rule | User instruction, 2026-09-12, attachment 5365fd21-41b2-46b0-99df-7cbaee5d1a85/pasted-text-1.txt. Start Ch.1 only in backend worktree; prove official Python MCP client → installed ATK 1.4.6 → TR market-only/read-only public reads before API work. Preserve CLI/core; exact normalization/provenance, deterministic tests, explicit real smoke; commit coherent target then stop without merge/push/tag. [Target spec](specs/runtime-atk-mcp-gate.md). |
 | [E-MCP-GATE-001] | [E] Local runtime interoperability evidence | Public product-runtime MCP data gate | VERIFIED NARROW RUNTIME GATE | N/A — no strategy/performance validation | [Smoke evidence](runtime-atk-mcp-gate.md): official mcp 2.2.0 + ATK MCP 1.4.6, protocol 2025-11-25, 21 discovered tools; actual BTC-USDT ticker, ten 15m rows (nine closed retained), depth-five book and candle snapshot. 36 baseline + 43 new deterministic tests passed. This evidence supports U-MCP-GATE-001, does not alter original rule provenance, and proves no API/UX/intelligence/PnL or full MTF delivery. |
+| [U-ANALYSIS-API-001] | [U] Explicit user implementation authorization | Ch.1 Backend Target #2 product service/API/persistence | CONFIRMED PROJECT REQUIREMENT | N/A — engineering scope | User attachment dcb7efe6-17be-4d50-bcca-1acf3dd92c6f/pasted-text-1.txt, 2026-09-12. Backend worktree only, parent cd686755; frozen report, real MCP MTF/core, thin FastAPI, stdlib SQLite/JSONL, deterministic explanation, neutral failures, offline tests and separate real product smoke; commit then stop with no merge/push/tag. [Contract](specs/analysis-api-v0.1.md). |
+| [E-ANALYSIS-API-001] | [E] Local public product interoperability evidence | Real MTF/core/report/SQLite/API flow | VERIFIED BOUNDED PRODUCT FLOW | N/A — no strategy/performance validation | [Real product smoke](product-analysis-smoke.md): analysis580b88e9-a183-4889-8cc7-b861fef405a4, five real public MCP reads, 100 closed candles per TF, causal core NO_TRADE/STRATEGY_NOT_CONFIGURED, exact string/UTC report, core audit, ten events, DELETE journal and identical fresh SQLite/API retrieval. 79 old +71 new =150 offline tests passed. No intelligence/order/private/deployment/UX claim; original trading-rule provenance unchanged. |
 
 Tag vocabulary: [D] DD Finance; [U] user hypothesis/clarification; [G] ChatGPT;
 [C] Claude; [R] external research; [E] empirical validation evidence.
@@ -27,8 +29,9 @@ artifact and its methodology/limitations before asserting empirical validation.
 No confirmed Range source is registered yet; no placeholder source ID asserts
 that unreceived DD material was reviewed. Range remains the next strategy-source
 ingestion topic. The narrow runtime MCP gate is verified under explicit Ch.1
-authorization; the next product task is the shared API contract after the user's
-next instruction. See [NEXT_TASK](NEXT_TASK.md).
+authorization; Target #2 then delivered its separately authorized API/service/SQLite.
+The next proposed product task is the bounded chart/history extension under the
+user's next instruction. See [NEXT_TASK](NEXT_TASK.md).
 
 Product approval does not resolve MarketStructureEngine N-1–N-7 or approve a
 Range/Deviation algorithm. P0.5 requires its own narrow, causal intelligence
@@ -37,7 +40,7 @@ validation. Preserve [D-DD-MSB-001] and [U-PD-001], including Premium/Discount
 context, no universal EQ reaction/reclaim and separate DD ordinary side blocks.
 
 Ch.0 froze scope/memory and prepared Git worktrees without implementation.
-Ch.1 Backend Target #1 is now verified; subsequent implementation remains gated
+Ch.1 Backend Targets #1 and #2 are now verified; subsequent implementation remains gated
 by its next user instruction and Ch.1 is not complete.
 Chapter sequence: Ch.0 Base Setup / Product Re-Scope; Ch.1 Product MVP & UX;
 Ch.2 Trading Intelligence; Ch.3 Agent Workflows; Ch.4 Validation & Demo.

@@ -8,8 +8,8 @@ Before work:
 4. Read [NEXT_TASK](docs/NEXT_TASK.md).
 5. Read the relevant file under [docs/specs](docs/specs/).
 6. Inspect `git status` and `git log -3 --oneline`.
-7. Run relevant tests; full suite: `py -B -m unittest discover -s tests -v`.
-   Python launcher fallback is documented in PROJECT_STATE.
+7. Run relevant tests; full offline product-suite command, optional dependencies
+   and interpreter fallback are documented in PROJECT_STATE. Use the backend .venv.
 
 Do not continue undocumented assumptions from chat history. Repository docs
 are shared project memory; record current user clarifications there.

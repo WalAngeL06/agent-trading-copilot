@@ -1,67 +1,54 @@
-# Next task — shared product API contract
+# Next backend task — bounded closed-candle chart/history API
 
-Updated: 2026-09-12. Chapter: **Ch.1 — Product MVP & UX**, incomplete.
-Backend Target #1 runtime MCP gate is verified under [U-MCP-GATE-001].
-**Do not auto-start this next task.** The current target ends after its requested
-backend commit; await the next explicit user instruction.
+Updated: 2026-09-12. Ch.1 remains incomplete.
+Backend Target #2 is verified under [U-ANALYSIS-API-001].
+**Await the next explicit user instruction; do not auto-start this proposal.**
 
-## Read and verify the starting point
+## Starting point
 
-Read AGENTS.md → PROJECT_STATE → HANDOFF → this file, the
-[product spec](specs/product-mvp-v0.1.md),
-[runtime gate spec](specs/runtime-atk-mcp-gate.md),
-[actual MCP evidence](runtime-atk-mcp-gate.md), SOURCE_REGISTRY and ADRs 006–009.
-Inspect branch/status/log before edits; verify the target commit and current
-suite. Backend is `work/copilot-backend` in
-`C:/Users/Serdar Arif/Desktop/Agent Trading-backend`, descended from Ch.0
-`24e1f465a886e2941a8ce2fce8fb51d53b643405`. Integration and UX remain at Ch.0;
-preserve them. The current baseline is **79 tests** (36 original + 43 MCP).
-No merge, push, remote creation or tag is authorized by the completed target.
+Read AGENTS → PROJECT_STATE → HANDOFF → this file, then
+[analysis API v0.1](specs/analysis-api-v0.1.md),
+[real product evidence](product-analysis-smoke.md), product spec and ADR010.
+Backend worktree/branch: Agent Trading-backend / work/copilot-backend.
+Parent checkpoint: cd686755cc1a01d032510806331ccf79267ed5af.
+Obtain Target #2 commit hash from Git/final report; current baseline150.
+Preserve integration/UX at Ch.0. No merge, push, tag or remote creation.
 
-## Proposed next deliverable — contract before parallel implementation
+## Exact proposed Target #3
 
-Codex defines; Claude reviews. Specify routes/request lifecycle, schema
-version, exact Decimal string fields, symbol/timeframe limits, analysis identity,
-candle decision `as_of`, separate ticker/book exchange/response observation
-times, freshness/error/loading states, facts/evidence references, unavailable
-modules, deterministic result/reasons, template explanation, history and
-sanitized MCP provenance. Keep future intelligence labels distinct from
-operational status and current `NO_TRADE / STRATEGY_NOT_CONFIGURED`.
+Codex defines and Claude reviews a bounded chart-history extension before
+parallel frontend work. Persist the actual normalized closed 4H/1H/15m history
+used by each analysis, then expose it through a typed read-only endpoint or
+versioned report extension with explicit size limits, Decimal strings,
+chronology, original analysis identity/as_of, provenance and available/error
+states. Do not reconstruct historical evidence from fresh exchange reads.
 
-Freeze request/response examples and expected behavior before frontend/backend
-implement in parallel. This proposal does not create a schema, FastAPI endpoint,
-SQLite store, frontend or Telegram flow. Current MCP returns immutable normalized
-facts with provenance; it does not expose the raw ATK envelope to core callers.
+Today's report deliberately exposes only latest closed candles/counts, not
+large chart arrays. In-memory snapshots contain the histories; JSONL stores
+core audit summaries. Neither source is a persistent full chart dataset.
+Specify schema/version/backward compatibility, repository migration,
+retention and limits before implementing the next extension. Review stable
+v0.1 fields with Claude and provide hand-checked request/response examples.
 
-## Later MCP/product wiring
+Possible completion evidence for that separately approved target: chart data
+retrieved after restart remains the original causal series; open/future rows
+never appear; per-symbol/TF isolation, bounded pagination and exact JSON hold;
+the existing150 tests remain green and meaningful new contract tests pass.
 
-The public SDK 2.2.0 / ATK MCP 1.4.6 TR gate passed real ticker/15m candles/book
-calls and feeds an existing candle snapshot. Preserve it and the separate CLI
-adapter; no silent fallback or development-tool MCP substitution.
+This is a proposal, not implemented work or authorization. No frontend,
+Telegram, LLM, deployment or trading-intelligence code is implied.
 
-After the shared contract and next implementation scope are approved, integrate
-4H/1H/15m bootstrap/polling and report inputs with exact normalization,
-per-symbol/timeframe isolation, causal closed filtering, visible errors and
-explicit freshness. Keep later live facts out of past decision evidence.
-Validate Linux/container operation and lock the actual deployment dependencies
-when that deliverable is authorized. No exchange writes or LIVE switch.
+## Preserved boundaries
 
-## Preserved future priorities and algorithm gates
+Target #2 already provides real public MCP -> MTF/core -> report/SQLite/API,
+deterministic explanation, failures/health/idempotency and real timeline.
+Keep the independent CLI SHADOW flow intact. Request-driven readiness needs
+a successful fresh analysis; no silent stale/CLI fallback.
 
-P0: BTC report/API, shared Analysis/History web/Mini App, chart, template
-explanation, SQLite history, optional Telegram and easy Compose installation.
-P0.5 before final demo requires an approved meaningful deterministic intelligence
-slice with source-labelled causal fixtures. Data quality or renaming the
-unconfigured placeholder to WAIT does not satisfy it.
-
-Intended intelligence: Market Structure → Range → Deviation → LTF
-confirmation/context. MarketStructure N-1–N-7 remain unresolved; no confirmed
-DD Range source/spec exists. Range remains the next strategy-source ingestion
-topic when authorized; record unresolved rules as **ALGORITHMIC DEFINITION
-PENDING**, never substitute generic SMC/library defaults or magic thresholds.
-Premium/Discount is context, not an entry trigger; EQ reaction is not universally
-mandatory and DD ordinary HTF side blocks remain separate.
-
-P1/P2 and excluded features remain governed by the frozen product spec. No
-private/account tools, PnL, full portfolio or live execution are implied by the
-completed public MCP gate. Ch.1 is not complete.
+P0 still needs shared UX, optional Telegram and Compose delivery. P0.5 final-demo
+gate needs its own approved meaningful deterministic intelligence slice;
+NO_TRADE / STRATEGY_NOT_CONFIGURED is honest infrastructure, not that slice.
+MarketStructure N-1–N-7 remain ALGORITHMIC DEFINITION PENDING. Range remains
+the next strategy-source intake; no confirmed DD Range source exists.
+Premium/Discount remains context, no universal EQ reaction/reclaim, and DD HTF
+side blocks remain separate. LIVE/private/order/PnL paths remain outside scope.

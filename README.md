@@ -10,7 +10,6 @@ Proje klasöründe Windows:
 
 ```powershell
 py -m agent_trading --config config.example.json
-py -m unittest discover -s tests -v
 ```
 
 Linux/macOS'ta `py` yerine `python3` kullanın.
@@ -99,8 +98,88 @@ Toolkit log/update kontrolleri kapalıdır; geçici dosyalar ignored `runs/` alt
 oluşup çıkışta silinir. Normal testler MCP/Node/network gerektirmez.
 
 [Smoke kanıtı, 21 keşfedilen araç ve uyumluluk ayrıntısı](docs/runtime-atk-mcp-gate.md).
-Bu dar kapı doğrulandı; MCP henüz mevcut SHADOW komutuna veya ürün API/raporuna
-bağlanmadı. Ch.1 ve strateji tamamlanmış değildir; işlem yazma yolu yoktur.
+Bu dar kapı doğrulandı; mevcut CLI SHADOW komutu korunur. MCP artık aşağıdaki
+ürün API/rapor akışında kullanılır. Ch.1 ve strateji tamamlanmış değildir.
+
+## Ürün analizi API’si ve kalıcı geçmiş
+
+Backend Hedef #2 gerçek BTC ürün akışını ekler: runtime MCP → ticker, kapalı
+4H/1H/15m mumları ve orderbook → mevcut çekirdek → AnalysisReport → SQLite/API.
+Strateji henüz yapılandırılmadığından başarılı veri akışının gerçek sonucu
+`NO_TRADE / STRATEGY_NOT_CONFIGURED` olabilir. Eksik/eski/bozuk veri ise
+`FAILED` ve null karar üretir; bu bir piyasa yönü değerlendirmesi değildir.
+
+Windows’ta backend proje klasöründe, mevcut .venv için:
+
+```powershell
+./.venv/Scripts/python.exe -B -m pip install -e '.[product,test-product]'
+./.venv/Scripts/python.exe -B -m unittest discover -s tests -v
+./.venv/Scripts/python.exe -B -m uvicorn agent_trading.api:create_app --factory --host 127.0.0.1 --port 8000 --workers 1
+```
+
+Ortam yoksa önce `py -B -m venv .venv` çalıştırın. Python launcher bulunamazsa
+[PROJECT_STATE](docs/PROJECT_STATE.md) içindeki doğrulanmış yorumlayıcıyı kullanın.
+Linux/macOS için .venv/bin/python; bu platformun canlı smoke’u henüz doğrulanmadı.
+Kurulum bir kez paket indirir; **150 testin normal çalışması internetsizdir**.
+API testleri FastAPI/HTTPX kullanır; Node, ATK, hesap veya gerçek MCP oturumu gerekmez.
+Replay ve CLI SHADOW komutları ek API paketleri olmadan çalışmaya devam eder.
+
+```powershell
+Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:8000/api/v1/analyses' -ContentType 'application/json' -Body '{"symbol":"BTC-USDT"}'
+```
+
+| Uç | Davranış |
+|---|---|
+| GET /health/live | Uygulama yanıt veriyor |
+| GET /health/ready | SQLite ve yakın zamanda doğrulanmış MCP/MTF ön koşulları |
+| POST /api/v1/analyses | Yeni tamamlanmış/başarısız rapor201; aynı idempotent istek200 |
+| GET /api/v1/analyses/{analysis_id} | Orijinal kayıt; yeniden hesaplama yok |
+| GET /api/v1/analyses | Geçmiş; limit1..50, offset0..10000 |
+
+Yeni `FAILED` rapor da oluşturulmuş kaynak olarak201 döner; istemci mutlaka
+`status` alanını kontrol eder. Doğrulama422, bilinmeyen kimlik404, çalışan aynı
+istek/anahtar çakışması409, kapasite veya kayıt sorunu503. İsteğe bağlı
+`Idempotency-Key` başlığı aynı terminal raporu MCP’yi yeniden çağırmadan döndürür;
+yalnız anahtar özeti saklanır. Aynı anda bir yeni analiz çalışır.
+
+İlk başarılı analize kadar /health/ready503 döner. POST bu durumda denenebilir.
+Hazırlık önbelleği varsayılan60 saniyedir; veri hatası, süre aşımı veya yeni mum
+sınırında eski kalan veri hazırlığı düşürür. GET hazır olma kontrolü ağ çağrısı
+yapmaz. Yeniden başlatma geçmişi korur; yeni veri doğrulaması ayrıca gerekir.
+
+Varsayılan SQLite yolu `runs/product/analyses.sqlite3`, her analizin ayrı çekirdek
+günlüğü `runs/analyses/{analysis_id}.jsonl`. İkisi de Git dışında kalır.
+SQLite DELETE rollback journal, kısa işlemler ve terminal rapor/olay atomik kaydı
+kullanır. Bir süreç/worker bu veriyi sahiplenir; çoklu worker başlatmayın.
+Yarım kalan RUNNING kayıtlar yeniden başlatmada FAILED/PROCESS_INTERRUPTED olur.
+SQLite geçmişi, mevcut JSONL çekirdek günlüğünün yerini almaz.
+
+Operatör ortam ayarları: ANALYSIS_DB_PATH, ANALYSIS_AUDIT_DIR,
+ANALYSIS_NODE_PATH, ANALYSIS_ATK_SERVER_PATH; açık operasyon ayarları
+ANALYSIS_HISTORY_LIMIT (100), ANALYSIS_PUBLICATION_GRACE_SECONDS (60),
+ANALYSIS_OBSERVATION_MAX_AGE_SECONDS (60), ANALYSIS_MCP_TIMEOUT_SECONDS (20),
+ANALYSIS_ANALYSIS_TIMEOUT_SECONDS (60), ANALYSIS_READY_TTL_SECONDS (60),
+ANALYSIS_SQLITE_TIMEOUT_SECONDS (1) ve küçük ANALYSIS_ALLOWED_SYMBOLS listesi.
+İstemci bu alanları HTTP isteğinde ayarlayamaz; site tr sabittir.
+
+Ayrı **gerçek internet/piyasa** ürün doğrulaması:
+
+```powershell
+./.venv/Scripts/python.exe -B -m agent_trading.product_smoke
+```
+
+--node-path/--server-path bulunmayan kurulu runtime yollarını, --db-path/
+--audit-dir saklama konumunu, --timeout/--mcp-timeout süre sınırını belirler.
+Çıktı yalnız kısa kimlik/zaman/karar/spread/araç/kayıt/emir özetidir.
+[Gerçek ürün kanıtı](docs/product-analysis-smoke.md): beş gerçek MCP okuması,
+100’er kapalı mum, mevcut çekirdek, SQLite ve aynı raporun API’den alınması başarılı.
+
+[Sabit API/UX sözleşmesi](docs/specs/analysis-api-v0.1.md) fiyat/miktarları string,
+tüm zamanları UTC taşır. Ticker/book gözlemleri geçmiş mum kararının girdisi olmaz.
+Market Structure, Range, Deviation ve Premium/Discount NOT_IMPLEMENTED;
+Acceptance/Risk NOT_EVALUATED. Açıklama yalnız rapordan üretilir, LLM yoktur.
+Tam grafik dizileri, Claude UX incelemesi, auth/CORS, sürekli veri yenileme,
+Linux/container ve deployment sonraki işlerdir. Ch.1 tamamlanmış değildir.
 
 ## Modüller
 
@@ -117,6 +196,13 @@ bağlanmadı. Ch.1 ve strateji tamamlanmış değildir; işlem yazma yolu yoktur
 | `okx_mcp_runtime.py` | Sabitlenmiş resmi SDK/ATK process yaşam döngüsü ve public izolasyonu |
 | `market_observations.py` | Snapshot dışındaki immutable Decimal ticker/book gözlemleri |
 | `mcp_smoke.py` | Açıkça çağrılan gerçek TR public MCP smoke |
+| `analysis_config.py` | Sınırlı operatör ürün ayarları |
+| `analysis_report.py` | Sabit rapor, freshness, exact spread ve template açıklama |
+| `analysis_repository.py` | SQLite kalıcı metadata/rapor/olaylar |
+| `analysis_service.py` | Sınırlı gerçek MCP/MTF/çekirdek ürün akışı |
+| `analysis_api_models.py` | Strict OpenAPI/string finansal veri şeması |
+| `api.py` | İnce analiz/geçmiş/health HTTP arayüzü |
+| `product_smoke.py` | Ayrı gerçek ürün ve SQLite smoke |
 | `shadow.py` | Bootstrap ve SHADOW veri yenileme akışı |
 | `journal.py` | JSONL karar/hata kaydı |
 | `__main__.py` | Komut satırından çalıştırma |
