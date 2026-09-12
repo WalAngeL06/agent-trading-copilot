@@ -1,8 +1,18 @@
 # Project state
 
 Updated: 2026-09-12. Owner: Codex.
-Chapter: **Ch.0 — Base Setup / Product Re-Scope**.
-Status: **Product scope frozen; documentation/Git closure only. Ch.1 not started.**
+Chapter: **Ch.1 — Product MVP & UX**.
+Status: **Backend Target #1 runtime MCP gate VERIFIED; Ch.1 incomplete.**
+
+The user's explicit [U-MCP-GATE-001] instruction starts Ch.1 in the backend
+worktree and prioritizes this narrow gate before the shared API contract.
+Python product code → official MCP SDK 2.2.0 → installed ATK MCP 1.4.6 → real
+OKX TR ticker/15m candles/orderbook → exact normalized domain facts and a
+candle-only snapshot succeeded on 2026-09-12. Protocol: `2025-11-25`.
+Evidence, discovered tools and compatibility details:
+[runtime-atk-mcp-gate](runtime-atk-mcp-gate.md).
+Stop after the target's backend commit; no later implementation is authorized
+by this instruction. Integration and UX remain untouched.
 
 ## Approved product and rubric
 
@@ -49,17 +59,17 @@ The shared-memory files and Market Structure draft were committed at 364a3a7;
 the older "uncommitted docs" state is historical and superseded. Existing tags
 remain preserved. No push/remote exists. This closure creates no tag.
 
-Only after the Ch.0 commit succeeds and integration status is clean, create
-`work/copilot-backend` and `work/copilot-ux` from that exact checkpoint:
+Ch.0 commit/worktree creation is verified complete. Exact checkpoint:
+`24e1f465a886e2941a8ce2fce8fb51d53b643405`. Both branches were clean at that
+checkpoint before this target:
 - Backend: `C:/Users/Serdar Arif/Desktop/Agent Trading-backend`.
 - UX: `C:/Users/Serdar Arif/Desktop/Agent Trading-ux`.
 
-These operations follow this document's commit. Verify the actual hash,
-branch/path, checkout cleanliness and same starting commit with `git status`,
-`git log -3 --oneline` and `git worktree list --porcelain`; the final closure
-report records their completion. Preserve/report existing branches/worktrees
-instead of recreating or destroying them. Both checkouts stay untouched.
-Root integration remains at `C:/Users/Serdar Arif/Desktop/Agent Trading`.
+Current work is exclusively on `work/copilot-backend`, descended from that
+checkpoint. Its next commit is `feat: add runtime OKX ATK MCP market adapter`;
+read the exact hash from Git/final target report. Root integration remains at
+`C:/Users/Serdar Arif/Desktop/Agent Trading`; integration and UX branch HEADs
+remain at Ch.0. No merge/push/tag/remote creation. Preserve both worktrees.
 
 ## Test status and invocation
 
@@ -67,15 +77,17 @@ Last verified baseline: **36 existing tests passing**, 0 failures/errors, on
 2026-09-12 at the shared-memory checkpoint.
 Fresh Ch.0 closure verification on 2026-09-12: **36 tests passed, zero
 failures/errors**, exit 0, with `py -B -m unittest discover -s tests -v`.
-Only documentation and Git setup are changed; application, tests, dependencies
-and runtime configuration are preserved. Infrastructure tests are not empirical
-validation of DD strategy behavior or evidence of product-runtime MCP.
+Fresh Ch.1 target verification: **79 tests passed**, zero failures/errors,
+exit 0: 36 preserved tests + 43 deterministic MCP tests. Normal suite needs no
+SDK, ATK, Node, credentials or network. A separate real smoke passed all three
+required reads. Infrastructure tests are not empirical validation of DD
+strategy behavior; runtime MCP is established by the separate live evidence.
 
 Full suite from the root:
 
 `py -B -m unittest discover -s tests -v`
 
-Set `PYTHONDONTWRITEBYTECODE=1` for subprocesses during this docs-only closure.
+Use `-B` / `PYTHONDONTWRITEBYTECODE=1` to suppress application bytecode.
 If the launcher is unavailable, use the verified local interpreter:
 
 `C:/Users/Serdar Arif/AppData/Local/Programs/Python/Python314/python.exe`
@@ -89,6 +101,14 @@ fallback, not a portable dependency. Linux/macOS can use `python3`.
 - Immutable MarketSnapshot; bounded symbol/timeframe-separated histories.
 - Official ATK public-market **CLI** adapter: ticker, candles and orderbook,
   exact normalization, closed filtering and allowlisted reads.
+- Separate async runtime **MCP** market adapter with authoritative discovery,
+  schema/name gates, sanitized provenance, bounded failures and the existing
+  candle normalizer. New immutable ticker/book observations remain outside
+  candle snapshots. Explicit public-network smoke builds an existing snapshot.
+- Optional `runtime-mcp` dependency: official `mcp==2.2.0` (mcp-types 2.2.0).
+  Installed/verified in the ignored backend `.venv`; host Python stays unchanged.
+  The pinned ATK MCP 1.4.6 child uses an isolated empty home, fixed TR URL,
+  market/read-only arguments, disabled toolkit logs/update checks and cleanup.
 - Real BTC-USDT bootstrap, configurable 4H / 1H / 15m snapshots; bootstrap does
   not call the decision chain.
 - SHADOW bounded/continuous polling; intent-only execution, zero real-order path.
@@ -98,7 +118,9 @@ fallback, not a portable dependency. Linux/macOS can use `python3`.
 
 ## Not implemented
 
-- Product-runtime MCP client/adapter, FastAPI, agent orchestration or explanation.
+- FastAPI, agent orchestration or product explanation/report.
+- MCP wiring into the existing synchronous SHADOW command or a full MTF
+  analysis/report workflow; the CLI SHADOW adapter remains the current default.
 - Web/Mini App, Telegram bot, SQLite, Docker Compose or product quickstart.
 - Real strategy, MarketStructureEngine, Range/Deviation/Manipulation detectors.
 - Momentum/Distribution, strategy HTF/Premium/Discount context, real Acceptance
@@ -135,13 +157,15 @@ Postponed topics are history, not permission to build them during this MVP.
 Incoming ecosystem [research](research/agentic-market-intelligence-ecosystem-2026-09-12.md)
 from the parallel Kaynak Tarama task is preserved as [R-COPILOT-001]. Its library,
 deployment and compatibility proposals remain references, not approved scope,
-installed dependencies, a completed runtime integration or new DD semantics.
+installed full product stack or new DD semantics. The SDK 2.2.0 / ATK 1.4.6
+combination alone is now verified for this narrow public runtime gate.
 
 ## Product boundaries and responsibilities
 
-Actual product-runtime MCP is mandatory; desktop Codex/Claude access and current
-CLI probes are not its proof. Validate application → MCP client → toolkit →
-real ticker/MTF candles/orderbook → normalized core input early in Ch.1.
+Actual product-runtime MCP is mandatory; desktop Codex/Claude access and CLI
+probes are not its proof. The narrow backend gate now verifies application →
+MCP client → toolkit → real ticker/15m candles/orderbook → normalized facts and
+snapshot. Full 4H/1H/15m report integration remains a later deliverable.
 
 Preferred explanation: deterministic report → template explanation → optional
 LLM enhancement. LLMs cannot determine/override prices, structural state,
@@ -160,8 +184,7 @@ Trading-intelligence core files have one owner at a time.
 
 ## Ch.0 exit / chapter model
 
-This is the pre-commit document-freeze checklist. The final two operations
-are verified afterward through Git metadata and the final closure report.
+Ch.0 historical exit checklist, now verified through Git metadata and baseline:
 
 - [x] Deterministic foundation checkpoint.
 - [x] Real OKX shadow-data pipeline.
@@ -170,13 +193,14 @@ are verified afterward through Git metadata and the final closure report.
 - [x] Hackathon MVP scope frozen.
 - [x] Product architecture documented.
 - [x] Agent responsibilities defined.
-- [ ] Final Ch.0 checkpoint commit.
-- [ ] Clean worktrees created from that checkpoint.
+- [x] Final Ch.0 checkpoint commit.
+- [x] Clean worktrees created from that checkpoint.
 
 Ch.0 — Base Setup / Product Re-Scope; Ch.1 — Product MVP & UX;
 Ch.2 — Trading Intelligence; Ch.3 — Agent Workflows; Ch.4 — Validation & Demo.
-**Ch.1 has not started and requires explicit user approval after closure review.**
-[NEXT_TASK](NEXT_TASK.md) describes future tasks, not an instruction to auto-start.
+**Ch.1 started with explicit approval for Backend Target #1 only; its runtime
+MCP gate is verified. Ch.1 is not complete.** [NEXT_TASK](NEXT_TASK.md) describes
+future work, not permission to auto-start after the requested commit.
 
 ## Historical runtime evidence / limits
 

@@ -56,16 +56,19 @@ gates preserved. Advanced models/theories and portfolio management are deferred.
 
 Chapter model: Ch.0 — Base Setup / Product Re-Scope; Ch.1 — Product MVP & UX;
 Ch.2 — Trading Intelligence; Ch.3 — Agent Workflows; Ch.4 — Validation & Demo.
-This task closes Ch.0 documentation and Git setup only. Ch.0 exit requires the
-approved/frozen scope, architecture, responsibilities, a passing existing suite,
-checkpoint commit and two clean worktrees from that checkpoint. **Do not begin
-Ch.1 until the user reviews and explicitly approves this closure.**
+Ch.0 closed at `24e1f465a886e2941a8ce2fce8fb51d53b643405`, with the frozen scope,
+architecture, responsibilities, 36 passing tests and two clean sibling worktrees.
+The user explicitly started Ch.1 with [U-MCP-GATE-001], approving **Backend
+Target #1: runtime MCP gate only**, before the shared API contract. That narrow
+gate is verified; see [evidence](docs/runtime-atk-mcp-gate.md). Ch.1 is not complete.
+Stop after the requested backend commit; subsequent implementation needs its
+next user instruction. No API/UX/intelligence scope is implied by this gate.
 
 ## Architecture: current vs intended
 
 | Component | Current state |
 |---|---|
-| Data Engine | JSONL replay and public-market-only OKX CLI adapter |
+| Data Engine | JSONL replay, preserved public-market-only OKX CLI adapter, and separate async MCP market adapter |
 | MarketSnapshot / MTF histories | Immutable causal snapshot; bounded histories separated by symbol/timeframe |
 | Market Structure | Spec draft only; MarketStructureEngine blocked by N-1–N-7 |
 | Pattern Engine | Unconfigured range/deviation/manipulation/momentum/distribution detectors |
@@ -76,7 +79,7 @@ Ch.1 until the user reviews and explicitly approves this closure.**
 | Execution | Replay disabled; SHADOW records intent only, with no exchange order client |
 | Position Management | Not implemented |
 | Logging | Structured JSONL, schema_version=2; new file for each run |
-| Product-runtime ATK MCP | Mandatory Ch.1 validation; not implemented in the current application |
+| Product-runtime ATK MCP | Verified narrow Python SDK 2.2.0 → ATK 1.4.6 TR market-only/read-only smoke; full report/MTF integration pending |
 | FastAPI / agent orchestration / product explanation | Planned; not implemented |
 | Shared React/Vite/TypeScript Web/Mini App and Telegram bot | Planned; not implemented; Telegram optional |
 | SQLite / Docker Compose / self-hosting quickstart | Planned; not implemented |
@@ -123,8 +126,8 @@ Do not silently rewrite the architecture or represent planned modules as done.
   No push or remote creation is currently authorized.
 - Document major decisions in [DECISIONS](docs/DECISIONS/), and update HANDOFF,
   PROJECT_STATE when state changes, and NEXT_TASK at each safe completion.
-- Next product work is the shared API contract and actual runtime MCP proof,
-  only after explicit Ch.1 approval. Range remains the next strategy-source
+- Next product work is the shared API contract, with Claude review, after the
+  user's next instruction. The narrow runtime MCP proof is verified. Range remains the next strategy-source
   ingestion topic; the Market Structure draft stays blocked by N-1–N-7.
   A product scope approval does not fill missing trading algorithms.
 
@@ -157,11 +160,12 @@ When switching Codex ↔ Claude:
 
 If agents work simultaneously, use separate Git worktrees **and branches**;
 never the same working directory. Merge/cherry-pick only reviewed commits.
-`strategy-v0.1` remains the integration branch. This closure explicitly creates
-`work/copilot-backend` and `work/copilot-ux` in sibling worktrees only after its
-documentation checkpoint commit and clean status. Both start from that exact
-commit and stay untouched; preserve/report existing branches/worktrees instead
-of recreating or destroying them. No tag, push or remote creation is authorized.
+`strategy-v0.1` remains the integration branch. Ch.0 created
+`work/copilot-backend` and `work/copilot-ux` in sibling worktrees from its exact
+documentation checkpoint. Only the backend worktree is authorized for this
+target; integration and UX remain at the checkpoint. Preserve/report existing
+branches/worktrees instead of recreating or destroying them. No merge, tag,
+push or remote creation is authorized by this target.
 
 Codex owns backend, runtime MCP adapter, FastAPI, core integration, persistence,
 backend tests and Compose/integration. Claude owns React/Vite/TypeScript,

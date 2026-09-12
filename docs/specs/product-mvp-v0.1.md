@@ -1,6 +1,6 @@
 # Product MVP v0.1 — Hackathon Scope Freeze
 
-Status: **APPROVED PRODUCT SCOPE — DOCUMENTATION ONLY; IMPLEMENTATION NOT STARTED**.
+Status: **APPROVED PRODUCT SCOPE — frozen at Ch.0**.
 Date: 2026-09-12. Chapter: **Ch.0 — Base Setup / Product Re-Scope**.
 Integration branch: `strategy-v0.1`.
 Base checkpoint: `364a3a7d50024520065e74a9c9e9da899d4e3897`.
@@ -8,10 +8,12 @@ Sources: [U-PRODUCT-001] and [U-RUBRIC-001], the user's formal Ch.0 closure
 instruction; see [SOURCE_REGISTRY](../SOURCE_REGISTRY.md).
 
 This freezes product requirements, not trading algorithms or an API schema.
-The existing Python application, tests, dependencies and runtime configuration
-are preserved. All product components below are planned unless explicitly
-identified as existing. Ch.1 requires a separate, explicit user approval after
-review of this closure.
+The tables/checklists below preserve the historical Ch.0 snapshot. The user
+subsequently started Ch.1 with [U-MCP-GATE-001], approving Backend Target #1
+before the shared API contract. Only the narrow runtime MCP market adapter/smoke
+is now verified; see its [spec](runtime-atk-mcp-gate.md) and
+[evidence](../runtime-atk-mcp-gate.md). Other product work remains planned;
+neither this gate nor these historical checklists mark Ch.1 complete.
 
 ## A. Product vision
 

@@ -1,7 +1,8 @@
 # Agent Trading
 
 Piyasa yapısı odaklı bir trading ajanının başlangıç altyapısı.
-Python 3.11+ gerekir. Çalıştırmak için ek paket kurulumu gerekmez.
+Python 3.11+ gerekir. Replay ve mevcut CLI SHADOW için ek Python paketi gerekmez.
+Gerçek MCP adaptörü aşağıdaki isteğe bağlı kurulumu kullanır.
 
 ## Çalıştırma
 
@@ -35,6 +36,7 @@ Veri ve varsayılan çıktı yolu config dosyasının klasörüne göre çözül
 - Tekrarlanabilir çıktılar ve entegrasyon testleri.
 - OKX Agent Trade Kit üzerinden gerçek kapalı mumları alan SHADOW akışı.
 - 4H / 1H / 15m için yapılandırılabilir bootstrap ve değiştirilemez MTF snapshot.
+- Ayrı, salt okunur ürün runtime MCP adaptörü; gerçek OKX TR smoke doğrulandı.
 
 **Bu sürüm strateji çalıştırmaz veya emir göndermez.** `NO_TRADE`, piyasanın
 uygun bulunmadığı anlamına gelmez: strateji henüz yapılandırılmamıştır.
@@ -68,6 +70,38 @@ Her çalışma ayrı günlük ister; `runs/` Git tarafından yok sayılır.
 
 Gerçek bağlantı kanıtı ve sınırlar: [Phase 1 raporu](docs/shadow-phase1.md).
 
+## Gerçek ürün runtime MCP smoke
+
+Resmi Node/ATK MCP `1.4.6` gerekir; mevcut CLI adaptörü korunur. Kurulu MCP
+sürümü farklıysa adaptör durur, otomatik yükseltme veya CLI fallback yapmaz.
+MCP yoksa ayrı olarak `npm install -g @okx_ai/okx-trade-mcp@1.4.6` kurun.
+Windows'ta proje klasöründe:
+
+```powershell
+py -B -m venv .venv
+.\.venv\Scripts\python.exe -B -m pip install -e '.[runtime-mcp]'
+.\.venv\Scripts\python.exe -B -m agent_trading.mcp_smoke
+```
+
+Linux/macOS: ortamı `python3 -m venv .venv` ile oluşturun; sonraki iki komutta
+`.venv/bin/python` kullanın. Bu platformdaki gerçek smoke henüz denenmedi.
+Node/paket bulunamazsa smoke'a `--node-path` ve `--server-path` verilebilir;
+ikinci yol MCP paketinin `dist/index.js` dosyasıdır. `--timeout` varsayılanı 30
+saniye, her initialize/discovery/call için ayrı sınırdır.
+
+Bu komut **gerçek internet/piyasa çağrısı** yapar: resmi Python `mcp==2.2.0`
+client → ATK MCP `1.4.6` → `site=tr`, `modules=market`, read-only. API anahtarı
+ve hesap girişi gerekmez; boş geçici home sayesinde hesap ayarları okunmaz.
+BTC-USDT ticker, on 15m mum ve beş seviyeli book okunur. Açık/gelecek mumlar
+filtrelenir; kapalı mumlar mevcut Decimal/UTC snapshot'a girer, ticker/book ayrı
+gözlem zamanları taşır. Çıktı sanitize edilmiş JSON; hata nonzero çıkış üretir.
+Toolkit log/update kontrolleri kapalıdır; geçici dosyalar ignored `runs/` altında
+oluşup çıkışta silinir. Normal testler MCP/Node/network gerektirmez.
+
+[Smoke kanıtı, 21 keşfedilen araç ve uyumluluk ayrıntısı](docs/runtime-atk-mcp-gate.md).
+Bu dar kapı doğrulandı; MCP henüz mevcut SHADOW komutuna veya ürün API/raporuna
+bağlanmadı. Ch.1 ve strateji tamamlanmış değildir; işlem yazma yolu yoktur.
+
 ## Modüller
 
 | Dosya | Sorumluluk |
@@ -79,6 +113,10 @@ Gerçek bağlantı kanıtı ve sınırlar: [Phase 1 raporu](docs/shadow-phase1.m
 | `engine.py` | Geçmiş yönetimi ve akış koordinasyonu |
 | `market.py` | Replay/bootstrap için ortak geçmiş deposu ve snapshot özeti |
 | `okx.py` | Yalnız piyasa okuyan Agent Trade Kit CLI adaptörü ve normalizasyon |
+| `okx_mcp.py` | MCP keşfi, izinli public okumalar, mevcut mum normalizer ve provenance |
+| `okx_mcp_runtime.py` | Sabitlenmiş resmi SDK/ATK process yaşam döngüsü ve public izolasyonu |
+| `market_observations.py` | Snapshot dışındaki immutable Decimal ticker/book gözlemleri |
+| `mcp_smoke.py` | Açıkça çağrılan gerçek TR public MCP smoke |
 | `shadow.py` | Bootstrap ve SHADOW veri yenileme akışı |
 | `journal.py` | JSONL karar/hata kaydı |
 | `__main__.py` | Komut satırından çalıştırma |
