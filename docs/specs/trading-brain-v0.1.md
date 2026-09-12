@@ -16,6 +16,23 @@ The user's new valid-pair, low-first range traversal, strict body-close break,
 frozen boundaries, sweep/reclaim, FVG/iFVG requirement and PAPER scope are
 [U-TRADING-BRAIN-001], not new DD attestations.
 
+## Confirmed candidate boundary correction [U-RANGE-BOUNDARIES-001]
+
+During candidate formation, ANY candle wick below frozen rangeLow or above
+frozen rangeHigh invalidates the candidate. Strict breaches invalidate; equality
+is permitted. Test candle bounds before any touch/confirmation on that close.
+The forming bar is also checked, conservatively avoiding an unchecked exception.
+Preserve all raw swings/valid levels and the frozen pair in RANGE_INVALIDATED;
+record invalidated_at, the causal breach candle and lower/upper/both reasons.
+Do not classify a candidate breach as manipulation or revive it with later touches.
+Only bars strictly after RANGE_CONFIRMED may supply manipulation evidence.
+Low touch: rangeLow <= swingLow <= rangeLow + tolerance.
+High touch: rangeHigh - tolerance <= swingHigh <= rangeHigh.
+Tolerance bands are capped at the opposite edge; a large tolerance never
+permits a swing outside either frozen boundary.
+These boundaries/inside-only touch semantics are confirmed user rules, not [H]
+and not new DD attestations. Initial pair selection and no-reseed remain [H].
+
 ## Explicit provisional definitions [H]
 - [H]-STRUCTURE-001: on each newly confirmed LOW, select that raw wick and the
   latest earlier confirmed HIGH as its break target (HIGH is symmetric).
@@ -27,8 +44,9 @@ frozen boundaries, sweep/reclaim, FVG/iFVG requirement and PAPER scope are
 - [H]-RANGE-001: first ValidLow, then a later ValidHigh with higher price creates
   one frozen range. Ignore subsequent valid levels for its boundaries. Require
   a confirmed LOW whose wick time is strictly after ValidHigh publication and
-  within configurable absolute-price tolerance of rangeLow; then a confirmed
-  HIGH whose wick time is strictly after low-touch publication, near rangeHigh.
+  inside the one-sided low boundary tolerance; then a confirmed
+  HIGH whose wick time is strictly after low-touch publication, inside the
+  one-sided high tolerance. Boundary breaches follow U-RANGE-BOUNDARIES-001.
   Internal swings are unlimited. These ordered extrema proxy flows without
   imposing monotonic candles. No expiry/reseed in this bounded MVP replay.
 - [H]-MANIPULATION-001: only bars strictly after RANGE_CONFIRMED can sweep.

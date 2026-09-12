@@ -1,32 +1,27 @@
-# Current handoff — causal PAPER trading brain complete
+# Current handoff — frozen range boundary correction
 
-2026-09-12. LAST AGENT Codex. Isolated work/trading-brain;
-C:/Users/Serdar Arif/Desktop/Agent Trading-brain. Base adbafa485c900164c95ed0e13fce0d267da8b645.
-User explicitly requested implementation/commit then STOP; no merge/push/tag.
+2026-09-12. Codex; work/trading-brain / Agent Trading-brain.
+Parent9adfe26ad61ed63d019f70c3f69a4756710c4599. Explicit user correction
+[U-RANGE-BOUNDARIES-001]: any pending-candidate wick breach invalidates;
+inside-only low/high tolerance; after-confirmation sweeps remain manipulation.
 
-Completed: separate models, structure/range/manipulation/gap components, risk,
-paper broker, causal runtime/offline CLI; synthetic fixture and31 tests; spec,
-ADR012, source registry, state/next-task and [evidence](trading-brain-replay.md).
-Real BTC4H LONG entry64236.3 / SL63137.6 / EQ TP64342.65 / size0.09101665 BTC;
-real1H FVG SHORT and synthetic full chain also demonstrated. PAPER only.
-SwingEngine, existing production API/decision core and dependencies unchanged.
+Changed range/models/runtime,11 additional regressions, corrected synthetic
+fixture, exact real15m bounded suffix fixture, spec/source/evidence/memory.
+Raw SwingEngine, valid-level selection, gap/risk/broker and dependencies unchanged.
+RANGE_INVALIDATED retains causal breach candle/reasons, blocks revival and
+manipulation, and preserves every raw event. Original4H and1H examples withdrawn;
+full BTC replays yield no orders. New15m249-row suffix from source index50:
+SHORT77214.6 / SL79996.3 / TP77019.9 / size0.03594923 BTC, with unchanged defaults.
+Corrected synthetic25-bar full chain retained. [Evidence](trading-brain-replay.md).
 
-Full suite281 pass, no errors/failures;1196 real and22 synthetic prefix checks;
-five offline CLI smokes. Independent read-only review fix/re-review passed.
-No pre-existing uncommitted files on this new worktree. The final requested
-commit includes all new strategy/tests/docs and shared-memory changes; verify
-clean Git status and exact hash from final report. Only ignored local runs
-remain outside Git; public durable evidence is research/trading-brain-replay-evidence.json.
-No other branches/worktrees were edited by this task beyond creating its branch.
-
-Known limits: all selection/threshold/gap/plan/risk/fill conventions [H],
-DD N-1–N-7 unresolved, one frozen range/order per replay; no expiry/reseed,
-MTF context, production acceptance/risk, costs, empirical performance validation,
-durable broker restart, autonomous loop or API/UX integration. LIVE excluded.
-
-NEXT: STOP for user review. Do not infer additional implementation/merge
-permission. Read current state/spec/evidence before any separately authorized work.
-Inherited records below are historical, not current instructions to execute.
+Full292 tests pass;6 CLI smokes;1470 real/synthetic prefixes checked.
+Independent read-only correction review clear. No pre-existing uncommitted work
+before correction. Separate requested commit includes only this correction;
+verify exact hash and clean status from Git/final report. Ignored local runs only.
+Original valid-trade assertions are superseded, with prior records in Git history.
+One-range/no-reseed and other [H]/DD/MTF/risk/cost/validation blockers remain.
+No exchange writes, merge/push/tag. NEXT: STOP; no additional work authorized.
+Inherited records below are historical, not current valid examples/permissions.
 
 ---
 

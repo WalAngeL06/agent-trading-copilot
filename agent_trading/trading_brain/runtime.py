@@ -79,7 +79,8 @@ class TradingBrain:
                        (self._ids[level.swing.raw], self._ids[level.target.raw]))
         for state in self.range.process(candle, valid, swings):
             kind = {'WAIT_LOW_TOUCH':'RANGE_CANDIDATE', 'WAIT_HIGH_TOUCH':'RANGE_LOW_TOUCH',
-                    'RANGE_CONFIRMED':'RANGE_CONFIRMED'}[state.phase]
+                    'RANGE_CONFIRMED':'RANGE_CONFIRMED',
+                    'RANGE_INVALIDATED':'RANGE_INVALIDATED'}[state.phase]
             refs = [self._ids[state.low], self._ids[state.high], self._range_id]
             if state.low_touch is not None: refs.append(self._ids[state.low_touch.raw])
             if state.high_touch is not None: refs.append(self._ids[state.high_touch.raw])

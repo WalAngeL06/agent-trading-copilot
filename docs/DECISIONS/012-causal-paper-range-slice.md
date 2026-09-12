@@ -14,8 +14,18 @@ process path drives historical replay and live-prefix equivalence. Next-open
 fills are published at the processed close, with effective filled_at separate.
 Risk approval and every paper order reference causal immutable evidence IDs.
 
-This provides real BTC FVG-short/iFVG-long and synthetic full-chain evidence;
+Current corrected evidence provides a bounded real15m FVG-short and synthetic
+full chain; original full-fixture real1H/4H examples are withdrawn;
 it does not approve provisional selection/thresholds as DD rules or validate
 profitability. Missing source/acceptance/risk/lifecycle semantics remain explicit
 blockers. No network/exchange client, usable LIVE option, merge/push/tag.
 [Spec](../specs/trading-brain-v0.1.md), [evidence](../trading-brain-replay.md).
+
+## Boundary correction
+
+[U-RANGE-BOUNDARIES-001] supersedes symmetric outside proximity. Every candidate
+candle including its forming/confirming bar is checked before touches; any strict
+wick breach records terminal RANGE_INVALIDATED with immutable candle/reasons.
+Raw swings/valid levels continue unchanged; later touches cannot revive it.
+Only previously confirmed ranges can manipulate. Initial pair selection and
+no-reseed remain existing [H]; do not add a reseed policy to force real trades.

@@ -9,7 +9,7 @@ import sys
 import unittest
 from agent_trading.data import read_candles
 from agent_trading.models import to_jsonable
-from agent_trading.swing import SwingConfig
+from agent_trading.swing import SwingConfig, SwingEngine
 from agent_trading.trading_brain import BrainConfig, TradingBrain, replay
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -54,7 +54,7 @@ class ReplayTests(unittest.TestCase):
 
     def test_bootstrap_then_stream_is_identical_to_full_replay(self):
         candles = tuple(read_candles(FIXTURE))
-        for split in (1,5,14,19,20):
+        for split in (1,5,14,19,22,23):
             brain = TradingBrain('BTC-USDT','15m',CONFIG)
             brain.bootstrap(candles[:split])
             for candle in candles[split:]: brain.process(candle)
@@ -107,22 +107,97 @@ class ReplayTests(unittest.TestCase):
             self.assertGreater(len(stream.swing.confirmed),0)
             self.assertGreater(len(stream.structure.valid),0)
 
-    def test_real_btc_default_fvg_short_and_ifvg_long_have_exact_replay_plans(self):
-        expected = {
-            '1H': ('SHORT','77289.8','78166.5','77250.85','0.11406410','FVG'),
-            '4H': ('LONG','64236.3','63137.6','64342.65','0.09101665','iFVG'),
-        }
-        for tf,(direction,entry,stop,tp,quantity,gap_kind) in expected.items():
-            brain = replay(read_candles(ROOT/('tests/data/btcusdt_'+tf+'.jsonl')))
-            trade, = brain.broker.trades
-            self.assertEqual((trade.direction,trade.entry,trade.stop,trade.tp,trade.quantity),
-                             (direction,D(entry),D(stop),D(tp),D(quantity)))
-            self.assertLessEqual(trade.risk_amount,D('100'))
-            candidate = next(e for e in brain.events if e.kind=='TRADE_CANDIDATE')
-            self.assertTrue(any(e.kind==gap_kind and e.id in candidate.evidence_ids for e in brain.events))
+    def test_original_real_btc_trades_are_invalid_and_all_raw_swings_survive(self):
+        for tf in ('1H','4H'):
+            candles=tuple(read_candles(ROOT/('tests/data/btcusdt_'+tf+'.jsonl')))
+            brain=replay(candles)
+            self.assertEqual(brain.range.state.phase,'RANGE_INVALIDATED')
+            self.assertEqual(brain.broker.trades,())
+            self.assertFalse(any(e.kind in ('RANGE_CONFIRMED','SWEEP','RECLAIM','TRADE_CANDIDATE')
+                                 for e in brain.events))
+            independent=SwingEngine('BTC-USDT',tf)
+            for candle in candles: independent.process(candle)
+            self.assertEqual(brain.swing.confirmed,independent.confirmed)
+            records=tuple(e.payload.raw for e in brain.events if e.kind in ('SWING_LOW','SWING_HIGH'))
+            self.assertEqual(records,independent.confirmed)
+            if tf=='4H':
+                self.assertEqual(brain.range.state.invalidation_candle.low,D('62457.1'))
+                self.assertEqual(brain.range.state.range_low,D('63261.6'))
+                self.assertTrue(any(raw.price==D('62983.5') for raw in records))
+
+    def test_synthetic_preconfirmation_breach_invalidates_only_range_and_keeps_future_raw(self):
+        candles=list(read_candles(FIXTURE))
+        candles[13]=replace(candles[13],low=D('79000'))
+        brain=replay(candles,CONFIG)
+        state=brain.range.state
+        self.assertEqual(state.phase,'RANGE_INVALIDATED')
+        self.assertEqual(state.invalidated_at,candles[13].close_time)
+        self.assertEqual(state.invalidation_reasons,('WICK_BELOW_RANGE_LOW',))
+        self.assertEqual(brain.broker.trades,())
+        self.assertFalse(any(e.kind in ('RANGE_CONFIRMED','SWEEP','RECLAIM') for e in brain.events))
+        independent=SwingEngine('BTC-USDT','15m',CONFIG.swing)
+        for candle in candles: independent.process(candle)
+        self.assertEqual(brain.swing.confirmed,independent.confirmed)
+        self.assertTrue(any(raw.confirmed_at>state.invalidated_at for raw in independent.confirmed))
+        for length in (13,14,18,25):
+            prefix=replay(candles[:length],CONFIG)
+            self.assertEqual(prefix.events,tuple(e for e in brain.events if e.observed_at<=candles[length-1].close_time))
+
+    def test_corrected_synthetic_all_candidate_wicks_and_touches_are_inside_then_sweep(self):
+        candles=tuple(read_candles(FIXTURE))
+        brain=replay(candles,CONFIG)
+        state=brain.range.state
+        self.assertEqual(state.phase,'RANGE_CONFIRMED')
+        self.assertEqual(state.low_touch.price,D('80800'))
+        self.assertEqual(state.high_touch.price,D('119000'))
+        forming=next(e.observed_at for e in brain.events if e.kind=='RANGE_CANDIDATE')
+        for candle in candles:
+            if forming<=candle.close_time<=state.confirmed_at:
+                self.assertGreaterEqual(candle.low,state.range_low)
+                self.assertLessEqual(candle.high,state.range_high)
+        sweep=next(e for e in brain.events if e.kind=='SWEEP')
+        reclaim=next(e for e in brain.events if e.kind=='RECLAIM')
+        self.assertGreater(sweep.observed_at,state.confirmed_at)
+        self.assertLess(sweep.payload.extreme,state.range_low)
+        self.assertEqual(reclaim.payload.phase,'RECLAIMED')
+        self.assertFalse(any(e.kind=='RANGE_INVALIDATED' for e in brain.events))
+
+    def test_new_real_15m_bounded_window_has_valid_inside_range_and_exact_paper_plan(self):
+        original=tuple(read_candles(ROOT/'tests/data/btcusdt_15m.jsonl'))
+        window=tuple(read_candles(ROOT/'tests/data/btcusdt_15m_range_window.jsonl'))
+        self.assertEqual(window,original[50:])
+        brain=replay(window)
+        state=brain.range.state
+        self.assertEqual(state.phase,'RANGE_CONFIRMED')
+        self.assertEqual((state.range_low,state.range_high,state.eq),
+                         (D('76541'),D('77498.8'),D('77019.9')))
+        self.assertGreaterEqual(state.low_touch.price,state.range_low)
+        self.assertLessEqual(state.low_touch.price,state.range_low+brain.config.boundary_proximity)
+        self.assertGreaterEqual(state.high_touch.price,state.range_high-brain.config.boundary_proximity)
+        self.assertLessEqual(state.high_touch.price,state.range_high)
+        forming=next(e.observed_at for e in brain.events if e.kind=='RANGE_CANDIDATE')
+        for candle in window:
+            if forming<=candle.close_time<=state.confirmed_at:
+                self.assertGreaterEqual(candle.low,state.range_low)
+                self.assertLessEqual(candle.high,state.range_high)
+        trade,=brain.broker.trades
+        self.assertEqual((trade.direction,trade.entry,trade.stop,trade.tp,trade.quantity),
+                         ('SHORT',D('77214.6'),D('79996.3'),D('77019.9'),D('.03594923')))
+        self.assertLessEqual(trade.risk_amount,D('100'))
+        self.assertFalse(any(e.kind=='RANGE_INVALIDATED' for e in brain.events))
+
+    def test_new_real_bounded_window_remains_causal_for_every_prefix(self):
+        candles=tuple(read_candles(ROOT/'tests/data/btcusdt_15m_range_window.jsonl'))
+        final=replay(candles)
+        stream=TradingBrain('BTC-USDT','15m')
+        for i,candle in enumerate(candles):
+            stream.process(candle)
+            prefix=replay(candles[:i+1])
+            self.assertEqual(prefix.snapshot(),stream.snapshot())
+            self.assertEqual(prefix.events,tuple(e for e in final.events if e.observed_at<=candle.close_time))
 
     def test_low_first_range_can_trade_short_through_fvg_with_real_swing_engine(self):
-        candles = list(read_candles(FIXTURE))[:15]
+        candles = list(read_candles(FIXTURE))[:18]
         rows = [('112','119','112','118'),('118','120','118','119'),
                 ('119','123','119','121'),('121','122','115','116'),
                 ('115','115','107','108'),('108','110','104','106'),
@@ -145,7 +220,7 @@ class ReplayTests(unittest.TestCase):
     def test_no_gap_and_new_sweep_cannot_use_old_reclaim_to_create_candidate(self):
         candles = list(read_candles(FIXTURE))
         for low in (D('82000'),D('76000')):
-            altered = candles[:20]
+            altered = candles[:23]
             altered[-1] = replace(altered[-1],low=low)
             brain = replay(altered,CONFIG)
             self.assertFalse(any(e.kind=='TRADE_CANDIDATE' for e in brain.events))

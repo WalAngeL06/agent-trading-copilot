@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from ..swing import ConfirmedSwing, SwingSide, SwingConfig
+from ..models import Candle
 
 @dataclass(frozen=True)
 class BrainConfig:
@@ -78,7 +79,10 @@ class RangeState:
     low_touch: SwingLow | None = None
     high_touch: SwingHigh | None = None
     confirmed_at: datetime | None = None
-    source_ids: tuple[str, ...] = ('[U-TRADING-BRAIN-001]', '[H]-RANGE-001')
+    source_ids: tuple[str, ...] = ('[U-TRADING-BRAIN-001]', '[U-RANGE-BOUNDARIES-001]', '[H]-RANGE-001')
+    invalidated_at: datetime | None = None
+    invalidation_candle: Candle | None = None
+    invalidation_reasons: tuple[str, ...] = ()
     @property
     def range_low(self): return self.low.price
     @property

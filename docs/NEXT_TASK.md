@@ -1,15 +1,11 @@
-# Current boundary — STOP after trading-brain commit
+# Current boundary — STOP after separate range correction
 
-2026-09-12. [U-TRADING-BRAIN-001] requested only the isolated causal PAPER
-strategy from adbafa4, full tests, exact commit message and report. This task
-is complete at the commit containing this record. No merge/push/tag or next
-feature is authorized. Worktree/branch stay preserved for review.
-
-Read [spec](specs/trading-brain-v0.1.md) and [evidence](trading-brain-replay.md).
-A later explicitly authorized owner may review [H] responsibility/selection,
-range lifecycle, gap semantics, MTF acceptance/risk, costs/validation or
-integration. These are blockers/future review topics, not instructions to start.
-General DD MarketStructureEngine gates are still open. LIVE remains excluded.
+2026-09-12. [U-RANGE-BOUNDARIES-001] authorized boundary diagnosis/fix,
+raw preservation, tests and real replay, separate correction commit then STOP.
+Do not merge/push/tag or begin another feature. Worktree remains work/trading-brain.
+Read [corrected spec](specs/trading-brain-v0.1.md) and [evidence](trading-brain-replay.md).
+Original4H/1H trades are withdrawn; full fixtures have no orders; explicit bounded
+15m/synthetic chains remain. No new reseed/expiry policy or missing DD rules approved.
 Historical task descriptions below do not override this STOP boundary.
 
 ---

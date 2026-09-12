@@ -1,30 +1,30 @@
-# Current state — isolated causal PAPER trading brain
+# Current state — frozen PAPER range boundaries corrected
 
-2026-09-12. Codex; work/trading-brain at
-C:/Users/Serdar Arif/Desktop/Agent Trading-brain. Exact base:
-`adbafa485c900164c95ed0e13fce0d267da8b645`. Explicit scope [U-TRADING-BRAIN-001]
-authorizes this strategy slice despite inherited historical STOP/no-strategy gates.
+2026-09-12. Codex; work/trading-brain at Agent Trading-brain.
+Correction parent9adfe26ad61ed63d019f70c3f69a4756710c4599;
+original baseadbafa485c900164c95ed0e13fce0d267da8b645.
+[U-RANGE-BOUNDARIES-001] supersedes symmetric outside-touch semantics.
+Every candidate candle wick breach invalidates BEFORE confirmation; inside-only
+touches/equality allowed; terminal RANGE_INVALIDATED retains frozen pair and
+breach evidence. Raw swings/valid levels continue unchanged; only confirmed
+ranges can manipulate. SwingEngine and production API unchanged.
 
-Implemented opt-in separate raw/valid levels, frozen ordered-touch range,
-sweep/reclaim, FVG/iFVG, candidate, provisional risk sizing and next-open local
-PAPER broker. SwingEngine is unchanged; current API/decision pipeline unchanged.
-Real saved BTC1H FVG SHORT and4H iFVG LONG both open/close deterministically;
-synthetic22-bar full chain is preserved as a regression fixture.
-[Spec](specs/trading-brain-v0.1.md), [replay evidence](trading-brain-replay.md),
-[exact JSON graph](research/trading-brain-replay-evidence.json),
-[ADR012](DECISIONS/012-causal-paper-range-slice.md).
+Original full-fixture4H/1H trades are invalid and withdrawn. Four299-candle
+BTC default replays now yield zero PAPER orders. A separately labelled249-bar
+15m suffix from Sep09 21:15 UTC yields a valid default-config SHORT:
+entry77214.6 / SL79996.3 / EQ TP77019.9 / size0.03594923 BTC. This bounded
+context changes seeding, not rules;1140 suffixes checked with fixed defaults.
+Corrected25-candle synthetic full chain has inside touches80800/119000 and
+only a post-confirmation77000 sweep. [Spec](specs/trading-brain-v0.1.md),
+[evidence](trading-brain-replay.md), [exact JSON](research/trading-brain-replay-evidence.json).
 
-Verified full suite281 passing (250 preserved +31 new), zero failures/errors;
-1196 real BTC prefixes and22 synthetic prefixes checked; five offline CLI smokes
-passed. Independent read-only review equality defect fixed/tested; re-review clear.
-Every provisional rule labelled [H]; no empirical DD/profitability validation.
-No exchange writes, LIVE option, API/UX/autonomous integration or production risk.
-
-Commit this completed slice with `feat: add causal range sweep paper strategy`;
-obtain exact final hash/clean status from Git/final report. Preserve other
-worktrees; no merge/push/tag. STOP after that commit. Source/lifecycle/MTF/risk/
-cost/validation blockers are in evidence/spec. Records below are inherited history
-and branch-specific prior permissions, not this worktree's current scope.
+Full292 tests pass, zero failures/errors (281 before +11 correction methods);
+6 CLI smokes;1196 original real +249 bounded real +25 synthetic prefix checks.
+Independent read-only correction review found no material defects. No empirical
+strategy validation, live writes, merge/push/tag or automatic reseed added.
+Commit `fix: enforce frozen range boundaries before confirmation` separately;
+read exact final hash/clean status from Git/report. STOP after commit.
+Inherited historical records below do not assert current valid PAPER examples.
 
 ---
 

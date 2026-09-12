@@ -4,6 +4,16 @@ This is the primary project instruction file for Codex and Claude. Current
 user instructions take precedence; persist new clarifications in repository
 docs rather than continuing undocumented assumptions from chat history.
 
+## Frozen candidate boundary correction — 2026-09-12
+
+[U-RANGE-BOUNDARIES-001] confirms: ANY wick outside frozen rangeLow/rangeHigh
+while forming a candidate invalidates it before any confirmation. Low/high
+proximity must be inside-only, equality allowed. Preserve raw swing/valid-level
+histories. Only AFTER RANGE_CONFIRMED may outside sweep/reclaim be manipulation.
+[Current evidence](docs/trading-brain-replay.md) withdraws original4H/1H trades;
+bounded15m and corrected synthetic examples are labelled explicitly. No reseed
+policy is newly approved. Commit correction separately then STOP; no merge/push/tag.
+
 ## Current isolated PAPER exception — 2026-09-12
 
 [U-TRADING-BRAIN-001] explicitly authorizes only the causal historical PAPER

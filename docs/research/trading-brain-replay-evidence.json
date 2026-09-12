@@ -1,5 +1,45 @@
 {
-  "base_commit": "adbafa485c900164c95ed0e13fce0d267da8b645",
+  "authority": "[U-RANGE-BOUNDARIES-001]",
+  "bounded_context_search": {
+    "limitation": "Contexts with orders are overlapping and are not independent profitable setups; raw seed/initial pair depend on context start.",
+    "method": "Every suffix with at least15 candles; fixed default parameters; original fixture rows unchanged; no automatic reseed added.",
+    "results": [
+      {
+        "confirmed_range_contexts": 149,
+        "contexts_with_paper_order": 0,
+        "first_order_context": null,
+        "suffixes_checked": 285,
+        "timeframe": "5m"
+      },
+      {
+        "confirmed_range_contexts": 90,
+        "contexts_with_paper_order": 87,
+        "first_order_context": {
+          "context_start": "2026-09-09T21:15:00Z",
+          "start_index": 50
+        },
+        "suffixes_checked": 285,
+        "timeframe": "15m"
+      },
+      {
+        "confirmed_range_contexts": 0,
+        "contexts_with_paper_order": 0,
+        "first_order_context": null,
+        "suffixes_checked": 285,
+        "timeframe": "1H"
+      },
+      {
+        "confirmed_range_contexts": 26,
+        "contexts_with_paper_order": 0,
+        "first_order_context": null,
+        "suffixes_checked": 285,
+        "timeframe": "4H"
+      }
+    ],
+    "total_suffixes": 1140
+  },
+  "candidate_guard": "Every candidate candle including forming/confirming close: low<rangeLow or high>rangeHigh invalidates BEFORE touches; equality allowed.",
+  "correction_parent_commit": "9adfe26ad61ed63d019f70c3f69a4756710c4599",
   "date": "2026-09-12",
   "examples": [
     {
@@ -16,7 +56,2213 @@
         },
         "target": "EQ"
       },
-      "equity": "10004.4427966950",
+      "context_kind": "BOUNDED_SUFFIX",
+      "equity": "10006.999315081",
+      "evidence_events": [
+        {
+          "evidence_ids": [],
+          "id": "e000057",
+          "kind": "SWING_HIGH",
+          "observed_at": "2026-09-11T00:00:00Z",
+          "payload": {
+            "raw": {
+              "atr": "162.3642857142857142857142857",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-09-11T00:00:00Z",
+              "price": "76817.4",
+              "side": "HIGH",
+              "swing_time": "2026-09-10T23:45:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "202.9553571428571428571428571",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000058",
+          "kind": "SWING_LOW",
+          "observed_at": "2026-09-11T00:15:00Z",
+          "payload": {
+            "raw": {
+              "atr": "179.45",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-09-11T00:15:00Z",
+              "price": "76541",
+              "side": "LOW",
+              "swing_time": "2026-09-11T00:00:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "224.3125",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000058",
+            "e000057"
+          ],
+          "id": "e000059",
+          "kind": "VALID_LOW",
+          "observed_at": "2026-09-11T00:15:00Z",
+          "payload": {
+            "confirmed_at": "2026-09-11T00:15:00Z",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-STRUCTURE-001"
+            ],
+            "swing": {
+              "raw": {
+                "atr": "179.45",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-09-11T00:15:00Z",
+                "price": "76541",
+                "side": "LOW",
+                "swing_time": "2026-09-11T00:00:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "224.3125",
+                "timeframe": "15m"
+              }
+            },
+            "target": {
+              "raw": {
+                "atr": "162.3642857142857142857142857",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-09-11T00:00:00Z",
+                "price": "76817.4",
+                "side": "HIGH",
+                "swing_time": "2026-09-10T23:45:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "202.9553571428571428571428571",
+                "timeframe": "15m"
+              }
+            }
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-STRUCTURE-001"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000075",
+          "kind": "SWING_LOW",
+          "observed_at": "2026-09-11T08:30:00Z",
+          "payload": {
+            "raw": {
+              "atr": "121.5785714285714285714285714",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-09-11T08:30:00Z",
+              "price": "77141.7",
+              "side": "LOW",
+              "swing_time": "2026-09-11T08:15:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "151.9732142857142857142857142",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000079",
+          "kind": "SWING_HIGH",
+          "observed_at": "2026-09-11T09:15:00Z",
+          "payload": {
+            "raw": {
+              "atr": "125.0857142857142857142857143",
+              "confirmation_delay_bars": 2,
+              "confirmed_at": "2026-09-11T09:15:00Z",
+              "price": "77498.8",
+              "side": "HIGH",
+              "swing_time": "2026-09-11T08:45:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "156.3571428571428571428571429",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000079",
+            "e000075"
+          ],
+          "id": "e000080",
+          "kind": "VALID_HIGH",
+          "observed_at": "2026-09-11T09:30:00Z",
+          "payload": {
+            "confirmed_at": "2026-09-11T09:30:00Z",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-STRUCTURE-001"
+            ],
+            "swing": {
+              "raw": {
+                "atr": "125.0857142857142857142857143",
+                "confirmation_delay_bars": 2,
+                "confirmed_at": "2026-09-11T09:15:00Z",
+                "price": "77498.8",
+                "side": "HIGH",
+                "swing_time": "2026-09-11T08:45:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "156.3571428571428571428571429",
+                "timeframe": "15m"
+              }
+            },
+            "target": {
+              "raw": {
+                "atr": "121.5785714285714285714285714",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-09-11T08:30:00Z",
+                "price": "77141.7",
+                "side": "LOW",
+                "swing_time": "2026-09-11T08:15:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "151.9732142857142857142857142",
+                "timeframe": "15m"
+              }
+            }
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-STRUCTURE-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000059",
+            "e000080"
+          ],
+          "id": "e000081",
+          "kind": "RANGE_CANDIDATE",
+          "observed_at": "2026-09-11T09:30:00Z",
+          "payload": {
+            "confirmed_at": null,
+            "high": {
+              "confirmed_at": "2026-09-11T09:30:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "125.0857142857142857142857143",
+                  "confirmation_delay_bars": 2,
+                  "confirmed_at": "2026-09-11T09:15:00Z",
+                  "price": "77498.8",
+                  "side": "HIGH",
+                  "swing_time": "2026-09-11T08:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "156.3571428571428571428571429",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "121.5785714285714285714285714",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-09-11T08:30:00Z",
+                  "price": "77141.7",
+                  "side": "LOW",
+                  "swing_time": "2026-09-11T08:15:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "151.9732142857142857142857142",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "high_touch": null,
+            "invalidated_at": null,
+            "invalidation_candle": null,
+            "invalidation_reasons": [],
+            "low": {
+              "confirmed_at": "2026-09-11T00:15:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "179.45",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-09-11T00:15:00Z",
+                  "price": "76541",
+                  "side": "LOW",
+                  "swing_time": "2026-09-11T00:00:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "224.3125",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "162.3642857142857142857142857",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-09-11T00:00:00Z",
+                  "price": "76817.4",
+                  "side": "HIGH",
+                  "swing_time": "2026-09-10T23:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "202.9553571428571428571428571",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "low_touch": null,
+            "phase": "WAIT_LOW_TOUCH",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[U-RANGE-BOUNDARIES-001]",
+              "[H]-RANGE-001"
+            ]
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[U-RANGE-BOUNDARIES-001]",
+            "[H]-RANGE-001"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000087",
+          "kind": "SWING_LOW",
+          "observed_at": "2026-09-11T10:00:00Z",
+          "payload": {
+            "raw": {
+              "atr": "132.05",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-09-11T10:00:00Z",
+              "price": "76866",
+              "side": "LOW",
+              "swing_time": "2026-09-11T09:45:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "165.0625",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000059",
+            "e000080",
+            "e000081",
+            "e000087"
+          ],
+          "id": "e000088",
+          "kind": "RANGE_LOW_TOUCH",
+          "observed_at": "2026-09-11T10:00:00Z",
+          "payload": {
+            "confirmed_at": null,
+            "high": {
+              "confirmed_at": "2026-09-11T09:30:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "125.0857142857142857142857143",
+                  "confirmation_delay_bars": 2,
+                  "confirmed_at": "2026-09-11T09:15:00Z",
+                  "price": "77498.8",
+                  "side": "HIGH",
+                  "swing_time": "2026-09-11T08:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "156.3571428571428571428571429",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "121.5785714285714285714285714",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-09-11T08:30:00Z",
+                  "price": "77141.7",
+                  "side": "LOW",
+                  "swing_time": "2026-09-11T08:15:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "151.9732142857142857142857142",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "high_touch": null,
+            "invalidated_at": null,
+            "invalidation_candle": null,
+            "invalidation_reasons": [],
+            "low": {
+              "confirmed_at": "2026-09-11T00:15:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "179.45",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-09-11T00:15:00Z",
+                  "price": "76541",
+                  "side": "LOW",
+                  "swing_time": "2026-09-11T00:00:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "224.3125",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "162.3642857142857142857142857",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-09-11T00:00:00Z",
+                  "price": "76817.4",
+                  "side": "HIGH",
+                  "swing_time": "2026-09-10T23:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "202.9553571428571428571428571",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "low_touch": {
+              "raw": {
+                "atr": "132.05",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-09-11T10:00:00Z",
+                "price": "76866",
+                "side": "LOW",
+                "swing_time": "2026-09-11T09:45:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "165.0625",
+                "timeframe": "15m"
+              }
+            },
+            "phase": "WAIT_HIGH_TOUCH",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[U-RANGE-BOUNDARIES-001]",
+              "[H]-RANGE-001"
+            ]
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[U-RANGE-BOUNDARIES-001]",
+            "[H]-RANGE-001"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000090",
+          "kind": "SWING_HIGH",
+          "observed_at": "2026-09-11T11:15:00Z",
+          "payload": {
+            "raw": {
+              "atr": "148.5214285714285714285714286",
+              "confirmation_delay_bars": 4,
+              "confirmed_at": "2026-09-11T11:15:00Z",
+              "price": "77167.6",
+              "side": "HIGH",
+              "swing_time": "2026-09-11T10:15:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "185.6517857142857142857142858",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000059",
+            "e000080",
+            "e000088",
+            "e000087",
+            "e000090"
+          ],
+          "id": "e000092",
+          "kind": "RANGE_CONFIRMED",
+          "observed_at": "2026-09-11T11:15:00Z",
+          "payload": {
+            "confirmed_at": "2026-09-11T11:15:00Z",
+            "high": {
+              "confirmed_at": "2026-09-11T09:30:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "125.0857142857142857142857143",
+                  "confirmation_delay_bars": 2,
+                  "confirmed_at": "2026-09-11T09:15:00Z",
+                  "price": "77498.8",
+                  "side": "HIGH",
+                  "swing_time": "2026-09-11T08:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "156.3571428571428571428571429",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "121.5785714285714285714285714",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-09-11T08:30:00Z",
+                  "price": "77141.7",
+                  "side": "LOW",
+                  "swing_time": "2026-09-11T08:15:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "151.9732142857142857142857142",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "high_touch": {
+              "raw": {
+                "atr": "148.5214285714285714285714286",
+                "confirmation_delay_bars": 4,
+                "confirmed_at": "2026-09-11T11:15:00Z",
+                "price": "77167.6",
+                "side": "HIGH",
+                "swing_time": "2026-09-11T10:15:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "185.6517857142857142857142858",
+                "timeframe": "15m"
+              }
+            },
+            "invalidated_at": null,
+            "invalidation_candle": null,
+            "invalidation_reasons": [],
+            "low": {
+              "confirmed_at": "2026-09-11T00:15:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "179.45",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-09-11T00:15:00Z",
+                  "price": "76541",
+                  "side": "LOW",
+                  "swing_time": "2026-09-11T00:00:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "224.3125",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "162.3642857142857142857142857",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-09-11T00:00:00Z",
+                  "price": "76817.4",
+                  "side": "HIGH",
+                  "swing_time": "2026-09-10T23:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "202.9553571428571428571428571",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "low_touch": {
+              "raw": {
+                "atr": "132.05",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-09-11T10:00:00Z",
+                "price": "76866",
+                "side": "LOW",
+                "swing_time": "2026-09-11T09:45:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "165.0625",
+                "timeframe": "15m"
+              }
+            },
+            "phase": "RANGE_CONFIRMED",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[U-RANGE-BOUNDARIES-001]",
+              "[H]-RANGE-001"
+            ]
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[U-RANGE-BOUNDARIES-001]",
+            "[H]-RANGE-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000092"
+          ],
+          "id": "e000102",
+          "kind": "SWEEP",
+          "observed_at": "2026-09-11T13:00:00Z",
+          "payload": {
+            "direction": "SHORT",
+            "extreme": "78159.9",
+            "observed_at": "2026-09-11T13:00:00Z",
+            "phase": "SWEPT",
+            "reclaimed_at": null,
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-MANIPULATION-001"
+            ],
+            "swept_at": "2026-09-11T13:00:00Z"
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-MANIPULATION-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000092",
+            "e000102"
+          ],
+          "id": "e000117",
+          "kind": "RECLAIM",
+          "observed_at": "2026-09-11T18:15:00Z",
+          "payload": {
+            "direction": "SHORT",
+            "extreme": "79896.3",
+            "observed_at": "2026-09-11T18:15:00Z",
+            "phase": "RECLAIMED",
+            "reclaimed_at": "2026-09-11T18:15:00Z",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-MANIPULATION-001"
+            ],
+            "swept_at": "2026-09-11T13:00:00Z"
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-MANIPULATION-001"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000120",
+          "kind": "FVG",
+          "observed_at": "2026-09-11T18:30:00Z",
+          "payload": {
+            "direction": "SHORT",
+            "formed_from": [
+              "2026-09-11T18:00:00Z",
+              "2026-09-11T18:15:00Z",
+              "2026-09-11T18:30:00Z"
+            ],
+            "kind": "FVG",
+            "lower": "77255.5",
+            "observed_at": "2026-09-11T18:30:00Z",
+            "origin_at": null,
+            "source_ids": [
+              "[H]-GAP-001"
+            ],
+            "upper": "77490.8"
+          },
+          "source_ids": [
+            "[H]-GAP-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000092",
+            "e000117",
+            "e000120"
+          ],
+          "id": "e000121",
+          "kind": "TRADE_CANDIDATE",
+          "observed_at": "2026-09-11T18:30:00Z",
+          "payload": {
+            "direction": "SHORT",
+            "entry": "77215",
+            "evidence_ids": [
+              "e000092",
+              "e000117",
+              "e000120"
+            ],
+            "observed_at": "2026-09-11T18:30:00Z",
+            "planned_quantity": "0.03595440",
+            "risk_budget": "100.00",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-PLAN-001"
+            ],
+            "stop": "79996.3",
+            "tp": "77019.9"
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-PLAN-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000121"
+          ],
+          "id": "e000122",
+          "kind": "RISK_APPROVED",
+          "observed_at": "2026-09-11T18:30:00Z",
+          "payload": {
+            "direction": "SHORT",
+            "entry": "77215",
+            "evidence_ids": [
+              "e000092",
+              "e000117",
+              "e000120"
+            ],
+            "observed_at": "2026-09-11T18:30:00Z",
+            "planned_quantity": "0.03595440",
+            "risk_budget": "100.00",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-PLAN-001"
+            ],
+            "stop": "79996.3",
+            "tp": "77019.9"
+          },
+          "source_ids": [
+            "[H]-RISK-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000121",
+            "e000122"
+          ],
+          "id": "e000123",
+          "kind": "PAPER_ORDER_OPENED",
+          "observed_at": "2026-09-11T18:45:00Z",
+          "payload": {
+            "candidate": {
+              "direction": "SHORT",
+              "entry": "77215",
+              "evidence_ids": [
+                "e000092",
+                "e000117",
+                "e000120"
+              ],
+              "observed_at": "2026-09-11T18:30:00Z",
+              "planned_quantity": "0.03595440",
+              "risk_budget": "100.00",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-PLAN-001"
+              ],
+              "stop": "79996.3",
+              "tp": "77019.9"
+            },
+            "closed_at": null,
+            "direction": "SHORT",
+            "entry": "77214.6",
+            "exit_price": null,
+            "filled_at": "2026-09-11T18:30:00Z",
+            "mode": "PAPER",
+            "opened_at": "2026-09-11T18:45:00Z",
+            "pnl": null,
+            "quantity": "0.03594923",
+            "risk_amount": "99.999973091",
+            "risk_budget": "100.00",
+            "source_ids": [
+              "[H]-RISK-001",
+              "[H]-PAPER-001"
+            ],
+            "status": "OPEN",
+            "stop": "79996.3",
+            "tp": "77019.9"
+          },
+          "source_ids": [
+            "[H]-RISK-001",
+            "[H]-PAPER-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000121",
+            "e000122",
+            "e000123"
+          ],
+          "id": "e000124",
+          "kind": "PAPER_ORDER_CLOSED",
+          "observed_at": "2026-09-11T19:00:00Z",
+          "payload": {
+            "candidate": {
+              "direction": "SHORT",
+              "entry": "77215",
+              "evidence_ids": [
+                "e000092",
+                "e000117",
+                "e000120"
+              ],
+              "observed_at": "2026-09-11T18:30:00Z",
+              "planned_quantity": "0.03595440",
+              "risk_budget": "100.00",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-PLAN-001"
+              ],
+              "stop": "79996.3",
+              "tp": "77019.9"
+            },
+            "closed_at": "2026-09-11T19:00:00Z",
+            "direction": "SHORT",
+            "entry": "77214.6",
+            "exit_price": "77019.9",
+            "filled_at": "2026-09-11T18:30:00Z",
+            "mode": "PAPER",
+            "opened_at": "2026-09-11T18:45:00Z",
+            "pnl": "6.999315081",
+            "quantity": "0.03594923",
+            "risk_amount": "99.999973091",
+            "risk_budget": "100.00",
+            "source_ids": [
+              "[H]-RISK-001",
+              "[H]-PAPER-001"
+            ],
+            "status": "CLOSED",
+            "stop": "79996.3",
+            "tp": "77019.9"
+          },
+          "source_ids": [
+            "[H]-RISK-001",
+            "[H]-PAPER-001"
+          ]
+        }
+      ],
+      "fixture": "tests/data/btcusdt_15m_range_window.jsonl",
+      "fixture_kind": "REAL_SAVED_BTC",
+      "fixture_sha256": "bd76f8e79689621f4bd1da57ee1c3ae78940f60c7288ec5968618f07de62b6b8",
+      "origin_fixture": "tests/data/btcusdt_15m.jsonl",
+      "range_levels": {
+        "eq": "77019.9",
+        "high": "77498.8",
+        "low": "76541"
+      },
+      "reproduce": "python -B -m agent_trading.trading_brain --candles tests\\data\\btcusdt_15m_range_window.jsonl --fixture-kind REAL_SAVED_BTC",
+      "source_slice": {
+        "candles": 249,
+        "context_start": "2026-09-09T21:15:00Z",
+        "end_index_exclusive": 299,
+        "selection": "Earliest start index producing an order with unchanged defaults among exhaustive suffix scan.",
+        "start_index": 50
+      },
+      "timeframe": "15m",
+      "trades": [
+        {
+          "candidate": {
+            "direction": "SHORT",
+            "entry": "77215",
+            "evidence_ids": [
+              "e000092",
+              "e000117",
+              "e000120"
+            ],
+            "observed_at": "2026-09-11T18:30:00Z",
+            "planned_quantity": "0.03595440",
+            "risk_budget": "100.00",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-PLAN-001"
+            ],
+            "stop": "79996.3",
+            "tp": "77019.9"
+          },
+          "closed_at": "2026-09-11T19:00:00Z",
+          "direction": "SHORT",
+          "entry": "77214.6",
+          "exit_price": "77019.9",
+          "filled_at": "2026-09-11T18:30:00Z",
+          "mode": "PAPER",
+          "opened_at": "2026-09-11T18:45:00Z",
+          "pnl": "6.999315081",
+          "quantity": "0.03594923",
+          "risk_amount": "99.999973091",
+          "risk_budget": "100.00",
+          "source_ids": [
+            "[H]-RISK-001",
+            "[H]-PAPER-001"
+          ],
+          "status": "CLOSED",
+          "stop": "79996.3",
+          "tp": "77019.9"
+        }
+      ]
+    },
+    {
+      "config": {
+        "boundary_proximity": "2000",
+        "equity": "10000",
+        "quantity_step": "1E-8",
+        "risk_fraction": "0.01",
+        "stop_buffer": "1000",
+        "swing": {
+          "atr_length": 2,
+          "atr_multiplier": "0.1",
+          "bootstrap_candles": 200
+        },
+        "target": "EQ"
+      },
+      "context_kind": "SYNTHETIC",
+      "equity": "10050.00000",
+      "evidence_events": [
+        {
+          "evidence_ids": [],
+          "id": "e000002",
+          "kind": "SWING_HIGH",
+          "observed_at": "2026-01-01T01:00:00Z",
+          "payload": {
+            "raw": {
+              "atr": "7000",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-01-01T01:00:00Z",
+              "price": "110000",
+              "side": "HIGH",
+              "swing_time": "2026-01-01T00:45:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "700.0",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000006",
+          "kind": "SWING_LOW",
+          "observed_at": "2026-01-01T01:30:00Z",
+          "payload": {
+            "raw": {
+              "atr": "23000",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-01-01T01:30:00Z",
+              "price": "80000",
+              "side": "LOW",
+              "swing_time": "2026-01-01T01:15:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "2300.0",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000006",
+            "e000002"
+          ],
+          "id": "e000008",
+          "kind": "VALID_LOW",
+          "observed_at": "2026-01-01T01:45:00Z",
+          "payload": {
+            "confirmed_at": "2026-01-01T01:45:00Z",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-STRUCTURE-001"
+            ],
+            "swing": {
+              "raw": {
+                "atr": "23000",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-01-01T01:30:00Z",
+                "price": "80000",
+                "side": "LOW",
+                "swing_time": "2026-01-01T01:15:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "2300.0",
+                "timeframe": "15m"
+              }
+            },
+            "target": {
+              "raw": {
+                "atr": "7000",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-01-01T01:00:00Z",
+                "price": "110000",
+                "side": "HIGH",
+                "swing_time": "2026-01-01T00:45:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "700.0",
+                "timeframe": "15m"
+              }
+            }
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-STRUCTURE-001"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000013",
+          "kind": "SWING_LOW",
+          "observed_at": "2026-01-01T02:30:00Z",
+          "payload": {
+            "raw": {
+              "atr": "16500",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-01-01T02:30:00Z",
+              "price": "90000",
+              "side": "LOW",
+              "swing_time": "2026-01-01T02:15:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "1650.0",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000015",
+          "kind": "SWING_HIGH",
+          "observed_at": "2026-01-01T03:00:00Z",
+          "payload": {
+            "raw": {
+              "atr": "16500",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-01-01T03:00:00Z",
+              "price": "120000",
+              "side": "HIGH",
+              "swing_time": "2026-01-01T02:45:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "1650.0",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000015",
+            "e000013"
+          ],
+          "id": "e000016",
+          "kind": "VALID_HIGH",
+          "observed_at": "2026-01-01T03:15:00Z",
+          "payload": {
+            "confirmed_at": "2026-01-01T03:15:00Z",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-STRUCTURE-001"
+            ],
+            "swing": {
+              "raw": {
+                "atr": "16500",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-01-01T03:00:00Z",
+                "price": "120000",
+                "side": "HIGH",
+                "swing_time": "2026-01-01T02:45:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "1650.0",
+                "timeframe": "15m"
+              }
+            },
+            "target": {
+              "raw": {
+                "atr": "16500",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-01-01T02:30:00Z",
+                "price": "90000",
+                "side": "LOW",
+                "swing_time": "2026-01-01T02:15:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "1650.0",
+                "timeframe": "15m"
+              }
+            }
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-STRUCTURE-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000008",
+            "e000016"
+          ],
+          "id": "e000017",
+          "kind": "RANGE_CANDIDATE",
+          "observed_at": "2026-01-01T03:15:00Z",
+          "payload": {
+            "confirmed_at": null,
+            "high": {
+              "confirmed_at": "2026-01-01T03:15:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "16500",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-01-01T03:00:00Z",
+                  "price": "120000",
+                  "side": "HIGH",
+                  "swing_time": "2026-01-01T02:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "1650.0",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "16500",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-01-01T02:30:00Z",
+                  "price": "90000",
+                  "side": "LOW",
+                  "swing_time": "2026-01-01T02:15:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "1650.0",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "high_touch": null,
+            "invalidated_at": null,
+            "invalidation_candle": null,
+            "invalidation_reasons": [],
+            "low": {
+              "confirmed_at": "2026-01-01T01:45:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "23000",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-01-01T01:30:00Z",
+                  "price": "80000",
+                  "side": "LOW",
+                  "swing_time": "2026-01-01T01:15:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "2300.0",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "7000",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-01-01T01:00:00Z",
+                  "price": "110000",
+                  "side": "HIGH",
+                  "swing_time": "2026-01-01T00:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "700.0",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "low_touch": null,
+            "phase": "WAIT_LOW_TOUCH",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[U-RANGE-BOUNDARIES-001]",
+              "[H]-RANGE-001"
+            ]
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[U-RANGE-BOUNDARIES-001]",
+            "[H]-RANGE-001"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000020",
+          "kind": "SWING_LOW",
+          "observed_at": "2026-01-01T03:45:00Z",
+          "payload": {
+            "raw": {
+              "atr": "7100.0",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-01-01T03:45:00Z",
+              "price": "80800.0",
+              "side": "LOW",
+              "swing_time": "2026-01-01T03:30:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "710.00",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000008",
+            "e000016",
+            "e000017",
+            "e000020"
+          ],
+          "id": "e000021",
+          "kind": "RANGE_LOW_TOUCH",
+          "observed_at": "2026-01-01T03:45:00Z",
+          "payload": {
+            "confirmed_at": null,
+            "high": {
+              "confirmed_at": "2026-01-01T03:15:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "16500",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-01-01T03:00:00Z",
+                  "price": "120000",
+                  "side": "HIGH",
+                  "swing_time": "2026-01-01T02:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "1650.0",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "16500",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-01-01T02:30:00Z",
+                  "price": "90000",
+                  "side": "LOW",
+                  "swing_time": "2026-01-01T02:15:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "1650.0",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "high_touch": null,
+            "invalidated_at": null,
+            "invalidation_candle": null,
+            "invalidation_reasons": [],
+            "low": {
+              "confirmed_at": "2026-01-01T01:45:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "23000",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-01-01T01:30:00Z",
+                  "price": "80000",
+                  "side": "LOW",
+                  "swing_time": "2026-01-01T01:15:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "2300.0",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "7000",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-01-01T01:00:00Z",
+                  "price": "110000",
+                  "side": "HIGH",
+                  "swing_time": "2026-01-01T00:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "700.0",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "low_touch": {
+              "raw": {
+                "atr": "7100.0",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-01-01T03:45:00Z",
+                "price": "80800.0",
+                "side": "LOW",
+                "swing_time": "2026-01-01T03:30:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "710.00",
+                "timeframe": "15m"
+              }
+            },
+            "phase": "WAIT_HIGH_TOUCH",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[U-RANGE-BOUNDARIES-001]",
+              "[H]-RANGE-001"
+            ]
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[U-RANGE-BOUNDARIES-001]",
+            "[H]-RANGE-001"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000027",
+          "kind": "SWING_HIGH",
+          "observed_at": "2026-01-01T04:30:00Z",
+          "payload": {
+            "raw": {
+              "atr": "9000",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-01-01T04:30:00Z",
+              "price": "119000",
+              "side": "HIGH",
+              "swing_time": "2026-01-01T04:15:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "900.0",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000008",
+            "e000016",
+            "e000021",
+            "e000020",
+            "e000027"
+          ],
+          "id": "e000028",
+          "kind": "RANGE_CONFIRMED",
+          "observed_at": "2026-01-01T04:30:00Z",
+          "payload": {
+            "confirmed_at": "2026-01-01T04:30:00Z",
+            "high": {
+              "confirmed_at": "2026-01-01T03:15:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "16500",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-01-01T03:00:00Z",
+                  "price": "120000",
+                  "side": "HIGH",
+                  "swing_time": "2026-01-01T02:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "1650.0",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "16500",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-01-01T02:30:00Z",
+                  "price": "90000",
+                  "side": "LOW",
+                  "swing_time": "2026-01-01T02:15:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "1650.0",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "high_touch": {
+              "raw": {
+                "atr": "9000",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-01-01T04:30:00Z",
+                "price": "119000",
+                "side": "HIGH",
+                "swing_time": "2026-01-01T04:15:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "900.0",
+                "timeframe": "15m"
+              }
+            },
+            "invalidated_at": null,
+            "invalidation_candle": null,
+            "invalidation_reasons": [],
+            "low": {
+              "confirmed_at": "2026-01-01T01:45:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "23000",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-01-01T01:30:00Z",
+                  "price": "80000",
+                  "side": "LOW",
+                  "swing_time": "2026-01-01T01:15:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "2300.0",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "7000",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-01-01T01:00:00Z",
+                  "price": "110000",
+                  "side": "HIGH",
+                  "swing_time": "2026-01-01T00:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "700.0",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "low_touch": {
+              "raw": {
+                "atr": "7100.0",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-01-01T03:45:00Z",
+                "price": "80800.0",
+                "side": "LOW",
+                "swing_time": "2026-01-01T03:30:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "710.00",
+                "timeframe": "15m"
+              }
+            },
+            "phase": "RANGE_CONFIRMED",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[U-RANGE-BOUNDARIES-001]",
+              "[H]-RANGE-001"
+            ]
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[U-RANGE-BOUNDARIES-001]",
+            "[H]-RANGE-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000028"
+          ],
+          "id": "e000032",
+          "kind": "SWEEP",
+          "observed_at": "2026-01-01T05:15:00Z",
+          "payload": {
+            "direction": "LONG",
+            "extreme": "77000",
+            "observed_at": "2026-01-01T05:15:00Z",
+            "phase": "SWEPT",
+            "reclaimed_at": null,
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-MANIPULATION-001"
+            ],
+            "swept_at": "2026-01-01T05:15:00Z"
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-MANIPULATION-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000028",
+            "e000032"
+          ],
+          "id": "e000035",
+          "kind": "RECLAIM",
+          "observed_at": "2026-01-01T05:30:00Z",
+          "payload": {
+            "direction": "LONG",
+            "extreme": "77000",
+            "observed_at": "2026-01-01T05:30:00Z",
+            "phase": "RECLAIMED",
+            "reclaimed_at": "2026-01-01T05:30:00Z",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-MANIPULATION-001"
+            ],
+            "swept_at": "2026-01-01T05:15:00Z"
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-MANIPULATION-001"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000036",
+          "kind": "FVG",
+          "observed_at": "2026-01-01T05:45:00Z",
+          "payload": {
+            "direction": "LONG",
+            "formed_from": [
+              "2026-01-01T05:15:00Z",
+              "2026-01-01T05:30:00Z",
+              "2026-01-01T05:45:00Z"
+            ],
+            "kind": "FVG",
+            "lower": "82000",
+            "observed_at": "2026-01-01T05:45:00Z",
+            "origin_at": null,
+            "source_ids": [
+              "[H]-GAP-001"
+            ],
+            "upper": "85000"
+          },
+          "source_ids": [
+            "[H]-GAP-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000028",
+            "e000035",
+            "e000036"
+          ],
+          "id": "e000037",
+          "kind": "TRADE_CANDIDATE",
+          "observed_at": "2026-01-01T05:45:00Z",
+          "payload": {
+            "direction": "LONG",
+            "entry": "92000",
+            "evidence_ids": [
+              "e000028",
+              "e000035",
+              "e000036"
+            ],
+            "observed_at": "2026-01-01T05:45:00Z",
+            "planned_quantity": "0.00625",
+            "risk_budget": "100.00",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-PLAN-001"
+            ],
+            "stop": "76000",
+            "tp": "100000"
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-PLAN-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000037"
+          ],
+          "id": "e000038",
+          "kind": "RISK_APPROVED",
+          "observed_at": "2026-01-01T05:45:00Z",
+          "payload": {
+            "direction": "LONG",
+            "entry": "92000",
+            "evidence_ids": [
+              "e000028",
+              "e000035",
+              "e000036"
+            ],
+            "observed_at": "2026-01-01T05:45:00Z",
+            "planned_quantity": "0.00625",
+            "risk_budget": "100.00",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-PLAN-001"
+            ],
+            "stop": "76000",
+            "tp": "100000"
+          },
+          "source_ids": [
+            "[H]-RISK-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000037",
+            "e000038"
+          ],
+          "id": "e000039",
+          "kind": "PAPER_ORDER_OPENED",
+          "observed_at": "2026-01-01T06:00:00Z",
+          "payload": {
+            "candidate": {
+              "direction": "LONG",
+              "entry": "92000",
+              "evidence_ids": [
+                "e000028",
+                "e000035",
+                "e000036"
+              ],
+              "observed_at": "2026-01-01T05:45:00Z",
+              "planned_quantity": "0.00625",
+              "risk_budget": "100.00",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-PLAN-001"
+              ],
+              "stop": "76000",
+              "tp": "100000"
+            },
+            "closed_at": null,
+            "direction": "LONG",
+            "entry": "92000",
+            "exit_price": null,
+            "filled_at": "2026-01-01T05:45:00Z",
+            "mode": "PAPER",
+            "opened_at": "2026-01-01T06:00:00Z",
+            "pnl": null,
+            "quantity": "0.00625",
+            "risk_amount": "100.00000",
+            "risk_budget": "100.00",
+            "source_ids": [
+              "[H]-RISK-001",
+              "[H]-PAPER-001"
+            ],
+            "status": "OPEN",
+            "stop": "76000",
+            "tp": "100000"
+          },
+          "source_ids": [
+            "[H]-RISK-001",
+            "[H]-PAPER-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000037",
+            "e000038",
+            "e000039"
+          ],
+          "id": "e000041",
+          "kind": "PAPER_ORDER_CLOSED",
+          "observed_at": "2026-01-01T06:15:00Z",
+          "payload": {
+            "candidate": {
+              "direction": "LONG",
+              "entry": "92000",
+              "evidence_ids": [
+                "e000028",
+                "e000035",
+                "e000036"
+              ],
+              "observed_at": "2026-01-01T05:45:00Z",
+              "planned_quantity": "0.00625",
+              "risk_budget": "100.00",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-PLAN-001"
+              ],
+              "stop": "76000",
+              "tp": "100000"
+            },
+            "closed_at": "2026-01-01T06:15:00Z",
+            "direction": "LONG",
+            "entry": "92000",
+            "exit_price": "100000",
+            "filled_at": "2026-01-01T05:45:00Z",
+            "mode": "PAPER",
+            "opened_at": "2026-01-01T06:00:00Z",
+            "pnl": "50.00000",
+            "quantity": "0.00625",
+            "risk_amount": "100.00000",
+            "risk_budget": "100.00",
+            "source_ids": [
+              "[H]-RISK-001",
+              "[H]-PAPER-001"
+            ],
+            "status": "CLOSED",
+            "stop": "76000",
+            "tp": "100000"
+          },
+          "source_ids": [
+            "[H]-RISK-001",
+            "[H]-PAPER-001"
+          ]
+        }
+      ],
+      "fixture": "tests/data/trading_brain_synthetic.jsonl",
+      "fixture_kind": "SYNTHETIC",
+      "fixture_sha256": "b497cda71f8b24fb49a017f4ee5ff6b3c2d36fad3236cd8dbdc856a0bdea9b14",
+      "range_levels": {
+        "eq": "100000",
+        "high": "120000",
+        "low": "80000"
+      },
+      "reproduce": "python -B -m agent_trading.trading_brain --candles tests\\data\\trading_brain_synthetic.jsonl --fixture-kind SYNTHETIC --atr-length 2 --atr-multiplier .1 --boundary-proximity 2000 --stop-buffer 1000",
+      "timeframe": "15m",
+      "trades": [
+        {
+          "candidate": {
+            "direction": "LONG",
+            "entry": "92000",
+            "evidence_ids": [
+              "e000028",
+              "e000035",
+              "e000036"
+            ],
+            "observed_at": "2026-01-01T05:45:00Z",
+            "planned_quantity": "0.00625",
+            "risk_budget": "100.00",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-PLAN-001"
+            ],
+            "stop": "76000",
+            "tp": "100000"
+          },
+          "closed_at": "2026-01-01T06:15:00Z",
+          "direction": "LONG",
+          "entry": "92000",
+          "exit_price": "100000",
+          "filled_at": "2026-01-01T05:45:00Z",
+          "mode": "PAPER",
+          "opened_at": "2026-01-01T06:00:00Z",
+          "pnl": "50.00000",
+          "quantity": "0.00625",
+          "risk_amount": "100.00000",
+          "risk_budget": "100.00",
+          "source_ids": [
+            "[H]-RISK-001",
+            "[H]-PAPER-001"
+          ],
+          "status": "CLOSED",
+          "stop": "76000",
+          "tp": "100000"
+        }
+      ]
+    }
+  ],
+  "invalidations": [
+    {
+      "evidence_events": [
+        {
+          "evidence_ids": [],
+          "id": "e000040",
+          "kind": "SWING_HIGH",
+          "observed_at": "2026-09-10T00:45:00Z",
+          "payload": {
+            "raw": {
+              "atr": "177.7142857142857142857142857",
+              "confirmation_delay_bars": 2,
+              "confirmed_at": "2026-09-10T00:45:00Z",
+              "price": "78397.5",
+              "side": "HIGH",
+              "swing_time": "2026-09-10T00:15:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "222.1428571428571428571428571",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000044",
+          "kind": "SWING_LOW",
+          "observed_at": "2026-09-10T02:45:00Z",
+          "payload": {
+            "raw": {
+              "atr": "164.9571428571428571428571429",
+              "confirmation_delay_bars": 4,
+              "confirmed_at": "2026-09-10T02:45:00Z",
+              "price": "77954.4",
+              "side": "LOW",
+              "swing_time": "2026-09-10T01:45:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "206.1964285714285714285714286",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000044",
+            "e000040"
+          ],
+          "id": "e000048",
+          "kind": "VALID_LOW",
+          "observed_at": "2026-09-10T05:00:00Z",
+          "payload": {
+            "confirmed_at": "2026-09-10T05:00:00Z",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-STRUCTURE-001"
+            ],
+            "swing": {
+              "raw": {
+                "atr": "164.9571428571428571428571429",
+                "confirmation_delay_bars": 4,
+                "confirmed_at": "2026-09-10T02:45:00Z",
+                "price": "77954.4",
+                "side": "LOW",
+                "swing_time": "2026-09-10T01:45:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "206.1964285714285714285714286",
+                "timeframe": "15m"
+              }
+            },
+            "target": {
+              "raw": {
+                "atr": "177.7142857142857142857142857",
+                "confirmation_delay_bars": 2,
+                "confirmed_at": "2026-09-10T00:45:00Z",
+                "price": "78397.5",
+                "side": "HIGH",
+                "swing_time": "2026-09-10T00:15:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "222.1428571428571428571428571",
+                "timeframe": "15m"
+              }
+            }
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-STRUCTURE-001"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000050",
+          "kind": "SWING_LOW",
+          "observed_at": "2026-09-10T05:30:00Z",
+          "payload": {
+            "raw": {
+              "atr": "142.5714285714285714285714286",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-09-10T05:30:00Z",
+              "price": "78272.7",
+              "side": "LOW",
+              "swing_time": "2026-09-10T05:15:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "178.2142857142857142857142858",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [],
+          "id": "e000051",
+          "kind": "SWING_HIGH",
+          "observed_at": "2026-09-10T06:15:00Z",
+          "payload": {
+            "raw": {
+              "atr": "145.5428571428571428571428571",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-09-10T06:15:00Z",
+              "price": "78552.6",
+              "side": "HIGH",
+              "swing_time": "2026-09-10T06:00:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "181.9285714285714285714285714",
+              "timeframe": "15m"
+            }
+          },
+          "source_ids": [
+            "[H]-SWING-ATR-CLOSE-001",
+            "[D-DD-MSB-001]"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000051",
+            "e000050"
+          ],
+          "id": "e000052",
+          "kind": "VALID_HIGH",
+          "observed_at": "2026-09-10T06:30:00Z",
+          "payload": {
+            "confirmed_at": "2026-09-10T06:30:00Z",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-STRUCTURE-001"
+            ],
+            "swing": {
+              "raw": {
+                "atr": "145.5428571428571428571428571",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-09-10T06:15:00Z",
+                "price": "78552.6",
+                "side": "HIGH",
+                "swing_time": "2026-09-10T06:00:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "181.9285714285714285714285714",
+                "timeframe": "15m"
+              }
+            },
+            "target": {
+              "raw": {
+                "atr": "142.5714285714285714285714286",
+                "confirmation_delay_bars": 1,
+                "confirmed_at": "2026-09-10T05:30:00Z",
+                "price": "78272.7",
+                "side": "LOW",
+                "swing_time": "2026-09-10T05:15:00Z",
+                "symbol": "BTC-USDT",
+                "threshold": "178.2142857142857142857142858",
+                "timeframe": "15m"
+              }
+            }
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-STRUCTURE-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000048",
+            "e000052"
+          ],
+          "id": "e000053",
+          "kind": "RANGE_CANDIDATE",
+          "observed_at": "2026-09-10T06:30:00Z",
+          "payload": {
+            "confirmed_at": null,
+            "high": {
+              "confirmed_at": "2026-09-10T06:30:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "145.5428571428571428571428571",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-09-10T06:15:00Z",
+                  "price": "78552.6",
+                  "side": "HIGH",
+                  "swing_time": "2026-09-10T06:00:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "181.9285714285714285714285714",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "142.5714285714285714285714286",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-09-10T05:30:00Z",
+                  "price": "78272.7",
+                  "side": "LOW",
+                  "swing_time": "2026-09-10T05:15:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "178.2142857142857142857142858",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "high_touch": null,
+            "invalidated_at": null,
+            "invalidation_candle": null,
+            "invalidation_reasons": [],
+            "low": {
+              "confirmed_at": "2026-09-10T05:00:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "164.9571428571428571428571429",
+                  "confirmation_delay_bars": 4,
+                  "confirmed_at": "2026-09-10T02:45:00Z",
+                  "price": "77954.4",
+                  "side": "LOW",
+                  "swing_time": "2026-09-10T01:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "206.1964285714285714285714286",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "177.7142857142857142857142857",
+                  "confirmation_delay_bars": 2,
+                  "confirmed_at": "2026-09-10T00:45:00Z",
+                  "price": "78397.5",
+                  "side": "HIGH",
+                  "swing_time": "2026-09-10T00:15:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "222.1428571428571428571428571",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "low_touch": null,
+            "phase": "WAIT_LOW_TOUCH",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[U-RANGE-BOUNDARIES-001]",
+              "[H]-RANGE-001"
+            ]
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[U-RANGE-BOUNDARIES-001]",
+            "[H]-RANGE-001"
+          ]
+        },
+        {
+          "evidence_ids": [
+            "e000048",
+            "e000052",
+            "e000053"
+          ],
+          "id": "e000063",
+          "kind": "RANGE_INVALIDATED",
+          "observed_at": "2026-09-10T07:45:00Z",
+          "payload": {
+            "confirmed_at": null,
+            "high": {
+              "confirmed_at": "2026-09-10T06:30:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "145.5428571428571428571428571",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-09-10T06:15:00Z",
+                  "price": "78552.6",
+                  "side": "HIGH",
+                  "swing_time": "2026-09-10T06:00:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "181.9285714285714285714285714",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "142.5714285714285714285714286",
+                  "confirmation_delay_bars": 1,
+                  "confirmed_at": "2026-09-10T05:30:00Z",
+                  "price": "78272.7",
+                  "side": "LOW",
+                  "swing_time": "2026-09-10T05:15:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "178.2142857142857142857142858",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "high_touch": null,
+            "invalidated_at": "2026-09-10T07:45:00Z",
+            "invalidation_candle": {
+              "close": "78023.3",
+              "close_time": "2026-09-10T07:45:00Z",
+              "closed": true,
+              "high": "78051.3",
+              "low": "77916",
+              "open": "78023.5",
+              "symbol": "BTC-USDT",
+              "timeframe": "15m",
+              "volume": "160.11588547"
+            },
+            "invalidation_reasons": [
+              "WICK_BELOW_RANGE_LOW"
+            ],
+            "low": {
+              "confirmed_at": "2026-09-10T05:00:00Z",
+              "source_ids": [
+                "[U-TRADING-BRAIN-001]",
+                "[H]-STRUCTURE-001"
+              ],
+              "swing": {
+                "raw": {
+                  "atr": "164.9571428571428571428571429",
+                  "confirmation_delay_bars": 4,
+                  "confirmed_at": "2026-09-10T02:45:00Z",
+                  "price": "77954.4",
+                  "side": "LOW",
+                  "swing_time": "2026-09-10T01:45:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "206.1964285714285714285714286",
+                  "timeframe": "15m"
+                }
+              },
+              "target": {
+                "raw": {
+                  "atr": "177.7142857142857142857142857",
+                  "confirmation_delay_bars": 2,
+                  "confirmed_at": "2026-09-10T00:45:00Z",
+                  "price": "78397.5",
+                  "side": "HIGH",
+                  "swing_time": "2026-09-10T00:15:00Z",
+                  "symbol": "BTC-USDT",
+                  "threshold": "222.1428571428571428571428571",
+                  "timeframe": "15m"
+                }
+              }
+            },
+            "low_touch": null,
+            "phase": "RANGE_INVALIDATED",
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[U-RANGE-BOUNDARIES-001]",
+              "[H]-RANGE-001"
+            ]
+          },
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[U-RANGE-BOUNDARIES-001]",
+            "[H]-RANGE-001"
+          ]
+        }
+      ],
+      "fixture": "tests/data/btcusdt_15m.jsonl",
+      "fixture_sha256": "8bb32ec8729727b4ab279d4d5362f1a812e6c6a85db44329c49226cc7e4ed84b",
+      "paper_orders": 0,
+      "range": {
+        "confirmed_at": null,
+        "high": {
+          "confirmed_at": "2026-09-10T06:30:00Z",
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-STRUCTURE-001"
+          ],
+          "swing": {
+            "raw": {
+              "atr": "145.5428571428571428571428571",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-09-10T06:15:00Z",
+              "price": "78552.6",
+              "side": "HIGH",
+              "swing_time": "2026-09-10T06:00:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "181.9285714285714285714285714",
+              "timeframe": "15m"
+            }
+          },
+          "target": {
+            "raw": {
+              "atr": "142.5714285714285714285714286",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-09-10T05:30:00Z",
+              "price": "78272.7",
+              "side": "LOW",
+              "swing_time": "2026-09-10T05:15:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "178.2142857142857142857142858",
+              "timeframe": "15m"
+            }
+          }
+        },
+        "high_touch": null,
+        "invalidated_at": "2026-09-10T07:45:00Z",
+        "invalidation_candle": {
+          "close": "78023.3",
+          "close_time": "2026-09-10T07:45:00Z",
+          "closed": true,
+          "high": "78051.3",
+          "low": "77916",
+          "open": "78023.5",
+          "symbol": "BTC-USDT",
+          "timeframe": "15m",
+          "volume": "160.11588547"
+        },
+        "invalidation_reasons": [
+          "WICK_BELOW_RANGE_LOW"
+        ],
+        "low": {
+          "confirmed_at": "2026-09-10T05:00:00Z",
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-STRUCTURE-001"
+          ],
+          "swing": {
+            "raw": {
+              "atr": "164.9571428571428571428571429",
+              "confirmation_delay_bars": 4,
+              "confirmed_at": "2026-09-10T02:45:00Z",
+              "price": "77954.4",
+              "side": "LOW",
+              "swing_time": "2026-09-10T01:45:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "206.1964285714285714285714286",
+              "timeframe": "15m"
+            }
+          },
+          "target": {
+            "raw": {
+              "atr": "177.7142857142857142857142857",
+              "confirmation_delay_bars": 2,
+              "confirmed_at": "2026-09-10T00:45:00Z",
+              "price": "78397.5",
+              "side": "HIGH",
+              "swing_time": "2026-09-10T00:15:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "222.1428571428571428571428571",
+              "timeframe": "15m"
+            }
+          }
+        },
+        "low_touch": null,
+        "phase": "RANGE_INVALIDATED",
+        "source_ids": [
+          "[U-TRADING-BRAIN-001]",
+          "[U-RANGE-BOUNDARIES-001]",
+          "[H]-RANGE-001"
+        ]
+      },
+      "range_levels": {
+        "eq": "78253.5",
+        "high": "78552.6",
+        "low": "77954.4"
+      },
+      "timeframe": "15m"
+    },
+    {
       "evidence_events": [
         {
           "evidence_ids": [],
@@ -223,6 +2469,9 @@
               }
             },
             "high_touch": null,
+            "invalidated_at": null,
+            "invalidation_candle": null,
+            "invalidation_reasons": [],
             "low": {
               "confirmed_at": "2026-09-02T06:00:00Z",
               "source_ids": [
@@ -260,47 +2509,25 @@
             "phase": "WAIT_LOW_TOUCH",
             "source_ids": [
               "[U-TRADING-BRAIN-001]",
+              "[U-RANGE-BOUNDARIES-001]",
               "[H]-RANGE-001"
             ]
           },
           "source_ids": [
             "[U-TRADING-BRAIN-001]",
+            "[U-RANGE-BOUNDARIES-001]",
             "[H]-RANGE-001"
-          ]
-        },
-        {
-          "evidence_ids": [],
-          "id": "e000035",
-          "kind": "SWING_LOW",
-          "observed_at": "2026-09-03T03:00:00Z",
-          "payload": {
-            "raw": {
-              "atr": "437.7214285714285714285714286",
-              "confirmation_delay_bars": 9,
-              "confirmed_at": "2026-09-03T03:00:00Z",
-              "price": "76963.2",
-              "side": "LOW",
-              "swing_time": "2026-09-02T18:00:00Z",
-              "symbol": "BTC-USDT",
-              "threshold": "547.1517857142857142857142858",
-              "timeframe": "1H"
-            }
-          },
-          "source_ids": [
-            "[H]-SWING-ATR-CLOSE-001",
-            "[D-DD-MSB-001]"
           ]
         },
         {
           "evidence_ids": [
             "e000028",
             "e000031",
-            "e000032",
-            "e000035"
+            "e000032"
           ],
-          "id": "e000037",
-          "kind": "RANGE_LOW_TOUCH",
-          "observed_at": "2026-09-03T03:00:00Z",
+          "id": "e000033",
+          "kind": "RANGE_INVALIDATED",
+          "observed_at": "2026-09-02T11:00:00Z",
           "payload": {
             "confirmed_at": null,
             "high": {
@@ -337,145 +2564,21 @@
               }
             },
             "high_touch": null,
-            "low": {
-              "confirmed_at": "2026-09-02T06:00:00Z",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-STRUCTURE-001"
-              ],
-              "swing": {
-                "raw": {
-                  "atr": "485.9357142857142857142857143",
-                  "confirmation_delay_bars": 2,
-                  "confirmed_at": "2026-09-02T04:00:00Z",
-                  "price": "76713.6",
-                  "side": "LOW",
-                  "swing_time": "2026-09-02T02:00:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "607.4196428571428571428571429",
-                  "timeframe": "1H"
-                }
-              },
-              "target": {
-                "raw": {
-                  "atr": "503.1357142857142857142857143",
-                  "confirmation_delay_bars": 2,
-                  "confirmed_at": "2026-09-02T02:00:00Z",
-                  "price": "77643.2",
-                  "side": "HIGH",
-                  "swing_time": "2026-09-02T00:00:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "628.9196428571428571428571429",
-                  "timeframe": "1H"
-                }
-              }
-            },
-            "low_touch": {
-              "raw": {
-                "atr": "437.7214285714285714285714286",
-                "confirmation_delay_bars": 9,
-                "confirmed_at": "2026-09-03T03:00:00Z",
-                "price": "76963.2",
-                "side": "LOW",
-                "swing_time": "2026-09-02T18:00:00Z",
-                "symbol": "BTC-USDT",
-                "threshold": "547.1517857142857142857142858",
-                "timeframe": "1H"
-              }
-            },
-            "phase": "WAIT_HIGH_TOUCH",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-RANGE-001"
-            ]
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-RANGE-001"
-          ]
-        },
-        {
-          "evidence_ids": [],
-          "id": "e000041",
-          "kind": "SWING_HIGH",
-          "observed_at": "2026-09-03T10:00:00Z",
-          "payload": {
-            "raw": {
-              "atr": "397.85",
-              "confirmation_delay_bars": 2,
-              "confirmed_at": "2026-09-03T10:00:00Z",
-              "price": "78176.1",
-              "side": "HIGH",
-              "swing_time": "2026-09-03T08:00:00Z",
+            "invalidated_at": "2026-09-02T11:00:00Z",
+            "invalidation_candle": {
+              "close": "76683.2",
+              "close_time": "2026-09-02T11:00:00Z",
+              "closed": true,
+              "high": "76763.1",
+              "low": "76261",
+              "open": "76750.7",
               "symbol": "BTC-USDT",
-              "threshold": "497.3125",
-              "timeframe": "1H"
-            }
-          },
-          "source_ids": [
-            "[H]-SWING-ATR-CLOSE-001",
-            "[D-DD-MSB-001]"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000028",
-            "e000031",
-            "e000037",
-            "e000035",
-            "e000041"
-          ],
-          "id": "e000042",
-          "kind": "RANGE_CONFIRMED",
-          "observed_at": "2026-09-03T10:00:00Z",
-          "payload": {
-            "confirmed_at": "2026-09-03T10:00:00Z",
-            "high": {
-              "confirmed_at": "2026-09-02T11:00:00Z",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-STRUCTURE-001"
-              ],
-              "swing": {
-                "raw": {
-                  "atr": "423.3357142857142857142857143",
-                  "confirmation_delay_bars": 5,
-                  "confirmed_at": "2026-09-02T09:00:00Z",
-                  "price": "77788.1",
-                  "side": "HIGH",
-                  "swing_time": "2026-09-02T04:00:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "529.1696428571428571428571429",
-                  "timeframe": "1H"
-                }
-              },
-              "target": {
-                "raw": {
-                  "atr": "485.9357142857142857142857143",
-                  "confirmation_delay_bars": 2,
-                  "confirmed_at": "2026-09-02T04:00:00Z",
-                  "price": "76713.6",
-                  "side": "LOW",
-                  "swing_time": "2026-09-02T02:00:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "607.4196428571428571428571429",
-                  "timeframe": "1H"
-                }
-              }
+              "timeframe": "1H",
+              "volume": "337.24081011"
             },
-            "high_touch": {
-              "raw": {
-                "atr": "397.85",
-                "confirmation_delay_bars": 2,
-                "confirmed_at": "2026-09-03T10:00:00Z",
-                "price": "78176.1",
-                "side": "HIGH",
-                "swing_time": "2026-09-03T08:00:00Z",
-                "symbol": "BTC-USDT",
-                "threshold": "497.3125",
-                "timeframe": "1H"
-              }
-            },
+            "invalidation_reasons": [
+              "WICK_BELOW_RANGE_LOW"
+            ],
             "low": {
               "confirmed_at": "2026-09-02T06:00:00Z",
               "source_ids": [
@@ -509,335 +2612,124 @@
                 }
               }
             },
-            "low_touch": {
-              "raw": {
-                "atr": "437.7214285714285714285714286",
-                "confirmation_delay_bars": 9,
-                "confirmed_at": "2026-09-03T03:00:00Z",
-                "price": "76963.2",
-                "side": "LOW",
-                "swing_time": "2026-09-02T18:00:00Z",
-                "symbol": "BTC-USDT",
-                "threshold": "547.1517857142857142857142858",
-                "timeframe": "1H"
-              }
-            },
-            "phase": "RANGE_CONFIRMED",
+            "low_touch": null,
+            "phase": "RANGE_INVALIDATED",
             "source_ids": [
               "[U-TRADING-BRAIN-001]",
+              "[U-RANGE-BOUNDARIES-001]",
               "[H]-RANGE-001"
             ]
           },
           "source_ids": [
             "[U-TRADING-BRAIN-001]",
+            "[U-RANGE-BOUNDARIES-001]",
             "[H]-RANGE-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000042"
-          ],
-          "id": "e000176",
-          "kind": "SWEEP",
-          "observed_at": "2026-09-11T17:00:00Z",
-          "payload": {
-            "direction": "SHORT",
-            "extreme": "78066.5",
-            "observed_at": "2026-09-11T17:00:00Z",
-            "phase": "SWEPT",
-            "reclaimed_at": null,
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-MANIPULATION-001"
-            ],
-            "swept_at": "2026-09-11T17:00:00Z"
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-MANIPULATION-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000042",
-            "e000176"
-          ],
-          "id": "e000178",
-          "kind": "RECLAIM",
-          "observed_at": "2026-09-11T18:00:00Z",
-          "payload": {
-            "direction": "SHORT",
-            "extreme": "78066.5",
-            "observed_at": "2026-09-11T18:00:00Z",
-            "phase": "RECLAIMED",
-            "reclaimed_at": "2026-09-11T18:00:00Z",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-MANIPULATION-001"
-            ],
-            "swept_at": "2026-09-11T17:00:00Z"
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-MANIPULATION-001"
-          ]
-        },
-        {
-          "evidence_ids": [],
-          "id": "e000179",
-          "kind": "FVG",
-          "observed_at": "2026-09-11T20:00:00Z",
-          "payload": {
-            "direction": "SHORT",
-            "formed_from": [
-              "2026-09-11T18:00:00Z",
-              "2026-09-11T19:00:00Z",
-              "2026-09-11T20:00:00Z"
-            ],
-            "kind": "FVG",
-            "lower": "77375",
-            "observed_at": "2026-09-11T20:00:00Z",
-            "origin_at": null,
-            "source_ids": [
-              "[H]-GAP-001"
-            ],
-            "upper": "77490.8"
-          },
-          "source_ids": [
-            "[H]-GAP-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000042",
-            "e000178",
-            "e000179"
-          ],
-          "id": "e000180",
-          "kind": "TRADE_CANDIDATE",
-          "observed_at": "2026-09-11T20:00:00Z",
-          "payload": {
-            "direction": "SHORT",
-            "entry": "77289.9",
-            "evidence_ids": [
-              "e000042",
-              "e000178",
-              "e000179"
-            ],
-            "observed_at": "2026-09-11T20:00:00Z",
-            "planned_quantity": "0.11407711",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-PLAN-001"
-            ],
-            "stop": "78166.5",
-            "tp": "77250.85"
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-PLAN-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000180"
-          ],
-          "id": "e000181",
-          "kind": "RISK_APPROVED",
-          "observed_at": "2026-09-11T20:00:00Z",
-          "payload": {
-            "direction": "SHORT",
-            "entry": "77289.9",
-            "evidence_ids": [
-              "e000042",
-              "e000178",
-              "e000179"
-            ],
-            "observed_at": "2026-09-11T20:00:00Z",
-            "planned_quantity": "0.11407711",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-PLAN-001"
-            ],
-            "stop": "78166.5",
-            "tp": "77250.85"
-          },
-          "source_ids": [
-            "[H]-RISK-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000180",
-            "e000181"
-          ],
-          "id": "e000182",
-          "kind": "PAPER_ORDER_OPENED",
-          "observed_at": "2026-09-11T21:00:00Z",
-          "payload": {
-            "candidate": {
-              "direction": "SHORT",
-              "entry": "77289.9",
-              "evidence_ids": [
-                "e000042",
-                "e000178",
-                "e000179"
-              ],
-              "observed_at": "2026-09-11T20:00:00Z",
-              "planned_quantity": "0.11407711",
-              "risk_budget": "100.00",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-PLAN-001"
-              ],
-              "stop": "78166.5",
-              "tp": "77250.85"
-            },
-            "closed_at": null,
-            "direction": "SHORT",
-            "entry": "77289.8",
-            "exit_price": null,
-            "filled_at": "2026-09-11T20:00:00Z",
-            "mode": "PAPER",
-            "opened_at": "2026-09-11T21:00:00Z",
-            "pnl": null,
-            "quantity": "0.11406410",
-            "risk_amount": "99.999996470",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[H]-RISK-001",
-              "[H]-PAPER-001"
-            ],
-            "status": "OPEN",
-            "stop": "78166.5",
-            "tp": "77250.85"
-          },
-          "source_ids": [
-            "[H]-RISK-001",
-            "[H]-PAPER-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000180",
-            "e000181",
-            "e000182"
-          ],
-          "id": "e000183",
-          "kind": "PAPER_ORDER_CLOSED",
-          "observed_at": "2026-09-11T21:00:00Z",
-          "payload": {
-            "candidate": {
-              "direction": "SHORT",
-              "entry": "77289.9",
-              "evidence_ids": [
-                "e000042",
-                "e000178",
-                "e000179"
-              ],
-              "observed_at": "2026-09-11T20:00:00Z",
-              "planned_quantity": "0.11407711",
-              "risk_budget": "100.00",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-PLAN-001"
-              ],
-              "stop": "78166.5",
-              "tp": "77250.85"
-            },
-            "closed_at": "2026-09-11T21:00:00Z",
-            "direction": "SHORT",
-            "entry": "77289.8",
-            "exit_price": "77250.85",
-            "filled_at": "2026-09-11T20:00:00Z",
-            "mode": "PAPER",
-            "opened_at": "2026-09-11T21:00:00Z",
-            "pnl": "4.4427966950",
-            "quantity": "0.11406410",
-            "risk_amount": "99.999996470",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[H]-RISK-001",
-              "[H]-PAPER-001"
-            ],
-            "status": "CLOSED",
-            "stop": "78166.5",
-            "tp": "77250.85"
-          },
-          "source_ids": [
-            "[H]-RISK-001",
-            "[H]-PAPER-001"
           ]
         }
       ],
       "fixture": "tests/data/btcusdt_1H.jsonl",
-      "fixture_kind": "REAL_SAVED_BTC",
       "fixture_sha256": "13c04411d8def08e1664058b946ec5231c7e1bdae140181c08519c8bc959e062",
+      "paper_orders": 0,
+      "range": {
+        "confirmed_at": null,
+        "high": {
+          "confirmed_at": "2026-09-02T11:00:00Z",
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-STRUCTURE-001"
+          ],
+          "swing": {
+            "raw": {
+              "atr": "423.3357142857142857142857143",
+              "confirmation_delay_bars": 5,
+              "confirmed_at": "2026-09-02T09:00:00Z",
+              "price": "77788.1",
+              "side": "HIGH",
+              "swing_time": "2026-09-02T04:00:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "529.1696428571428571428571429",
+              "timeframe": "1H"
+            }
+          },
+          "target": {
+            "raw": {
+              "atr": "485.9357142857142857142857143",
+              "confirmation_delay_bars": 2,
+              "confirmed_at": "2026-09-02T04:00:00Z",
+              "price": "76713.6",
+              "side": "LOW",
+              "swing_time": "2026-09-02T02:00:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "607.4196428571428571428571429",
+              "timeframe": "1H"
+            }
+          }
+        },
+        "high_touch": null,
+        "invalidated_at": "2026-09-02T11:00:00Z",
+        "invalidation_candle": {
+          "close": "76683.2",
+          "close_time": "2026-09-02T11:00:00Z",
+          "closed": true,
+          "high": "76763.1",
+          "low": "76261",
+          "open": "76750.7",
+          "symbol": "BTC-USDT",
+          "timeframe": "1H",
+          "volume": "337.24081011"
+        },
+        "invalidation_reasons": [
+          "WICK_BELOW_RANGE_LOW"
+        ],
+        "low": {
+          "confirmed_at": "2026-09-02T06:00:00Z",
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-STRUCTURE-001"
+          ],
+          "swing": {
+            "raw": {
+              "atr": "485.9357142857142857142857143",
+              "confirmation_delay_bars": 2,
+              "confirmed_at": "2026-09-02T04:00:00Z",
+              "price": "76713.6",
+              "side": "LOW",
+              "swing_time": "2026-09-02T02:00:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "607.4196428571428571428571429",
+              "timeframe": "1H"
+            }
+          },
+          "target": {
+            "raw": {
+              "atr": "503.1357142857142857142857143",
+              "confirmation_delay_bars": 2,
+              "confirmed_at": "2026-09-02T02:00:00Z",
+              "price": "77643.2",
+              "side": "HIGH",
+              "swing_time": "2026-09-02T00:00:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "628.9196428571428571428571429",
+              "timeframe": "1H"
+            }
+          }
+        },
+        "low_touch": null,
+        "phase": "RANGE_INVALIDATED",
+        "source_ids": [
+          "[U-TRADING-BRAIN-001]",
+          "[U-RANGE-BOUNDARIES-001]",
+          "[H]-RANGE-001"
+        ]
+      },
       "range_levels": {
         "eq": "77250.85",
         "high": "77788.1",
         "low": "76713.6"
       },
-      "reproduce": "python -B -m agent_trading.trading_brain --candles tests\\data\\btcusdt_1H.jsonl --fixture-kind REAL_SAVED_BTC",
-      "timeframe": "1H",
-      "trades": [
-        {
-          "candidate": {
-            "direction": "SHORT",
-            "entry": "77289.9",
-            "evidence_ids": [
-              "e000042",
-              "e000178",
-              "e000179"
-            ],
-            "observed_at": "2026-09-11T20:00:00Z",
-            "planned_quantity": "0.11407711",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-PLAN-001"
-            ],
-            "stop": "78166.5",
-            "tp": "77250.85"
-          },
-          "closed_at": "2026-09-11T21:00:00Z",
-          "direction": "SHORT",
-          "entry": "77289.8",
-          "exit_price": "77250.85",
-          "filled_at": "2026-09-11T20:00:00Z",
-          "mode": "PAPER",
-          "opened_at": "2026-09-11T21:00:00Z",
-          "pnl": "4.4427966950",
-          "quantity": "0.11406410",
-          "risk_amount": "99.999996470",
-          "risk_budget": "100.00",
-          "source_ids": [
-            "[H]-RISK-001",
-            "[H]-PAPER-001"
-          ],
-          "status": "CLOSED",
-          "stop": "78166.5",
-          "tp": "77250.85"
-        }
-      ]
+      "timeframe": "1H"
     },
     {
-      "config": {
-        "boundary_proximity": "500",
-        "equity": "10000",
-        "quantity_step": "1E-8",
-        "risk_fraction": "0.01",
-        "stop_buffer": "100",
-        "swing": {
-          "atr_length": 14,
-          "atr_multiplier": "1.25",
-          "bootstrap_candles": 200
-        },
-        "target": "EQ"
-      },
-      "equity": "10009.6796207275",
       "evidence_events": [
         {
           "evidence_ids": [],
@@ -1044,6 +2936,9 @@
               }
             },
             "high_touch": null,
+            "invalidated_at": null,
+            "invalidation_candle": null,
+            "invalidation_reasons": [],
             "low": {
               "confirmed_at": "2026-07-30T12:00:00Z",
               "source_ids": [
@@ -1081,47 +2976,25 @@
             "phase": "WAIT_LOW_TOUCH",
             "source_ids": [
               "[U-TRADING-BRAIN-001]",
+              "[U-RANGE-BOUNDARIES-001]",
               "[H]-RANGE-001"
             ]
           },
           "source_ids": [
             "[U-TRADING-BRAIN-001]",
+            "[U-RANGE-BOUNDARIES-001]",
             "[H]-RANGE-001"
-          ]
-        },
-        {
-          "evidence_ids": [],
-          "id": "e000033",
-          "kind": "SWING_LOW",
-          "observed_at": "2026-08-03T00:00:00Z",
-          "payload": {
-            "raw": {
-              "atr": "383.9785714285714285714285714",
-              "confirmation_delay_bars": 3,
-              "confirmed_at": "2026-08-03T00:00:00Z",
-              "price": "62983.5",
-              "side": "LOW",
-              "swing_time": "2026-08-02T12:00:00Z",
-              "symbol": "BTC-USDT",
-              "threshold": "479.9732142857142857142857142",
-              "timeframe": "4H"
-            }
-          },
-          "source_ids": [
-            "[H]-SWING-ATR-CLOSE-001",
-            "[D-DD-MSB-001]"
           ]
         },
         {
           "evidence_ids": [
             "e000016",
             "e000022",
-            "e000023",
-            "e000033"
+            "e000023"
           ],
-          "id": "e000034",
-          "kind": "RANGE_LOW_TOUCH",
-          "observed_at": "2026-08-03T00:00:00Z",
+          "id": "e000024",
+          "kind": "RANGE_INVALIDATED",
+          "observed_at": "2026-07-31T16:00:00Z",
           "payload": {
             "confirmed_at": null,
             "high": {
@@ -1158,145 +3031,21 @@
               }
             },
             "high_touch": null,
-            "low": {
-              "confirmed_at": "2026-07-30T12:00:00Z",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-STRUCTURE-001"
-              ],
-              "swing": {
-                "raw": {
-                  "atr": "712.7142857142857142857142857",
-                  "confirmation_delay_bars": 3,
-                  "confirmed_at": "2026-07-30T12:00:00Z",
-                  "price": "63261.6",
-                  "side": "LOW",
-                  "swing_time": "2026-07-30T00:00:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "890.8928571428571428571428571",
-                  "timeframe": "4H"
-                }
-              },
-              "target": {
-                "raw": {
-                  "atr": "799.6",
-                  "confirmation_delay_bars": 2,
-                  "confirmed_at": "2026-07-29T20:00:00Z",
-                  "price": "64751.6",
-                  "side": "HIGH",
-                  "swing_time": "2026-07-29T12:00:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "999.500",
-                  "timeframe": "4H"
-                }
-              }
-            },
-            "low_touch": {
-              "raw": {
-                "atr": "383.9785714285714285714285714",
-                "confirmation_delay_bars": 3,
-                "confirmed_at": "2026-08-03T00:00:00Z",
-                "price": "62983.5",
-                "side": "LOW",
-                "swing_time": "2026-08-02T12:00:00Z",
-                "symbol": "BTC-USDT",
-                "threshold": "479.9732142857142857142857142",
-                "timeframe": "4H"
-              }
-            },
-            "phase": "WAIT_HIGH_TOUCH",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-RANGE-001"
-            ]
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-RANGE-001"
-          ]
-        },
-        {
-          "evidence_ids": [],
-          "id": "e000050",
-          "kind": "SWING_HIGH",
-          "observed_at": "2026-08-07T00:00:00Z",
-          "payload": {
-            "raw": {
-              "atr": "514.0571428571428571428571429",
-              "confirmation_delay_bars": 6,
-              "confirmed_at": "2026-08-07T00:00:00Z",
-              "price": "65026.6",
-              "side": "HIGH",
-              "swing_time": "2026-08-06T00:00:00Z",
+            "invalidated_at": "2026-07-31T16:00:00Z",
+            "invalidation_candle": {
+              "close": "62725",
+              "close_time": "2026-07-31T16:00:00Z",
+              "closed": true,
+              "high": "63840",
+              "low": "62457.1",
+              "open": "63808.8",
               "symbol": "BTC-USDT",
-              "threshold": "642.5714285714285714285714286",
-              "timeframe": "4H"
-            }
-          },
-          "source_ids": [
-            "[H]-SWING-ATR-CLOSE-001",
-            "[D-DD-MSB-001]"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000016",
-            "e000022",
-            "e000034",
-            "e000033",
-            "e000050"
-          ],
-          "id": "e000051",
-          "kind": "RANGE_CONFIRMED",
-          "observed_at": "2026-08-07T00:00:00Z",
-          "payload": {
-            "confirmed_at": "2026-08-07T00:00:00Z",
-            "high": {
-              "confirmed_at": "2026-07-31T16:00:00Z",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-STRUCTURE-001"
-              ],
-              "swing": {
-                "raw": {
-                  "atr": "714.3642857142857142857142857",
-                  "confirmation_delay_bars": 1,
-                  "confirmed_at": "2026-07-31T08:00:00Z",
-                  "price": "65423.7",
-                  "side": "HIGH",
-                  "swing_time": "2026-07-31T04:00:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "892.9553571428571428571428571",
-                  "timeframe": "4H"
-                }
-              },
-              "target": {
-                "raw": {
-                  "atr": "712.7142857142857142857142857",
-                  "confirmation_delay_bars": 3,
-                  "confirmed_at": "2026-07-30T12:00:00Z",
-                  "price": "63261.6",
-                  "side": "LOW",
-                  "swing_time": "2026-07-30T00:00:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "890.8928571428571428571428571",
-                  "timeframe": "4H"
-                }
-              }
+              "timeframe": "4H",
+              "volume": "2417.79940794"
             },
-            "high_touch": {
-              "raw": {
-                "atr": "514.0571428571428571428571429",
-                "confirmation_delay_bars": 6,
-                "confirmed_at": "2026-08-07T00:00:00Z",
-                "price": "65026.6",
-                "side": "HIGH",
-                "swing_time": "2026-08-06T00:00:00Z",
-                "symbol": "BTC-USDT",
-                "threshold": "642.5714285714285714285714286",
-                "timeframe": "4H"
-              }
-            },
+            "invalidation_reasons": [
+              "WICK_BELOW_RANGE_LOW"
+            ],
             "low": {
               "confirmed_at": "2026-07-30T12:00:00Z",
               "source_ids": [
@@ -1330,1180 +3079,158 @@
                 }
               }
             },
-            "low_touch": {
-              "raw": {
-                "atr": "383.9785714285714285714285714",
-                "confirmation_delay_bars": 3,
-                "confirmed_at": "2026-08-03T00:00:00Z",
-                "price": "62983.5",
-                "side": "LOW",
-                "swing_time": "2026-08-02T12:00:00Z",
-                "symbol": "BTC-USDT",
-                "threshold": "479.9732142857142857142857142",
-                "timeframe": "4H"
-              }
-            },
-            "phase": "RANGE_CONFIRMED",
+            "low_touch": null,
+            "phase": "RANGE_INVALIDATED",
             "source_ids": [
               "[U-TRADING-BRAIN-001]",
+              "[U-RANGE-BOUNDARIES-001]",
               "[H]-RANGE-001"
             ]
           },
           "source_ids": [
             "[U-TRADING-BRAIN-001]",
+            "[U-RANGE-BOUNDARIES-001]",
             "[H]-RANGE-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000051"
-          ],
-          "id": "e000084",
-          "kind": "SWEEP",
-          "observed_at": "2026-08-11T20:00:00Z",
-          "payload": {
-            "direction": "LONG",
-            "extreme": "63237.6",
-            "observed_at": "2026-08-11T20:00:00Z",
-            "phase": "SWEPT",
-            "reclaimed_at": null,
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-MANIPULATION-001"
-            ],
-            "swept_at": "2026-08-11T20:00:00Z"
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-MANIPULATION-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000051",
-            "e000084"
-          ],
-          "id": "e000085",
-          "kind": "RECLAIM",
-          "observed_at": "2026-08-11T20:00:00Z",
-          "payload": {
-            "direction": "LONG",
-            "extreme": "63237.6",
-            "observed_at": "2026-08-11T20:00:00Z",
-            "phase": "RECLAIMED",
-            "reclaimed_at": "2026-08-11T20:00:00Z",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-MANIPULATION-001"
-            ],
-            "swept_at": "2026-08-11T20:00:00Z"
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-MANIPULATION-001"
-          ]
-        },
-        {
-          "evidence_ids": [],
-          "id": "e000086",
-          "kind": "FVG",
-          "observed_at": "2026-08-11T20:00:00Z",
-          "payload": {
-            "direction": "SHORT",
-            "formed_from": [
-              "2026-08-11T12:00:00Z",
-              "2026-08-11T16:00:00Z",
-              "2026-08-11T20:00:00Z"
-            ],
-            "kind": "FVG",
-            "lower": "63655.4",
-            "observed_at": "2026-08-11T20:00:00Z",
-            "origin_at": null,
-            "source_ids": [
-              "[H]-GAP-001"
-            ],
-            "upper": "64044.5"
-          },
-          "source_ids": [
-            "[H]-GAP-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000086"
-          ],
-          "id": "e000088",
-          "kind": "iFVG",
-          "observed_at": "2026-08-12T12:00:00Z",
-          "payload": {
-            "direction": "LONG",
-            "formed_from": [
-              "2026-08-11T12:00:00Z",
-              "2026-08-11T16:00:00Z",
-              "2026-08-11T20:00:00Z"
-            ],
-            "kind": "iFVG",
-            "lower": "63655.4",
-            "observed_at": "2026-08-12T12:00:00Z",
-            "origin_at": "2026-08-11T20:00:00Z",
-            "source_ids": [
-              "[H]-GAP-001"
-            ],
-            "upper": "64044.5"
-          },
-          "source_ids": [
-            "[H]-GAP-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000051",
-            "e000085",
-            "e000088"
-          ],
-          "id": "e000089",
-          "kind": "TRADE_CANDIDATE",
-          "observed_at": "2026-08-12T12:00:00Z",
-          "payload": {
-            "direction": "LONG",
-            "entry": "64236.3",
-            "evidence_ids": [
-              "e000051",
-              "e000085",
-              "e000088"
-            ],
-            "observed_at": "2026-08-12T12:00:00Z",
-            "planned_quantity": "0.09101665",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-PLAN-001"
-            ],
-            "stop": "63137.6",
-            "tp": "64342.65"
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-PLAN-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000089"
-          ],
-          "id": "e000090",
-          "kind": "RISK_APPROVED",
-          "observed_at": "2026-08-12T12:00:00Z",
-          "payload": {
-            "direction": "LONG",
-            "entry": "64236.3",
-            "evidence_ids": [
-              "e000051",
-              "e000085",
-              "e000088"
-            ],
-            "observed_at": "2026-08-12T12:00:00Z",
-            "planned_quantity": "0.09101665",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-PLAN-001"
-            ],
-            "stop": "63137.6",
-            "tp": "64342.65"
-          },
-          "source_ids": [
-            "[H]-RISK-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000089",
-            "e000090"
-          ],
-          "id": "e000091",
-          "kind": "PAPER_ORDER_OPENED",
-          "observed_at": "2026-08-12T16:00:00Z",
-          "payload": {
-            "candidate": {
-              "direction": "LONG",
-              "entry": "64236.3",
-              "evidence_ids": [
-                "e000051",
-                "e000085",
-                "e000088"
-              ],
-              "observed_at": "2026-08-12T12:00:00Z",
-              "planned_quantity": "0.09101665",
-              "risk_budget": "100.00",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-PLAN-001"
-              ],
-              "stop": "63137.6",
-              "tp": "64342.65"
-            },
-            "closed_at": null,
-            "direction": "LONG",
-            "entry": "64236.3",
-            "exit_price": null,
-            "filled_at": "2026-08-12T12:00:00Z",
-            "mode": "PAPER",
-            "opened_at": "2026-08-12T16:00:00Z",
-            "pnl": null,
-            "quantity": "0.09101665",
-            "risk_amount": "99.999993355",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[H]-RISK-001",
-              "[H]-PAPER-001"
-            ],
-            "status": "OPEN",
-            "stop": "63137.6",
-            "tp": "64342.65"
-          },
-          "source_ids": [
-            "[H]-RISK-001",
-            "[H]-PAPER-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000089",
-            "e000090",
-            "e000091"
-          ],
-          "id": "e000092",
-          "kind": "PAPER_ORDER_CLOSED",
-          "observed_at": "2026-08-12T16:00:00Z",
-          "payload": {
-            "candidate": {
-              "direction": "LONG",
-              "entry": "64236.3",
-              "evidence_ids": [
-                "e000051",
-                "e000085",
-                "e000088"
-              ],
-              "observed_at": "2026-08-12T12:00:00Z",
-              "planned_quantity": "0.09101665",
-              "risk_budget": "100.00",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-PLAN-001"
-              ],
-              "stop": "63137.6",
-              "tp": "64342.65"
-            },
-            "closed_at": "2026-08-12T16:00:00Z",
-            "direction": "LONG",
-            "entry": "64236.3",
-            "exit_price": "64342.65",
-            "filled_at": "2026-08-12T12:00:00Z",
-            "mode": "PAPER",
-            "opened_at": "2026-08-12T16:00:00Z",
-            "pnl": "9.6796207275",
-            "quantity": "0.09101665",
-            "risk_amount": "99.999993355",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[H]-RISK-001",
-              "[H]-PAPER-001"
-            ],
-            "status": "CLOSED",
-            "stop": "63137.6",
-            "tp": "64342.65"
-          },
-          "source_ids": [
-            "[H]-RISK-001",
-            "[H]-PAPER-001"
           ]
         }
       ],
       "fixture": "tests/data/btcusdt_4H.jsonl",
-      "fixture_kind": "REAL_SAVED_BTC",
       "fixture_sha256": "7bba94f3a273d80b75083fa281b4d10bc90be8c256cac516d4e6f4c713648e34",
+      "paper_orders": 0,
+      "range": {
+        "confirmed_at": null,
+        "high": {
+          "confirmed_at": "2026-07-31T16:00:00Z",
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-STRUCTURE-001"
+          ],
+          "swing": {
+            "raw": {
+              "atr": "714.3642857142857142857142857",
+              "confirmation_delay_bars": 1,
+              "confirmed_at": "2026-07-31T08:00:00Z",
+              "price": "65423.7",
+              "side": "HIGH",
+              "swing_time": "2026-07-31T04:00:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "892.9553571428571428571428571",
+              "timeframe": "4H"
+            }
+          },
+          "target": {
+            "raw": {
+              "atr": "712.7142857142857142857142857",
+              "confirmation_delay_bars": 3,
+              "confirmed_at": "2026-07-30T12:00:00Z",
+              "price": "63261.6",
+              "side": "LOW",
+              "swing_time": "2026-07-30T00:00:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "890.8928571428571428571428571",
+              "timeframe": "4H"
+            }
+          }
+        },
+        "high_touch": null,
+        "invalidated_at": "2026-07-31T16:00:00Z",
+        "invalidation_candle": {
+          "close": "62725",
+          "close_time": "2026-07-31T16:00:00Z",
+          "closed": true,
+          "high": "63840",
+          "low": "62457.1",
+          "open": "63808.8",
+          "symbol": "BTC-USDT",
+          "timeframe": "4H",
+          "volume": "2417.79940794"
+        },
+        "invalidation_reasons": [
+          "WICK_BELOW_RANGE_LOW"
+        ],
+        "low": {
+          "confirmed_at": "2026-07-30T12:00:00Z",
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-STRUCTURE-001"
+          ],
+          "swing": {
+            "raw": {
+              "atr": "712.7142857142857142857142857",
+              "confirmation_delay_bars": 3,
+              "confirmed_at": "2026-07-30T12:00:00Z",
+              "price": "63261.6",
+              "side": "LOW",
+              "swing_time": "2026-07-30T00:00:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "890.8928571428571428571428571",
+              "timeframe": "4H"
+            }
+          },
+          "target": {
+            "raw": {
+              "atr": "799.6",
+              "confirmation_delay_bars": 2,
+              "confirmed_at": "2026-07-29T20:00:00Z",
+              "price": "64751.6",
+              "side": "HIGH",
+              "swing_time": "2026-07-29T12:00:00Z",
+              "symbol": "BTC-USDT",
+              "threshold": "999.500",
+              "timeframe": "4H"
+            }
+          }
+        },
+        "low_touch": null,
+        "phase": "RANGE_INVALIDATED",
+        "source_ids": [
+          "[U-TRADING-BRAIN-001]",
+          "[U-RANGE-BOUNDARIES-001]",
+          "[H]-RANGE-001"
+        ]
+      },
       "range_levels": {
         "eq": "64342.65",
         "high": "65423.7",
         "low": "63261.6"
       },
-      "reproduce": "python -B -m agent_trading.trading_brain --candles tests\\data\\btcusdt_4H.jsonl --fixture-kind REAL_SAVED_BTC",
-      "timeframe": "4H",
-      "trades": [
-        {
-          "candidate": {
-            "direction": "LONG",
-            "entry": "64236.3",
-            "evidence_ids": [
-              "e000051",
-              "e000085",
-              "e000088"
-            ],
-            "observed_at": "2026-08-12T12:00:00Z",
-            "planned_quantity": "0.09101665",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-PLAN-001"
-            ],
-            "stop": "63137.6",
-            "tp": "64342.65"
-          },
-          "closed_at": "2026-08-12T16:00:00Z",
-          "direction": "LONG",
-          "entry": "64236.3",
-          "exit_price": "64342.65",
-          "filled_at": "2026-08-12T12:00:00Z",
-          "mode": "PAPER",
-          "opened_at": "2026-08-12T16:00:00Z",
-          "pnl": "9.6796207275",
-          "quantity": "0.09101665",
-          "risk_amount": "99.999993355",
-          "risk_budget": "100.00",
-          "source_ids": [
-            "[H]-RISK-001",
-            "[H]-PAPER-001"
-          ],
-          "status": "CLOSED",
-          "stop": "63137.6",
-          "tp": "64342.65"
-        }
-      ]
-    },
-    {
-      "config": {
-        "boundary_proximity": "2000",
-        "equity": "10000",
-        "quantity_step": "1E-8",
-        "risk_fraction": "0.01",
-        "stop_buffer": "1000",
-        "swing": {
-          "atr_length": 2,
-          "atr_multiplier": "0.1",
-          "bootstrap_candles": 200
+      "retained_outside_raw_low": {
+        "evidence_ids": [],
+        "id": "e000034",
+        "kind": "SWING_LOW",
+        "observed_at": "2026-08-03T00:00:00Z",
+        "payload": {
+          "raw": {
+            "atr": "383.9785714285714285714285714",
+            "confirmation_delay_bars": 3,
+            "confirmed_at": "2026-08-03T00:00:00Z",
+            "price": "62983.5",
+            "side": "LOW",
+            "swing_time": "2026-08-02T12:00:00Z",
+            "symbol": "BTC-USDT",
+            "threshold": "479.9732142857142857142857142",
+            "timeframe": "4H"
+          }
         },
-        "target": "EQ"
+        "source_ids": [
+          "[H]-SWING-ATR-CLOSE-001",
+          "[D-DD-MSB-001]"
+        ]
       },
-      "equity": "10050.00000",
-      "evidence_events": [
-        {
-          "evidence_ids": [],
-          "id": "e000002",
-          "kind": "SWING_HIGH",
-          "observed_at": "2026-01-01T01:00:00Z",
-          "payload": {
-            "raw": {
-              "atr": "7000",
-              "confirmation_delay_bars": 1,
-              "confirmed_at": "2026-01-01T01:00:00Z",
-              "price": "110000",
-              "side": "HIGH",
-              "swing_time": "2026-01-01T00:45:00Z",
-              "symbol": "BTC-USDT",
-              "threshold": "700.0",
-              "timeframe": "15m"
-            }
-          },
-          "source_ids": [
-            "[H]-SWING-ATR-CLOSE-001",
-            "[D-DD-MSB-001]"
-          ]
-        },
-        {
-          "evidence_ids": [],
-          "id": "e000006",
-          "kind": "SWING_LOW",
-          "observed_at": "2026-01-01T01:30:00Z",
-          "payload": {
-            "raw": {
-              "atr": "23000",
-              "confirmation_delay_bars": 1,
-              "confirmed_at": "2026-01-01T01:30:00Z",
-              "price": "80000",
-              "side": "LOW",
-              "swing_time": "2026-01-01T01:15:00Z",
-              "symbol": "BTC-USDT",
-              "threshold": "2300.0",
-              "timeframe": "15m"
-            }
-          },
-          "source_ids": [
-            "[H]-SWING-ATR-CLOSE-001",
-            "[D-DD-MSB-001]"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000006",
-            "e000002"
-          ],
-          "id": "e000008",
-          "kind": "VALID_LOW",
-          "observed_at": "2026-01-01T01:45:00Z",
-          "payload": {
-            "confirmed_at": "2026-01-01T01:45:00Z",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-STRUCTURE-001"
-            ],
-            "swing": {
-              "raw": {
-                "atr": "23000",
-                "confirmation_delay_bars": 1,
-                "confirmed_at": "2026-01-01T01:30:00Z",
-                "price": "80000",
-                "side": "LOW",
-                "swing_time": "2026-01-01T01:15:00Z",
-                "symbol": "BTC-USDT",
-                "threshold": "2300.0",
-                "timeframe": "15m"
-              }
-            },
-            "target": {
-              "raw": {
-                "atr": "7000",
-                "confirmation_delay_bars": 1,
-                "confirmed_at": "2026-01-01T01:00:00Z",
-                "price": "110000",
-                "side": "HIGH",
-                "swing_time": "2026-01-01T00:45:00Z",
-                "symbol": "BTC-USDT",
-                "threshold": "700.0",
-                "timeframe": "15m"
-              }
-            }
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-STRUCTURE-001"
-          ]
-        },
-        {
-          "evidence_ids": [],
-          "id": "e000011",
-          "kind": "SWING_HIGH",
-          "observed_at": "2026-01-01T02:15:00Z",
-          "payload": {
-            "raw": {
-              "atr": "13500",
-              "confirmation_delay_bars": 1,
-              "confirmed_at": "2026-01-01T02:15:00Z",
-              "price": "120000",
-              "side": "HIGH",
-              "swing_time": "2026-01-01T02:00:00Z",
-              "symbol": "BTC-USDT",
-              "threshold": "1350.0",
-              "timeframe": "15m"
-            }
-          },
-          "source_ids": [
-            "[H]-SWING-ATR-CLOSE-001",
-            "[D-DD-MSB-001]"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000011",
-            "e000006"
-          ],
-          "id": "e000012",
-          "kind": "VALID_HIGH",
-          "observed_at": "2026-01-01T02:30:00Z",
-          "payload": {
-            "confirmed_at": "2026-01-01T02:30:00Z",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-STRUCTURE-001"
-            ],
-            "swing": {
-              "raw": {
-                "atr": "13500",
-                "confirmation_delay_bars": 1,
-                "confirmed_at": "2026-01-01T02:15:00Z",
-                "price": "120000",
-                "side": "HIGH",
-                "swing_time": "2026-01-01T02:00:00Z",
-                "symbol": "BTC-USDT",
-                "threshold": "1350.0",
-                "timeframe": "15m"
-              }
-            },
-            "target": {
-              "raw": {
-                "atr": "23000",
-                "confirmation_delay_bars": 1,
-                "confirmed_at": "2026-01-01T01:30:00Z",
-                "price": "80000",
-                "side": "LOW",
-                "swing_time": "2026-01-01T01:15:00Z",
-                "symbol": "BTC-USDT",
-                "threshold": "2300.0",
-                "timeframe": "15m"
-              }
-            }
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-STRUCTURE-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000008",
-            "e000012"
-          ],
-          "id": "e000013",
-          "kind": "RANGE_CANDIDATE",
-          "observed_at": "2026-01-01T02:30:00Z",
-          "payload": {
-            "confirmed_at": null,
-            "high": {
-              "confirmed_at": "2026-01-01T02:30:00Z",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-STRUCTURE-001"
-              ],
-              "swing": {
-                "raw": {
-                  "atr": "13500",
-                  "confirmation_delay_bars": 1,
-                  "confirmed_at": "2026-01-01T02:15:00Z",
-                  "price": "120000",
-                  "side": "HIGH",
-                  "swing_time": "2026-01-01T02:00:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "1350.0",
-                  "timeframe": "15m"
-                }
-              },
-              "target": {
-                "raw": {
-                  "atr": "23000",
-                  "confirmation_delay_bars": 1,
-                  "confirmed_at": "2026-01-01T01:30:00Z",
-                  "price": "80000",
-                  "side": "LOW",
-                  "swing_time": "2026-01-01T01:15:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "2300.0",
-                  "timeframe": "15m"
-                }
-              }
-            },
-            "high_touch": null,
-            "low": {
-              "confirmed_at": "2026-01-01T01:45:00Z",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-STRUCTURE-001"
-              ],
-              "swing": {
-                "raw": {
-                  "atr": "23000",
-                  "confirmation_delay_bars": 1,
-                  "confirmed_at": "2026-01-01T01:30:00Z",
-                  "price": "80000",
-                  "side": "LOW",
-                  "swing_time": "2026-01-01T01:15:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "2300.0",
-                  "timeframe": "15m"
-                }
-              },
-              "target": {
-                "raw": {
-                  "atr": "7000",
-                  "confirmation_delay_bars": 1,
-                  "confirmed_at": "2026-01-01T01:00:00Z",
-                  "price": "110000",
-                  "side": "HIGH",
-                  "swing_time": "2026-01-01T00:45:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "700.0",
-                  "timeframe": "15m"
-                }
-              }
-            },
-            "low_touch": null,
-            "phase": "WAIT_LOW_TOUCH",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-RANGE-001"
-            ]
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-RANGE-001"
-          ]
-        },
-        {
-          "evidence_ids": [],
-          "id": "e000017",
-          "kind": "SWING_LOW",
-          "observed_at": "2026-01-01T03:00:00Z",
-          "payload": {
-            "raw": {
-              "atr": "4100.0",
-              "confirmation_delay_bars": 1,
-              "confirmed_at": "2026-01-01T03:00:00Z",
-              "price": "78800.0",
-              "side": "LOW",
-              "swing_time": "2026-01-01T02:45:00Z",
-              "symbol": "BTC-USDT",
-              "threshold": "410.00",
-              "timeframe": "15m"
-            }
-          },
-          "source_ids": [
-            "[H]-SWING-ATR-CLOSE-001",
-            "[D-DD-MSB-001]"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000008",
-            "e000012",
-            "e000013",
-            "e000017"
-          ],
-          "id": "e000018",
-          "kind": "RANGE_LOW_TOUCH",
-          "observed_at": "2026-01-01T03:00:00Z",
-          "payload": {
-            "confirmed_at": null,
-            "high": {
-              "confirmed_at": "2026-01-01T02:30:00Z",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-STRUCTURE-001"
-              ],
-              "swing": {
-                "raw": {
-                  "atr": "13500",
-                  "confirmation_delay_bars": 1,
-                  "confirmed_at": "2026-01-01T02:15:00Z",
-                  "price": "120000",
-                  "side": "HIGH",
-                  "swing_time": "2026-01-01T02:00:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "1350.0",
-                  "timeframe": "15m"
-                }
-              },
-              "target": {
-                "raw": {
-                  "atr": "23000",
-                  "confirmation_delay_bars": 1,
-                  "confirmed_at": "2026-01-01T01:30:00Z",
-                  "price": "80000",
-                  "side": "LOW",
-                  "swing_time": "2026-01-01T01:15:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "2300.0",
-                  "timeframe": "15m"
-                }
-              }
-            },
-            "high_touch": null,
-            "low": {
-              "confirmed_at": "2026-01-01T01:45:00Z",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-STRUCTURE-001"
-              ],
-              "swing": {
-                "raw": {
-                  "atr": "23000",
-                  "confirmation_delay_bars": 1,
-                  "confirmed_at": "2026-01-01T01:30:00Z",
-                  "price": "80000",
-                  "side": "LOW",
-                  "swing_time": "2026-01-01T01:15:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "2300.0",
-                  "timeframe": "15m"
-                }
-              },
-              "target": {
-                "raw": {
-                  "atr": "7000",
-                  "confirmation_delay_bars": 1,
-                  "confirmed_at": "2026-01-01T01:00:00Z",
-                  "price": "110000",
-                  "side": "HIGH",
-                  "swing_time": "2026-01-01T00:45:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "700.0",
-                  "timeframe": "15m"
-                }
-              }
-            },
-            "low_touch": {
-              "raw": {
-                "atr": "4100.0",
-                "confirmation_delay_bars": 1,
-                "confirmed_at": "2026-01-01T03:00:00Z",
-                "price": "78800.0",
-                "side": "LOW",
-                "swing_time": "2026-01-01T02:45:00Z",
-                "symbol": "BTC-USDT",
-                "threshold": "410.00",
-                "timeframe": "15m"
-              }
-            },
-            "phase": "WAIT_HIGH_TOUCH",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-RANGE-001"
-            ]
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-RANGE-001"
-          ]
-        },
-        {
-          "evidence_ids": [],
-          "id": "e000023",
-          "kind": "SWING_HIGH",
-          "observed_at": "2026-01-01T03:45:00Z",
-          "payload": {
-            "raw": {
-              "atr": "9000",
-              "confirmation_delay_bars": 1,
-              "confirmed_at": "2026-01-01T03:45:00Z",
-              "price": "119000",
-              "side": "HIGH",
-              "swing_time": "2026-01-01T03:30:00Z",
-              "symbol": "BTC-USDT",
-              "threshold": "900.0",
-              "timeframe": "15m"
-            }
-          },
-          "source_ids": [
-            "[H]-SWING-ATR-CLOSE-001",
-            "[D-DD-MSB-001]"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000008",
-            "e000012",
-            "e000018",
-            "e000017",
-            "e000023"
-          ],
-          "id": "e000024",
-          "kind": "RANGE_CONFIRMED",
-          "observed_at": "2026-01-01T03:45:00Z",
-          "payload": {
-            "confirmed_at": "2026-01-01T03:45:00Z",
-            "high": {
-              "confirmed_at": "2026-01-01T02:30:00Z",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-STRUCTURE-001"
-              ],
-              "swing": {
-                "raw": {
-                  "atr": "13500",
-                  "confirmation_delay_bars": 1,
-                  "confirmed_at": "2026-01-01T02:15:00Z",
-                  "price": "120000",
-                  "side": "HIGH",
-                  "swing_time": "2026-01-01T02:00:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "1350.0",
-                  "timeframe": "15m"
-                }
-              },
-              "target": {
-                "raw": {
-                  "atr": "23000",
-                  "confirmation_delay_bars": 1,
-                  "confirmed_at": "2026-01-01T01:30:00Z",
-                  "price": "80000",
-                  "side": "LOW",
-                  "swing_time": "2026-01-01T01:15:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "2300.0",
-                  "timeframe": "15m"
-                }
-              }
-            },
-            "high_touch": {
-              "raw": {
-                "atr": "9000",
-                "confirmation_delay_bars": 1,
-                "confirmed_at": "2026-01-01T03:45:00Z",
-                "price": "119000",
-                "side": "HIGH",
-                "swing_time": "2026-01-01T03:30:00Z",
-                "symbol": "BTC-USDT",
-                "threshold": "900.0",
-                "timeframe": "15m"
-              }
-            },
-            "low": {
-              "confirmed_at": "2026-01-01T01:45:00Z",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-STRUCTURE-001"
-              ],
-              "swing": {
-                "raw": {
-                  "atr": "23000",
-                  "confirmation_delay_bars": 1,
-                  "confirmed_at": "2026-01-01T01:30:00Z",
-                  "price": "80000",
-                  "side": "LOW",
-                  "swing_time": "2026-01-01T01:15:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "2300.0",
-                  "timeframe": "15m"
-                }
-              },
-              "target": {
-                "raw": {
-                  "atr": "7000",
-                  "confirmation_delay_bars": 1,
-                  "confirmed_at": "2026-01-01T01:00:00Z",
-                  "price": "110000",
-                  "side": "HIGH",
-                  "swing_time": "2026-01-01T00:45:00Z",
-                  "symbol": "BTC-USDT",
-                  "threshold": "700.0",
-                  "timeframe": "15m"
-                }
-              }
-            },
-            "low_touch": {
-              "raw": {
-                "atr": "4100.0",
-                "confirmation_delay_bars": 1,
-                "confirmed_at": "2026-01-01T03:00:00Z",
-                "price": "78800.0",
-                "side": "LOW",
-                "swing_time": "2026-01-01T02:45:00Z",
-                "symbol": "BTC-USDT",
-                "threshold": "410.00",
-                "timeframe": "15m"
-              }
-            },
-            "phase": "RANGE_CONFIRMED",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-RANGE-001"
-            ]
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-RANGE-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000024"
-          ],
-          "id": "e000027",
-          "kind": "SWEEP",
-          "observed_at": "2026-01-01T04:30:00Z",
-          "payload": {
-            "direction": "LONG",
-            "extreme": "77000",
-            "observed_at": "2026-01-01T04:30:00Z",
-            "phase": "SWEPT",
-            "reclaimed_at": null,
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-MANIPULATION-001"
-            ],
-            "swept_at": "2026-01-01T04:30:00Z"
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-MANIPULATION-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000024",
-            "e000027"
-          ],
-          "id": "e000031",
-          "kind": "RECLAIM",
-          "observed_at": "2026-01-01T04:45:00Z",
-          "payload": {
-            "direction": "LONG",
-            "extreme": "77000",
-            "observed_at": "2026-01-01T04:45:00Z",
-            "phase": "RECLAIMED",
-            "reclaimed_at": "2026-01-01T04:45:00Z",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-MANIPULATION-001"
-            ],
-            "swept_at": "2026-01-01T04:30:00Z"
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-MANIPULATION-001"
-          ]
-        },
-        {
-          "evidence_ids": [],
-          "id": "e000032",
-          "kind": "FVG",
-          "observed_at": "2026-01-01T05:00:00Z",
-          "payload": {
-            "direction": "LONG",
-            "formed_from": [
-              "2026-01-01T04:30:00Z",
-              "2026-01-01T04:45:00Z",
-              "2026-01-01T05:00:00Z"
-            ],
-            "kind": "FVG",
-            "lower": "82000",
-            "observed_at": "2026-01-01T05:00:00Z",
-            "origin_at": null,
-            "source_ids": [
-              "[H]-GAP-001"
-            ],
-            "upper": "85000"
-          },
-          "source_ids": [
-            "[H]-GAP-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000024",
-            "e000031",
-            "e000032"
-          ],
-          "id": "e000033",
-          "kind": "TRADE_CANDIDATE",
-          "observed_at": "2026-01-01T05:00:00Z",
-          "payload": {
-            "direction": "LONG",
-            "entry": "92000",
-            "evidence_ids": [
-              "e000024",
-              "e000031",
-              "e000032"
-            ],
-            "observed_at": "2026-01-01T05:00:00Z",
-            "planned_quantity": "0.00625",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-PLAN-001"
-            ],
-            "stop": "76000",
-            "tp": "100000"
-          },
-          "source_ids": [
-            "[U-TRADING-BRAIN-001]",
-            "[H]-PLAN-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000033"
-          ],
-          "id": "e000034",
-          "kind": "RISK_APPROVED",
-          "observed_at": "2026-01-01T05:00:00Z",
-          "payload": {
-            "direction": "LONG",
-            "entry": "92000",
-            "evidence_ids": [
-              "e000024",
-              "e000031",
-              "e000032"
-            ],
-            "observed_at": "2026-01-01T05:00:00Z",
-            "planned_quantity": "0.00625",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-PLAN-001"
-            ],
-            "stop": "76000",
-            "tp": "100000"
-          },
-          "source_ids": [
-            "[H]-RISK-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000033",
-            "e000034"
-          ],
-          "id": "e000035",
-          "kind": "PAPER_ORDER_OPENED",
-          "observed_at": "2026-01-01T05:15:00Z",
-          "payload": {
-            "candidate": {
-              "direction": "LONG",
-              "entry": "92000",
-              "evidence_ids": [
-                "e000024",
-                "e000031",
-                "e000032"
-              ],
-              "observed_at": "2026-01-01T05:00:00Z",
-              "planned_quantity": "0.00625",
-              "risk_budget": "100.00",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-PLAN-001"
-              ],
-              "stop": "76000",
-              "tp": "100000"
-            },
-            "closed_at": null,
-            "direction": "LONG",
-            "entry": "92000",
-            "exit_price": null,
-            "filled_at": "2026-01-01T05:00:00Z",
-            "mode": "PAPER",
-            "opened_at": "2026-01-01T05:15:00Z",
-            "pnl": null,
-            "quantity": "0.00625",
-            "risk_amount": "100.00000",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[H]-RISK-001",
-              "[H]-PAPER-001"
-            ],
-            "status": "OPEN",
-            "stop": "76000",
-            "tp": "100000"
-          },
-          "source_ids": [
-            "[H]-RISK-001",
-            "[H]-PAPER-001"
-          ]
-        },
-        {
-          "evidence_ids": [
-            "e000033",
-            "e000034",
-            "e000035"
-          ],
-          "id": "e000037",
-          "kind": "PAPER_ORDER_CLOSED",
-          "observed_at": "2026-01-01T05:30:00Z",
-          "payload": {
-            "candidate": {
-              "direction": "LONG",
-              "entry": "92000",
-              "evidence_ids": [
-                "e000024",
-                "e000031",
-                "e000032"
-              ],
-              "observed_at": "2026-01-01T05:00:00Z",
-              "planned_quantity": "0.00625",
-              "risk_budget": "100.00",
-              "source_ids": [
-                "[U-TRADING-BRAIN-001]",
-                "[H]-PLAN-001"
-              ],
-              "stop": "76000",
-              "tp": "100000"
-            },
-            "closed_at": "2026-01-01T05:30:00Z",
-            "direction": "LONG",
-            "entry": "92000",
-            "exit_price": "100000",
-            "filled_at": "2026-01-01T05:00:00Z",
-            "mode": "PAPER",
-            "opened_at": "2026-01-01T05:15:00Z",
-            "pnl": "50.00000",
-            "quantity": "0.00625",
-            "risk_amount": "100.00000",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[H]-RISK-001",
-              "[H]-PAPER-001"
-            ],
-            "status": "CLOSED",
-            "stop": "76000",
-            "tp": "100000"
-          },
-          "source_ids": [
-            "[H]-RISK-001",
-            "[H]-PAPER-001"
-          ]
-        }
-      ],
-      "fixture": "tests/data/trading_brain_synthetic.jsonl",
-      "fixture_kind": "SYNTHETIC",
-      "fixture_sha256": "fde823fcf03979318c4bee445faaba50047f75830bb4c8dc95e0e11b2406137a",
-      "range_levels": {
-        "eq": "100000",
-        "high": "120000",
-        "low": "80000"
-      },
-      "reproduce": "python -B -m agent_trading.trading_brain --candles tests\\data\\trading_brain_synthetic.jsonl --fixture-kind SYNTHETIC --atr-length 2 --atr-multiplier .1 --boundary-proximity 2000 --stop-buffer 1000",
-      "timeframe": "15m",
-      "trades": [
-        {
-          "candidate": {
-            "direction": "LONG",
-            "entry": "92000",
-            "evidence_ids": [
-              "e000024",
-              "e000031",
-              "e000032"
-            ],
-            "observed_at": "2026-01-01T05:00:00Z",
-            "planned_quantity": "0.00625",
-            "risk_budget": "100.00",
-            "source_ids": [
-              "[U-TRADING-BRAIN-001]",
-              "[H]-PLAN-001"
-            ],
-            "stop": "76000",
-            "tp": "100000"
-          },
-          "closed_at": "2026-01-01T05:30:00Z",
-          "direction": "LONG",
-          "entry": "92000",
-          "exit_price": "100000",
-          "filled_at": "2026-01-01T05:00:00Z",
-          "mode": "PAPER",
-          "opened_at": "2026-01-01T05:15:00Z",
-          "pnl": "50.00000",
-          "quantity": "0.00625",
-          "risk_amount": "100.00000",
-          "risk_budget": "100.00",
-          "source_ids": [
-            "[H]-RISK-001",
-            "[H]-PAPER-001"
-          ],
-          "status": "CLOSED",
-          "stop": "76000",
-          "tp": "100000"
-        }
-      ]
+      "timeframe": "4H"
     }
   ],
   "limitations": [
-    "PROJECT_HYPOTHESES_NOT_DD_ATTESTATIONS",
     "NO_EMPIRICAL_STRATEGY_VALIDATION",
     "NO_FEES_OR_SLIPPAGE",
     "NO_PRODUCTION_ACCEPTANCE_OR_RISK",
-    "ONE_FROZEN_RANGE_ONE_PAPER_ORDER_PER_REPLAY",
+    "ONE_RANGE_NO_RESEED_PER_REPLAY",
     "NO_API_OR_AUTONOMOUS_LOOP_WIRING"
   ],
   "mode": "PAPER",
-  "review": "Read-only independent review: equality defect reproduced/fixed; 31 focused checks passed on re-review; no further material defects.",
-  "schema_version": "trading-brain-replay-evidence-v0.1",
+  "original_base_commit": "adbafa485c900164c95ed0e13fce0d267da8b645",
+  "review": "Independent read-only correction review: 6 boundary and33 then-current strategy checks pass; no material defects.",
+  "schema_version": "trading-brain-replay-evidence-v0.2",
   "smokes": [
     {
       "candle_count": 299,
@@ -2539,6 +3266,7 @@
         "high": "78838.7",
         "low": "76785.6"
       },
+      "range_phase": "WAIT_HIGH_TOUCH",
       "timeframe": "5m"
     },
     {
@@ -2558,15 +3286,10 @@
       },
       "counts": {
         "FVG": 60,
-        "MANIPULATION_AMBIGUOUS": 2,
         "RANGE_CANDIDATE": 1,
-        "RANGE_CONFIRMED": 1,
-        "RANGE_LOW_TOUCH": 1,
-        "RECLAIM": 6,
-        "SWEEP": 9,
+        "RANGE_INVALIDATED": 1,
         "SWING_HIGH": 23,
         "SWING_LOW": 23,
-        "TRADE_REJECTED": 1,
         "VALID_HIGH": 10,
         "VALID_LOW": 6,
         "iFVG": 52
@@ -2580,6 +3303,7 @@
         "high": "78552.6",
         "low": "77954.4"
       },
+      "range_phase": "RANGE_INVALIDATED",
       "timeframe": "15m"
     },
     {
@@ -2599,19 +3323,10 @@
       },
       "counts": {
         "FVG": 49,
-        "MANIPULATION_AMBIGUOUS": 2,
-        "PAPER_ORDER_CLOSED": 1,
-        "PAPER_ORDER_OPENED": 1,
         "RANGE_CANDIDATE": 1,
-        "RANGE_CONFIRMED": 1,
-        "RANGE_LOW_TOUCH": 1,
-        "RECLAIM": 5,
-        "RISK_APPROVED": 1,
-        "SWEEP": 6,
+        "RANGE_INVALIDATED": 1,
         "SWING_HIGH": 26,
         "SWING_LOW": 27,
-        "TRADE_CANDIDATE": 1,
-        "TRADE_REJECTED": 2,
         "VALID_HIGH": 12,
         "VALID_LOW": 9,
         "iFVG": 42
@@ -2619,12 +3334,13 @@
       "fixture": "tests/data/btcusdt_1H.jsonl",
       "fixture_kind": "REAL_SAVED_BTC",
       "fixture_sha256": "13c04411d8def08e1664058b946ec5231c7e1bdae140181c08519c8bc959e062",
-      "paper_orders": 1,
+      "paper_orders": 0,
       "range_levels": {
         "eq": "77250.85",
         "high": "77788.1",
         "low": "76713.6"
       },
+      "range_phase": "RANGE_INVALIDATED",
       "timeframe": "1H"
     },
     {
@@ -2644,18 +3360,10 @@
       },
       "counts": {
         "FVG": 53,
-        "PAPER_ORDER_CLOSED": 1,
-        "PAPER_ORDER_OPENED": 1,
         "RANGE_CANDIDATE": 1,
-        "RANGE_CONFIRMED": 1,
-        "RANGE_LOW_TOUCH": 1,
-        "RECLAIM": 4,
-        "RISK_APPROVED": 1,
-        "SWEEP": 5,
+        "RANGE_INVALIDATED": 1,
         "SWING_HIGH": 24,
         "SWING_LOW": 25,
-        "TRADE_CANDIDATE": 1,
-        "TRADE_REJECTED": 4,
         "VALID_HIGH": 10,
         "VALID_LOW": 8,
         "iFVG": 42
@@ -2663,16 +3371,62 @@
       "fixture": "tests/data/btcusdt_4H.jsonl",
       "fixture_kind": "REAL_SAVED_BTC",
       "fixture_sha256": "7bba94f3a273d80b75083fa281b4d10bc90be8c256cac516d4e6f4c713648e34",
-      "paper_orders": 1,
+      "paper_orders": 0,
       "range_levels": {
         "eq": "64342.65",
         "high": "65423.7",
         "low": "63261.6"
       },
+      "range_phase": "RANGE_INVALIDATED",
       "timeframe": "4H"
     },
     {
-      "candle_count": 22,
+      "candle_count": 249,
+      "config": {
+        "boundary_proximity": "500",
+        "equity": "10000",
+        "quantity_step": "1E-8",
+        "risk_fraction": "0.01",
+        "stop_buffer": "100",
+        "swing": {
+          "atr_length": 14,
+          "atr_multiplier": "1.25",
+          "bootstrap_candles": 200
+        },
+        "target": "EQ"
+      },
+      "counts": {
+        "FVG": 44,
+        "MANIPULATION_AMBIGUOUS": 1,
+        "PAPER_ORDER_CLOSED": 1,
+        "PAPER_ORDER_OPENED": 1,
+        "RANGE_CANDIDATE": 1,
+        "RANGE_CONFIRMED": 1,
+        "RANGE_LOW_TOUCH": 1,
+        "RECLAIM": 2,
+        "RISK_APPROVED": 1,
+        "SWEEP": 2,
+        "SWING_HIGH": 20,
+        "SWING_LOW": 19,
+        "TRADE_CANDIDATE": 1,
+        "VALID_HIGH": 8,
+        "VALID_LOW": 5,
+        "iFVG": 37
+      },
+      "fixture": "tests/data/btcusdt_15m_range_window.jsonl",
+      "fixture_kind": "REAL_SAVED_BTC",
+      "fixture_sha256": "bd76f8e79689621f4bd1da57ee1c3ae78940f60c7288ec5968618f07de62b6b8",
+      "paper_orders": 1,
+      "range_levels": {
+        "eq": "77019.9",
+        "high": "77498.8",
+        "low": "76541"
+      },
+      "range_phase": "RANGE_CONFIRMED",
+      "timeframe": "15m"
+    },
+    {
+      "candle_count": 25,
       "config": {
         "boundary_proximity": "2000",
         "equity": "10000",
@@ -2696,32 +3450,39 @@
         "RECLAIM": 1,
         "RISK_APPROVED": 1,
         "SWEEP": 1,
-        "SWING_HIGH": 3,
-        "SWING_LOW": 4,
+        "SWING_HIGH": 4,
+        "SWING_LOW": 5,
         "TRADE_CANDIDATE": 1,
-        "VALID_HIGH": 2,
-        "VALID_LOW": 1,
+        "VALID_HIGH": 3,
+        "VALID_LOW": 2,
         "iFVG": 7
       },
       "fixture": "tests/data/trading_brain_synthetic.jsonl",
       "fixture_kind": "SYNTHETIC",
-      "fixture_sha256": "fde823fcf03979318c4bee445faaba50047f75830bb4c8dc95e0e11b2406137a",
+      "fixture_sha256": "b497cda71f8b24fb49a017f4ee5ff6b3c2d36fad3236cd8dbdc856a0bdea9b14",
       "paper_orders": 1,
       "range_levels": {
         "eq": "100000",
         "high": "120000",
         "low": "80000"
       },
+      "range_phase": "RANGE_CONFIRMED",
       "timeframe": "15m"
     }
   ],
   "tests": {
-    "added": 31,
-    "baseline": 250,
+    "baseline_before_correction": 281,
+    "boundary_test_methods": 7,
+    "bounded_real_prefixes": 249,
+    "correction_added": 11,
     "errors": 0,
     "failures": 0,
-    "real_btc_prefixes": 1196,
-    "synthetic_prefixes": 22,
-    "total": 281
-  }
+    "full_real_btc_prefixes": 1196,
+    "synthetic_prefixes": 25,
+    "total": 292
+  },
+  "withdrawn_examples": [
+    "Original full-fixture 4H LONG: invalid candidate boundary; no current order.",
+    "Original full-fixture 1H SHORT: invalid candidate boundary; no current order."
+  ]
 }
