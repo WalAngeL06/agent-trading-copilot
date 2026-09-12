@@ -37,6 +37,14 @@ def _error(code, status, analysis_id=None):
 
 
 def create_app(config=None, service=None, bot_config=None, adapter=None):
+    import os
+    env_vars = ["TELEGRAM_BOT_TOKEN", "WEBAPP_URL", "VITE_BACKEND_URL", "OKX_API_KEY", "OKX_SECRET_KEY", "OKX_PASSPHRASE"]
+    print("\n--- ENV VALIDATION ---")
+    for v in env_vars:
+        status = "PRESENT" if os.environ.get(v) else "MISSING"
+        print(f"{v}: {status}")
+    print("----------------------\n")
+
     analysis_service = service or AnalysisService(config or AnalysisConfig.from_env())
     try:
         if bot_config is None: bot_config = Config.from_env()
@@ -54,6 +62,23 @@ def create_app(config=None, service=None, bot_config=None, adapter=None):
 
     app = FastAPI(title="Autonomous Trading Agent Analysis API", version="0.2", lifespan=lifespan)
     app.state.analysis_service = analysis_service
+
+    from fastapi.middleware.cors import CORSMiddleware
+    allowed_origin = os.environ.get("WEBAPP_URL", "http://localhost:5173")
+    origins = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ]
+    if allowed_origin not in origins:
+        origins.append(allowed_origin)
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     @app.exception_handler(RequestValidationError)
     async def invalid_request(request, exc):
@@ -80,6 +105,16 @@ def create_app(config=None, service=None, bot_config=None, adapter=None):
     @app.get("/health/ready")
     async def ready(response: Response):
         result = await analysis_service.readiness()
+        if bot_service:
+            result["market"] = "CONNECTED" if result["status"] == "READY" else "ERROR"
+            result["account"] = bot_service.private_state.get("account_auth", "UNKNOWN")
+            result["telegram"] = "CONNECTED" if bot_service.telegram and bot_service.telegram.running else ("DISABLED" if not bot_service.telegram else "ERROR")
+            result["execution_mode"] = "PAPER"
+            
+            # Decide overall readiness
+            if result["market"] == "ERROR":
+                result["status"] = "NOT_READY"
+
         response.status_code = 200 if result["status"] == "READY" else 503
         return result
 
@@ -121,7 +156,11 @@ def create_app(config=None, service=None, bot_config=None, adapter=None):
     @app.get("/api/v1/bot/activity")
     async def bot_activity():
         if not bot_service: return {"error": "Bot service not configured"}
-        return bot_service.latest_state.get("execution", {}) if bot_service.latest_state else {}
+        activity = bot_service.latest_state.get("execution", {}) if bot_service.latest_state else {}
+        return {
+            **activity,
+            "events": bot_service.ui_events
+        }
 
     @app.post("/api/v1/bot/start")
     async def bot_start():

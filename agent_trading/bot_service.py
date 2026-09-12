@@ -19,9 +19,22 @@ class BotService:
         
         token = os.environ.get("TELEGRAM_BOT_TOKEN")
         webapp_url = os.environ.get("WEBAPP_URL", "http://127.0.0.1:5173")
-        self.telegram = TelegramBot(token, webapp_url) if token else None
+        self.telegram = TelegramBot(token, webapp_url, status_callback=self._get_telegram_status) if token else None
         self.seen_event_ids = set()
         self.private_state = {"account_auth": "UNKNOWN", "autoEarn": "UNKNOWN", "balance": None}
+        self.ui_events = []
+
+    def _get_telegram_status(self):
+        bot_status = "RUNNING" if self.is_running else "STOPPED"
+        strategy = self.latest_state.get("decision", {}).get("action", "UNKNOWN") if self.latest_state else "UNKNOWN"
+        auth = self.private_state.get("account_auth", "UNKNOWN")
+        earn = self.private_state.get("autoEarn", "UNKNOWN")
+        return (f"Trading Bot: {bot_status}\n"
+                f"Execution Mode: PAPER\n"
+                f"Market Connection: CONNECTED (OKX ATK MCP)\n"
+                f"Account Auth: {auth}\n"
+                f"Auto Earn: {earn}\n"
+                f"Strategy State: {strategy}")
 
     def startup(self):
         if self.telegram:
@@ -76,6 +89,18 @@ class BotService:
                 if event.kind in ("RANGE_CONFIRMED", "SWEEP", "TRADE_CANDIDATE", "BLOCKED", "PAPER_ORDER_OPENED", "PAPER_ORDER_CLOSED"):
                     self.telegram.broadcast(f"Notification: {event.kind}")
 
+    def _add_ui_event(self, title, detail, tone="neutral"):
+        import uuid
+        from datetime import datetime, timezone
+        self.ui_events.insert(0, {
+            "id": str(uuid.uuid4()),
+            "at": datetime.now(timezone.utc).isoformat(),
+            "title": title,
+            "detail": detail,
+            "tone": tone
+        })
+        self.ui_events = self.ui_events[:50]  # keep last 50
+
     async def _update_private_state(self):
         from .okx_private_config import load_private_config
         from .okx_private_runtime import read_private_snapshots
@@ -87,19 +112,24 @@ class BotService:
         try:
             res = await read_private_snapshots(config, timeout=5)
             self.private_state["account_auth"] = res.status
+            self._add_ui_event("OKX Private Auth", f"Status: {res.status}")
+            
             if res.status == "CONNECTED":
                 # Check Auto Earn
+                earn_val = "UNKNOWN"
                 if res.earn and res.earn.auto_earn is not None:
-                    self.private_state["autoEarn"] = "ON" if res.earn.auto_earn == "active" else "OFF"
+                    earn_val = "ON" if res.earn.auto_earn == "active" else "OFF"
                 elif res.account and res.account.flags:
-                    # check first asset flag
-                    self.private_state["autoEarn"] = "ON" if res.account.flags[0].auto_earn == "active" else "OFF"
+                    earn_val = "ON" if res.account.flags[0].auto_earn == "active" else "OFF"
+                self.private_state["autoEarn"] = earn_val
+                self._add_ui_event("Auto Earn", earn_val)
                 
                 if res.account and res.account.equity is not None:
                     self.private_state["balance"] = str(res.account.equity)
         except Exception as e:
             logging.error(f"Failed to read private snapshot: {e}")
             self.private_state["account_auth"] = "ERROR"
+            self._add_ui_event("OKX Private Auth", "ERROR", tone="warning")
 
     async def _private_loop(self):
         try:
@@ -122,6 +152,8 @@ class BotService:
         try:
             as_of = datetime.now(timezone.utc)
             candles = await self._fetch_candles(as_of)
+            if candles:
+                self._add_ui_event("OKX ATK", "15m candles updated")
             self.brain.bootstrap(candles)
             self._update_state()
             self._check_notifications()

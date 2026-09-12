@@ -6,9 +6,10 @@ from urllib.request import Request, urlopen
 from urllib.error import URLError
 
 class TelegramBot:
-    def __init__(self, token: str, webapp_url: str):
+    def __init__(self, token: str, webapp_url: str, status_callback=None):
         self.token = token
         self.webapp_url = webapp_url
+        self.status_callback = status_callback
         self.base_url = f"https://api.telegram.org/bot{self.token}"
         self.offset = 0
         self.running = False
@@ -59,7 +60,11 @@ class TelegramBot:
                                 }
                                 self.send_message(chat_id, "Welcome to Agent Trading Copilot!", reply_markup=markup)
                             elif text.startswith("/status"):
-                                self.send_message(chat_id, "Bot is running. Use the WebApp for detailed status.")
+                                if self.status_callback:
+                                    status_text = self.status_callback()
+                                    self.send_message(chat_id, status_text)
+                                else:
+                                    self.send_message(chat_id, "Bot is running. Use the WebApp for detailed status.")
             except Exception as e:
                 logging.error(f"Telegram poll error: {e}")
             await asyncio.sleep(1)

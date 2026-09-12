@@ -25,8 +25,9 @@ export class BackendApi implements TradingControlApi {
   async getDashboard(): Promise<DashboardSnapshot> {
     const statusPromise = fetchJson<any>('/api/v1/bot/status');
     const marketPromise = fetchJson<any>('/api/v1/bot/market');
+    const activityPromise = fetchJson<any>('/api/v1/bot/activity').catch(() => ({}));
     
-    const [statusData, marketData] = await Promise.all([statusPromise, marketPromise]);
+    const [statusData, marketData, activityData] = await Promise.all([statusPromise, marketPromise, activityPromise]);
     
     let lastPrice = null;
     let observedAt = null;
@@ -46,6 +47,15 @@ export class BackendApi implements TradingControlApi {
     };
 
     const strategy = await this.getStrategy();
+    
+    const events = (activityData.events || []).map((e: any) => ({
+      id: e.id,
+      at: e.at,
+      title: e.title,
+      detail: e.detail,
+      tone: e.tone || 'neutral',
+      origin: 'BACKEND'
+    }));
 
     return {
       bot: { 
@@ -56,7 +66,7 @@ export class BackendApi implements TradingControlApi {
       strategy,
       market: marketSummary,
       autoEarn: statusData.autoEarn === 'ON' ? 'ON' : statusData.autoEarn === 'OFF' ? 'OFF' : 'UNKNOWN',
-      events: []
+      events
     };
   }
 
