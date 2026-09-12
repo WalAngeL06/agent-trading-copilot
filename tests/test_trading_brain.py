@@ -187,36 +187,41 @@ class RiskPaperTests(unittest.TestCase):
                               bar(3).close_time, ('gap-evidence',))
 
     def test_risk_sizes_down_and_broker_fills_only_next_open(self):
-        config = BrainConfig(equity=D('1000'), risk_fraction=D('.01'), quantity_step=D('.01'))
+        config = BrainConfig(equity=D('1000'), risk_fraction=D('.01'), quantity_step=D('.01'),
+                             stop_profile='FIXED_SL_TP', min_reward_risk=D('.5'))
         risk = RiskPolicy(config)
         self.assertEqual(risk.size(D('90'), D('78'), D('1000')), D('.83'))
         broker = PaperBroker(risk, D('1000'))
-        broker.submit(self.candidate())
+        broker.submit(risk.evaluate(self.candidate(), broker.equity).plan)
         self.assertEqual(broker.process(bar(3, '90', '95', '85', '90')), ())
-        opened, = broker.process(bar(4, '92', '96', '85', '94'))
+        approval, opened = broker.process(bar(4, '92', '96', '85', '94'))
+        self.assertEqual(approval.kind, 'RISK_APPROVED')
         self.assertEqual(opened.kind, 'PAPER_ORDER_OPENED')
         self.assertEqual((broker.trades[0].entry, broker.trades[0].quantity), (D('92'), D('.71')))
         self.assertLessEqual(broker.trades[0].quantity * D('14'), D('10'))
 
     def test_gap_past_target_cancels_instead_of_impossible_fill(self):
-        broker = PaperBroker(RiskPolicy(BrainConfig()), D('1000'))
-        broker.submit(self.candidate())
-        value, = broker.process(bar(4, '101', '105', '100', '103'))
+        broker = PaperBroker(RiskPolicy(BrainConfig(stop_profile='FIXED_SL_TP', min_reward_risk=D('.5'))), D('1000'))
+        broker.submit(broker.risk.evaluate(self.candidate(), broker.equity).plan)
+        blocked, value = broker.process(bar(4, '101', '105', '100', '103'))
+        self.assertEqual((blocked.kind, blocked.payload.reason), ('BLOCKED', 'INVALID_TP_SIDE'))
         self.assertEqual(value.kind, 'PAPER_ORDER_CANCELLED')
         self.assertEqual(broker.trades, ())
 
     def test_stop_first_if_fill_bar_touches_both_and_updates_equity(self):
-        broker = PaperBroker(RiskPolicy(BrainConfig(equity=D('1000'), quantity_step=D('.01'))), D('1000'))
-        broker.submit(self.candidate())
+        broker = PaperBroker(RiskPolicy(BrainConfig(equity=D('1000'), quantity_step=D('.01'),
+                                                  stop_profile='FIXED_SL_TP', min_reward_risk=D('.5'))), D('1000'))
+        broker.submit(broker.risk.evaluate(self.candidate(), broker.equity).plan)
         results = broker.process(bar(4, '90', '105', '75', '95'))
-        self.assertEqual([x.kind for x in results], ['PAPER_ORDER_OPENED', 'PAPER_ORDER_CLOSED'])
+        self.assertEqual([x.kind for x in results], ['RISK_APPROVED', 'PAPER_ORDER_OPENED', 'PAPER_ORDER_CLOSED'])
         self.assertEqual(broker.trades[0].exit_price, D('78'))
         self.assertEqual(broker.trades[0].pnl, D('-9.96'))
         self.assertEqual(broker.equity, D('990.04'))
 
     def test_short_target_exit_and_gap_stop_use_open_price(self):
-        broker = PaperBroker(RiskPolicy(BrainConfig(equity=D('1000'), quantity_step=D('.01'))), D('1000'))
-        broker.submit(self.candidate('SHORT'))
+        broker = PaperBroker(RiskPolicy(BrainConfig(equity=D('1000'), quantity_step=D('.01'),
+                                                  stop_profile='FIXED_SL_TP', min_reward_risk=D('.5'))), D('1000'))
+        broker.submit(broker.risk.evaluate(self.candidate('SHORT'), broker.equity).plan)
         broker.process(bar(4, '110', '115', '105', '108'))
         broker.process(bar(5, '125', '127', '120', '123'))
         self.assertEqual(broker.trades[0].exit_price, D('125'))

@@ -4,6 +4,19 @@ This is the primary project instruction file for Codex and Claude. Current
 user instructions take precedence; persist new clarifications in repository
 docs rather than continuing undocumented assumptions from chat history.
 
+## Current RiskEngine exception — 2026-09-12
+
+[U-RISK-ENGINE-001] explicitly authorizes the modular PAPER-only RiskEngine
+from corrected e9ff346b151587c8deaf903b9ffc40d289659725 in work/risk-engine.
+[Risk spec](docs/specs/risk-engine-v0.1.md), [evidence](docs/risk-engine.md) and
+[ADR013](docs/DECISIONS/013-risk-approved-paper-plans.md) supersede older risk
+and STOP records only within this task. Preserve SwingEngine and Range semantics.
+STRUCTURE_BE default, generic validated fresh support, sweep fallback [H],
+configurable1R break-even [H], quality gates and approved-plan-only paper fills.
+Production API/UX, LIVE and other worktrees remain outside this change.
+Commit `feat: add configurable structure-aware risk engine`, then STOP.
+No merge/push/tag. Historical range/swing/source approvals remain preserved.
+
 ## Frozen candidate boundary correction — 2026-09-12
 
 [U-RANGE-BOUNDARIES-001] confirms: ANY wick outside frozen rangeLow/rangeHigh

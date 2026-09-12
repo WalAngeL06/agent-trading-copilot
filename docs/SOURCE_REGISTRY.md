@@ -1,5 +1,18 @@
 # Source registry
 
+## RiskEngine source amendment — 2026-09-12
+
+| ID | Provenance | Status | Evidence / limits |
+|---|---|---|---|
+| [U-RISK-ENGINE-001] | Explicit urgent user implementation instruction | CONFIRMED NARROW PROJECT REQUIREMENT | Structure-aware initial stop, fresh validated generic zones, sweep fallback [H], monotonic stops, configurable profiles/BE, quality gates, approved-plan-only PAPER, evidence/tests/full suite/feature commit then STOP. Preserve Swing/Range; no merge/push/tag. [Spec](specs/risk-engine-v0.1.md). |
+| [H]-RISK-ENGINE-001 | Explicit provisional MVP implementation choices authorized by user | HYPOTHESIS; NOT EMPIRICALLY VALIDATED | STRUCTURE_BE,1R favorable excursion, minimum R:R1, optional maximum disabled, buffer100, fraction.01, equity10000, quantity step.00000001, round down/unleveraged cap, nearest invalidation tie policy and close-effective BE. Fixed profile preserves candidate SL/TP. [Exact definitions](specs/risk-engine-v0.1.md). |
+| [H]-RISK-ZONE-001 | Conservative risk-support adapter over preserved FVG/iFVG publications | HYPOTHESIS; NOT DD ATTESTATION | Fresh at directional publication; later wick/edge touch or gap past invalidation removes freshness; lower/upper invalidation; no age expiry. Generic provider validation/freshness remains its responsibility. No Breaker/OB detectors or empirical validation. |
+| [E-RISK-ENGINE-001] | Local deterministic unit/replay/CLI evidence | VERIFIED INFRASTRUCTURE BEHAVIOR ONLY | Baseline292; final full323 pass,31 new risk tests,7 post-fix offline CLI smokes and preserved causal prefixes. Independent review findings fixed/re-reviewed clear. [Report](risk-engine.md), [exact JSON](research/risk-engine-evidence.json). Synthetic examples / saved real fixtures; no strategy performance, costs or LIVE proof. |
+
+This amendment supersedes older [H]-RISK-001 direct sizing / sweep-only plan
+approval within the opt-in PAPER runtime; original rule provenance is retained.
+Final full-suite/review results are recorded in current HANDOFF/PROJECT_STATE.
+
 Updated: 2026-09-12. **Source and validation are separate concepts.** A source
 ID identifies provenance; its confirmation status is not proof of performance.
 Agent-authored summaries and external libraries do not become DD strategy truth.

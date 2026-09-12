@@ -225,6 +225,24 @@ okunması doğrulandı; [devir kanıtı](docs/HANDOFF.md).
 Tam grafik dizileri, Claude UX incelemesi, auth/CORS, sürekli veri yenileme,
 Linux/container ve deployment sonraki işlerdir. Ch.1 tamamlanmış değildir.
 
+## Configurable PAPER RiskEngine
+
+The opt-in offline trading brain now requires a RiskEngine-approved plan before
+paper execution. STRUCTURE_BE defaults to fresh validated structure support,
+sweep fallback and configurable1R break-even [H]. FIXED_SL_TP preserves original
+SL/TP. R:R/stop distance/size gates emit machine-readable BLOCKED with evidence;
+actual next-open fills are reapproved. Swing and frozen Range semantics are preserved.
+
+```powershell
+py -B -m agent_trading.trading_brain --candles tests/data/btcusdt_15m.jsonl --stop-profile STRUCTURE_BE --break-even-r 1 --min-reward-risk 1 --risk-per-trade .01
+```
+
+Optional `--max-stop-distance` uses absolute price units; `--stop-buffer`,
+`--equity`, `--quantity-step` and `--target EQ|BOUNDARY` remain configurable.
+These are provisional PAPER settings [H], not trading recommendations or empirical
+validation. [Risk spec](docs/specs/risk-engine-v0.1.md),
+[approved/blocked evidence and gaps](docs/risk-engine.md). No LIVE is implemented.
+
 ## Modüller
 
 | Dosya | Sorumluluk |

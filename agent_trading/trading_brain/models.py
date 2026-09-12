@@ -2,8 +2,11 @@
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 from ..swing import ConfirmedSwing, SwingSide, SwingConfig
 from ..models import Candle
+if TYPE_CHECKING:
+    from .risk_models import ApprovedTradePlan, StopUpdate
 
 @dataclass(frozen=True)
 class BrainConfig:
@@ -14,6 +17,10 @@ class BrainConfig:
     risk_fraction: Decimal = Decimal('.01')
     quantity_step: Decimal = Decimal('.00000001')
     target: str = 'EQ'
+    stop_profile: str = 'STRUCTURE_BE'
+    break_even_r: Decimal = Decimal('1')
+    min_reward_risk: Decimal = Decimal('1')
+    max_stop_distance: Decimal | None = None
 
     def __post_init__(self):
         if not isinstance(self.swing, SwingConfig):
@@ -26,6 +33,14 @@ class BrainConfig:
                 raise ValueError(f'{name} is out of bounds')
         if self.risk_fraction > 1 or self.target not in ('EQ', 'BOUNDARY'):
             raise ValueError('invalid risk fraction or target')
+        self.risk_config()
+
+    def risk_config(self):
+        from .risk_models import RiskConfig
+        return RiskConfig(profile=self.stop_profile, break_even_r=self.break_even_r,
+                          min_reward_risk=self.min_reward_risk, max_stop_distance=self.max_stop_distance,
+                          risk_per_trade=self.risk_fraction, stop_buffer=self.stop_buffer,
+                          quantity_step=self.quantity_step)
 
 @dataclass(frozen=True)
 class SwingHigh:
@@ -122,6 +137,7 @@ class TradeCandidate:
     planned_quantity: Decimal | None = None
     risk_budget: Decimal | None = None
     source_ids: tuple[str, ...] = ('[U-TRADING-BRAIN-001]', '[H]-PLAN-001')
+    sweep_extreme: Decimal | None = None
 
 @dataclass(frozen=True)
 class PaperTrade:
@@ -140,13 +156,15 @@ class PaperTrade:
     exit_price: Decimal | None = None
     closed_at: datetime | None = None
     pnl: Decimal | None = None
-    source_ids: tuple[str, ...] = ('[H]-RISK-001', '[H]-PAPER-001')
+    source_ids: tuple[str, ...] = ('[U-RISK-ENGINE-001]', '[H]-RISK-ENGINE-001', '[H]-PAPER-001')
+    approved_plan: 'ApprovedTradePlan | None' = None
+    stop_updates: 'tuple[StopUpdate, ...]' = ()
 
 @dataclass(frozen=True)
 class BrokerEvent:
     kind: str
     observed_at: datetime
-    payload: PaperTrade | TradeCandidate
+    payload: object
 
 @dataclass(frozen=True)
 class BrainEvent:

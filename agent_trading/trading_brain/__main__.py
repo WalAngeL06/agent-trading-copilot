@@ -21,6 +21,10 @@ def main():
     parser.add_argument('--risk-per-trade', default='.01', help='equity fraction [H]')
     parser.add_argument('--quantity-step', default='.00000001')
     parser.add_argument('--target', choices=('EQ','BOUNDARY'), default='EQ')
+    parser.add_argument('--stop-profile', choices=('STRUCTURE_BE', 'FIXED_SL_TP'), default='STRUCTURE_BE')
+    parser.add_argument('--break-even-r', default='1', help='favorable excursion in initial R [H]')
+    parser.add_argument('--min-reward-risk', default='1', help='minimum reward/risk ratio [H]')
+    parser.add_argument('--max-stop-distance', help='optional absolute price distance [H]')
     parser.add_argument('--fixture-kind', choices=('SYNTHETIC','REAL_SAVED_BTC','UNKNOWN'))
     args = parser.parse_args()
     try:
@@ -30,7 +34,10 @@ def main():
                              boundary_proximity=Decimal(args.boundary_proximity),
                              stop_buffer=Decimal(args.stop_buffer), equity=Decimal(args.equity),
                              risk_fraction=Decimal(args.risk_per_trade),
-                             quantity_step=Decimal(args.quantity_step), target=args.target)
+                             quantity_step=Decimal(args.quantity_step), target=args.target,
+                             stop_profile=args.stop_profile, break_even_r=Decimal(args.break_even_r),
+                             min_reward_risk=Decimal(args.min_reward_risk),
+                             max_stop_distance=Decimal(args.max_stop_distance) if args.max_stop_distance else None)
         report = replay(read_candles(args.candles),config).report()
         report['fixture_kind'] = args.fixture_kind or ('SYNTHETIC' if
                                  args.candles.name=='trading_brain_synthetic.jsonl' else 'UNKNOWN')

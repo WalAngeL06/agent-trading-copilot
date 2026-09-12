@@ -1,0 +1,1093 @@
+{
+  "approved_example": {
+    "candidate": {
+      "direction": "LONG",
+      "entry": "100000",
+      "evidence_ids": [
+        "synthetic-signal"
+      ],
+      "observed_at": "2026-01-01T00:45:00Z",
+      "planned_quantity": null,
+      "risk_budget": null,
+      "source_ids": [
+        "[U-TRADING-BRAIN-001]",
+        "[H]-PLAN-001"
+      ],
+      "stop": "97000",
+      "sweep_extreme": "97100",
+      "tp": "103000"
+    },
+    "evidence": {
+      "blocked_reason": null,
+      "break_even_r": "1",
+      "break_even_trigger": "FAVORABLE_EXCURSION_R",
+      "entry": "100000",
+      "initial_stop": "98900",
+      "initial_stop_source": "SUPPORTING_ZONE",
+      "invalidation_level": "99000",
+      "max_stop_distance": null,
+      "min_reward_risk": "1",
+      "position_size": "0.09090909",
+      "profile": "STRUCTURE_BE",
+      "reward_distance": "3000",
+      "reward_risk_ratio": "2.727272727272727272727272727",
+      "risk_amount": "99.99999900",
+      "risk_budget": "100.00",
+      "risk_distance": "1100",
+      "risk_per_trade": "0.01",
+      "source_ids": [
+        "[U-RISK-ENGINE-001]",
+        "[H]-RISK-ENGINE-001"
+      ],
+      "supporting_zone_id": "synthetic-zone-1",
+      "supporting_zone_type": "FVG",
+      "symbol": "BTC-USDT",
+      "timeframe": "15m",
+      "tp": "103000",
+      "zone_source_ids": [
+        "[H]-RISK-ZONE-001"
+      ]
+    },
+    "observed_at": "2026-01-01T00:45:00Z",
+    "plan": {
+      "approved_at": "2026-01-01T00:45:00Z",
+      "candidate": {
+        "direction": "LONG",
+        "entry": "100000",
+        "evidence_ids": [
+          "synthetic-signal"
+        ],
+        "observed_at": "2026-01-01T00:45:00Z",
+        "planned_quantity": null,
+        "risk_budget": null,
+        "source_ids": [
+          "[U-TRADING-BRAIN-001]",
+          "[H]-PLAN-001"
+        ],
+        "stop": "97000",
+        "sweep_extreme": "97100",
+        "tp": "103000"
+      },
+      "entry": "100000",
+      "evidence": {
+        "blocked_reason": null,
+        "break_even_r": "1",
+        "break_even_trigger": "FAVORABLE_EXCURSION_R",
+        "entry": "100000",
+        "initial_stop": "98900",
+        "initial_stop_source": "SUPPORTING_ZONE",
+        "invalidation_level": "99000",
+        "max_stop_distance": null,
+        "min_reward_risk": "1",
+        "position_size": "0.09090909",
+        "profile": "STRUCTURE_BE",
+        "reward_distance": "3000",
+        "reward_risk_ratio": "2.727272727272727272727272727",
+        "risk_amount": "99.99999900",
+        "risk_budget": "100.00",
+        "risk_distance": "1100",
+        "risk_per_trade": "0.01",
+        "source_ids": [
+          "[U-RISK-ENGINE-001]",
+          "[H]-RISK-ENGINE-001"
+        ],
+        "supporting_zone_id": "synthetic-zone-1",
+        "supporting_zone_type": "FVG",
+        "symbol": "BTC-USDT",
+        "timeframe": "15m",
+        "tp": "103000",
+        "zone_source_ids": [
+          "[H]-RISK-ZONE-001"
+        ]
+      },
+      "quantity": "0.09090909",
+      "risk_amount": "99.99999900",
+      "risk_budget": "100.00",
+      "source_ids": [
+        "[U-RISK-ENGINE-001]",
+        "[H]-RISK-ENGINE-001"
+      ],
+      "stop": "98900",
+      "tp": "103000"
+    },
+    "reason": null,
+    "source_ids": [
+      "[U-RISK-ENGINE-001]",
+      "[H]-RISK-ENGINE-001"
+    ],
+    "status": "APPROVED"
+  },
+  "authority": "[U-RISK-ENGINE-001]",
+  "base_commit": "e9ff346b151587c8deaf903b9ffc40d289659725",
+  "blocked_example": {
+    "candidate": {
+      "direction": "LONG",
+      "entry": "100000",
+      "evidence_ids": [
+        "synthetic-signal"
+      ],
+      "observed_at": "2026-01-01T00:45:00Z",
+      "planned_quantity": null,
+      "risk_budget": null,
+      "source_ids": [
+        "[U-TRADING-BRAIN-001]",
+        "[H]-PLAN-001"
+      ],
+      "stop": "97000",
+      "sweep_extreme": "97100",
+      "tp": "100500"
+    },
+    "evidence": {
+      "blocked_reason": "MIN_REWARD_RISK",
+      "break_even_r": "1",
+      "break_even_trigger": "FAVORABLE_EXCURSION_R",
+      "entry": "100000",
+      "initial_stop": "98900",
+      "initial_stop_source": "SUPPORTING_ZONE",
+      "invalidation_level": "99000",
+      "max_stop_distance": null,
+      "min_reward_risk": "1",
+      "position_size": "0.09090909",
+      "profile": "STRUCTURE_BE",
+      "reward_distance": "500",
+      "reward_risk_ratio": "0.4545454545454545454545454545",
+      "risk_amount": "99.99999900",
+      "risk_budget": "100.00",
+      "risk_distance": "1100",
+      "risk_per_trade": "0.01",
+      "source_ids": [
+        "[U-RISK-ENGINE-001]",
+        "[H]-RISK-ENGINE-001"
+      ],
+      "supporting_zone_id": "synthetic-zone-1",
+      "supporting_zone_type": "FVG",
+      "symbol": "BTC-USDT",
+      "timeframe": "15m",
+      "tp": "100500",
+      "zone_source_ids": [
+        "[H]-RISK-ZONE-001"
+      ]
+    },
+    "observed_at": "2026-01-01T00:45:00Z",
+    "plan": null,
+    "reason": "MIN_REWARD_RISK",
+    "source_ids": [
+      "[U-RISK-ENGINE-001]",
+      "[H]-RISK-ENGINE-001"
+    ],
+    "status": "BLOCKED"
+  },
+  "cli_smokes": [
+    {
+      "counts": {
+        "FVG": 68,
+        "RANGE_CANDIDATE": 1,
+        "RANGE_LOW_TOUCH": 1,
+        "SWING_HIGH": 25,
+        "SWING_LOW": 24,
+        "VALID_HIGH": 8,
+        "VALID_LOW": 8,
+        "iFVG": 53
+      },
+      "exit_code": 0,
+      "fixture": "tests\\data\\btcusdt_5m.jsonl",
+      "options": [],
+      "schema_version": "trading-brain-paper-v0.2",
+      "trade_count": 0
+    },
+    {
+      "counts": {
+        "FVG": 60,
+        "RANGE_CANDIDATE": 1,
+        "RANGE_INVALIDATED": 1,
+        "SWING_HIGH": 23,
+        "SWING_LOW": 23,
+        "VALID_HIGH": 10,
+        "VALID_LOW": 6,
+        "iFVG": 52
+      },
+      "exit_code": 0,
+      "fixture": "tests\\data\\btcusdt_15m.jsonl",
+      "options": [],
+      "schema_version": "trading-brain-paper-v0.2",
+      "trade_count": 0
+    },
+    {
+      "counts": {
+        "FVG": 49,
+        "RANGE_CANDIDATE": 1,
+        "RANGE_INVALIDATED": 1,
+        "SWING_HIGH": 26,
+        "SWING_LOW": 27,
+        "VALID_HIGH": 12,
+        "VALID_LOW": 9,
+        "iFVG": 42
+      },
+      "exit_code": 0,
+      "fixture": "tests\\data\\btcusdt_1H.jsonl",
+      "options": [],
+      "schema_version": "trading-brain-paper-v0.2",
+      "trade_count": 0
+    },
+    {
+      "counts": {
+        "FVG": 53,
+        "RANGE_CANDIDATE": 1,
+        "RANGE_INVALIDATED": 1,
+        "SWING_HIGH": 24,
+        "SWING_LOW": 25,
+        "VALID_HIGH": 10,
+        "VALID_LOW": 8,
+        "iFVG": 42
+      },
+      "exit_code": 0,
+      "fixture": "tests\\data\\btcusdt_4H.jsonl",
+      "options": [],
+      "schema_version": "trading-brain-paper-v0.2",
+      "trade_count": 0
+    },
+    {
+      "counts": {
+        "BLOCKED": 5,
+        "FVG": 44,
+        "MANIPULATION_AMBIGUOUS": 1,
+        "RANGE_CANDIDATE": 1,
+        "RANGE_CONFIRMED": 1,
+        "RANGE_LOW_TOUCH": 1,
+        "RECLAIM": 2,
+        "SWEEP": 2,
+        "SWING_HIGH": 20,
+        "SWING_LOW": 19,
+        "TRADE_CANDIDATE": 5,
+        "VALID_HIGH": 8,
+        "VALID_LOW": 5,
+        "iFVG": 37
+      },
+      "exit_code": 0,
+      "fixture": "tests\\data\\btcusdt_15m_range_window.jsonl",
+      "options": [],
+      "schema_version": "trading-brain-paper-v0.2",
+      "trade_count": 0
+    },
+    {
+      "counts": {
+        "FVG": 12,
+        "PAPER_ORDER_OPENED": 1,
+        "RANGE_CANDIDATE": 1,
+        "RANGE_CONFIRMED": 1,
+        "RANGE_LOW_TOUCH": 1,
+        "RECLAIM": 1,
+        "RISK_APPROVED": 2,
+        "SWEEP": 1,
+        "SWING_HIGH": 4,
+        "SWING_LOW": 5,
+        "TRADE_CANDIDATE": 1,
+        "VALID_HIGH": 3,
+        "VALID_LOW": 2,
+        "iFVG": 7
+      },
+      "exit_code": 0,
+      "fixture": "tests\\data\\trading_brain_synthetic.jsonl",
+      "options": [
+        "--atr-length",
+        "2",
+        "--atr-multiplier",
+        ".1",
+        "--boundary-proximity",
+        "2000",
+        "--stop-buffer",
+        "1000",
+        "--target",
+        "BOUNDARY"
+      ],
+      "schema_version": "trading-brain-paper-v0.2",
+      "trade_count": 1
+    },
+    {
+      "counts": {
+        "FVG": 12,
+        "PAPER_ORDER_OPENED": 1,
+        "RANGE_CANDIDATE": 1,
+        "RANGE_CONFIRMED": 1,
+        "RANGE_LOW_TOUCH": 1,
+        "RECLAIM": 1,
+        "RISK_APPROVED": 2,
+        "SWEEP": 1,
+        "SWING_HIGH": 4,
+        "SWING_LOW": 5,
+        "TRADE_CANDIDATE": 1,
+        "VALID_HIGH": 3,
+        "VALID_LOW": 2,
+        "iFVG": 7
+      },
+      "exit_code": 0,
+      "fixture": "tests\\data\\trading_brain_synthetic.jsonl",
+      "options": [
+        "--atr-length",
+        "2",
+        "--atr-multiplier",
+        ".1",
+        "--boundary-proximity",
+        "2000",
+        "--stop-buffer",
+        "1000",
+        "--target",
+        "BOUNDARY",
+        "--stop-profile",
+        "FIXED_SL_TP"
+      ],
+      "schema_version": "trading-brain-paper-v0.2",
+      "trade_count": 1
+    }
+  ],
+  "defaults": {
+    "break_even_r": "1",
+    "max_stop_distance": null,
+    "min_reward_risk": "1",
+    "profile": "STRUCTURE_BE",
+    "quantity_step": "1E-8",
+    "risk_per_trade": "0.01",
+    "stop_buffer": "100"
+  },
+  "fixture_kind": "SYNTHETIC_LITERALS_EXPLICITLY_VALIDATED_SUPPORT",
+  "limitations": [
+    "NOT_EMPIRICALLY_VALIDATED",
+    "NO_COSTS",
+    "UNLEVERAGED_PAPER",
+    "NO_OTHER_ZONE_DETECTORS",
+    "NO_TRAILING_PROFILES",
+    "NO_LIVE"
+  ],
+  "paper_equity": "10000",
+  "paper_example_events": [
+    {
+      "kind": "RISK_APPROVED",
+      "observed_at": "2026-01-01T01:00:00Z",
+      "payload": {
+        "candidate": {
+          "direction": "LONG",
+          "entry": "100000",
+          "evidence_ids": [
+            "synthetic-signal"
+          ],
+          "observed_at": "2026-01-01T00:45:00Z",
+          "planned_quantity": null,
+          "risk_budget": null,
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-PLAN-001"
+          ],
+          "stop": "97000",
+          "sweep_extreme": "97100",
+          "tp": "103000"
+        },
+        "evidence": {
+          "blocked_reason": null,
+          "break_even_r": "1",
+          "break_even_trigger": "FAVORABLE_EXCURSION_R",
+          "entry": "100000",
+          "initial_stop": "98900",
+          "initial_stop_source": "SUPPORTING_ZONE",
+          "invalidation_level": "99000",
+          "max_stop_distance": null,
+          "min_reward_risk": "1",
+          "position_size": "0.09090909",
+          "profile": "STRUCTURE_BE",
+          "reward_distance": "3000",
+          "reward_risk_ratio": "2.727272727272727272727272727",
+          "risk_amount": "99.99999900",
+          "risk_budget": "100.00",
+          "risk_distance": "1100",
+          "risk_per_trade": "0.01",
+          "source_ids": [
+            "[U-RISK-ENGINE-001]",
+            "[H]-RISK-ENGINE-001"
+          ],
+          "supporting_zone_id": "synthetic-zone-1",
+          "supporting_zone_type": "FVG",
+          "symbol": "BTC-USDT",
+          "timeframe": "15m",
+          "tp": "103000",
+          "zone_source_ids": [
+            "[H]-RISK-ZONE-001"
+          ]
+        },
+        "observed_at": "2026-01-01T01:00:00Z",
+        "plan": {
+          "approved_at": "2026-01-01T01:00:00Z",
+          "candidate": {
+            "direction": "LONG",
+            "entry": "100000",
+            "evidence_ids": [
+              "synthetic-signal"
+            ],
+            "observed_at": "2026-01-01T00:45:00Z",
+            "planned_quantity": null,
+            "risk_budget": null,
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-PLAN-001"
+            ],
+            "stop": "97000",
+            "sweep_extreme": "97100",
+            "tp": "103000"
+          },
+          "entry": "100000",
+          "evidence": {
+            "blocked_reason": null,
+            "break_even_r": "1",
+            "break_even_trigger": "FAVORABLE_EXCURSION_R",
+            "entry": "100000",
+            "initial_stop": "98900",
+            "initial_stop_source": "SUPPORTING_ZONE",
+            "invalidation_level": "99000",
+            "max_stop_distance": null,
+            "min_reward_risk": "1",
+            "position_size": "0.09090909",
+            "profile": "STRUCTURE_BE",
+            "reward_distance": "3000",
+            "reward_risk_ratio": "2.727272727272727272727272727",
+            "risk_amount": "99.99999900",
+            "risk_budget": "100.00",
+            "risk_distance": "1100",
+            "risk_per_trade": "0.01",
+            "source_ids": [
+              "[U-RISK-ENGINE-001]",
+              "[H]-RISK-ENGINE-001"
+            ],
+            "supporting_zone_id": "synthetic-zone-1",
+            "supporting_zone_type": "FVG",
+            "symbol": "BTC-USDT",
+            "timeframe": "15m",
+            "tp": "103000",
+            "zone_source_ids": [
+              "[H]-RISK-ZONE-001"
+            ]
+          },
+          "quantity": "0.09090909",
+          "risk_amount": "99.99999900",
+          "risk_budget": "100.00",
+          "source_ids": [
+            "[U-RISK-ENGINE-001]",
+            "[H]-RISK-ENGINE-001"
+          ],
+          "stop": "98900",
+          "tp": "103000"
+        },
+        "reason": null,
+        "source_ids": [
+          "[U-RISK-ENGINE-001]",
+          "[H]-RISK-ENGINE-001"
+        ],
+        "status": "APPROVED"
+      }
+    },
+    {
+      "kind": "PAPER_ORDER_OPENED",
+      "observed_at": "2026-01-01T01:00:00Z",
+      "payload": {
+        "approved_plan": {
+          "approved_at": "2026-01-01T01:00:00Z",
+          "candidate": {
+            "direction": "LONG",
+            "entry": "100000",
+            "evidence_ids": [
+              "synthetic-signal"
+            ],
+            "observed_at": "2026-01-01T00:45:00Z",
+            "planned_quantity": null,
+            "risk_budget": null,
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-PLAN-001"
+            ],
+            "stop": "97000",
+            "sweep_extreme": "97100",
+            "tp": "103000"
+          },
+          "entry": "100000",
+          "evidence": {
+            "blocked_reason": null,
+            "break_even_r": "1",
+            "break_even_trigger": "FAVORABLE_EXCURSION_R",
+            "entry": "100000",
+            "initial_stop": "98900",
+            "initial_stop_source": "SUPPORTING_ZONE",
+            "invalidation_level": "99000",
+            "max_stop_distance": null,
+            "min_reward_risk": "1",
+            "position_size": "0.09090909",
+            "profile": "STRUCTURE_BE",
+            "reward_distance": "3000",
+            "reward_risk_ratio": "2.727272727272727272727272727",
+            "risk_amount": "99.99999900",
+            "risk_budget": "100.00",
+            "risk_distance": "1100",
+            "risk_per_trade": "0.01",
+            "source_ids": [
+              "[U-RISK-ENGINE-001]",
+              "[H]-RISK-ENGINE-001"
+            ],
+            "supporting_zone_id": "synthetic-zone-1",
+            "supporting_zone_type": "FVG",
+            "symbol": "BTC-USDT",
+            "timeframe": "15m",
+            "tp": "103000",
+            "zone_source_ids": [
+              "[H]-RISK-ZONE-001"
+            ]
+          },
+          "quantity": "0.09090909",
+          "risk_amount": "99.99999900",
+          "risk_budget": "100.00",
+          "source_ids": [
+            "[U-RISK-ENGINE-001]",
+            "[H]-RISK-ENGINE-001"
+          ],
+          "stop": "98900",
+          "tp": "103000"
+        },
+        "candidate": {
+          "direction": "LONG",
+          "entry": "100000",
+          "evidence_ids": [
+            "synthetic-signal"
+          ],
+          "observed_at": "2026-01-01T00:45:00Z",
+          "planned_quantity": null,
+          "risk_budget": null,
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-PLAN-001"
+          ],
+          "stop": "97000",
+          "sweep_extreme": "97100",
+          "tp": "103000"
+        },
+        "closed_at": null,
+        "direction": "LONG",
+        "entry": "100000",
+        "exit_price": null,
+        "filled_at": "2026-01-01T00:45:00Z",
+        "mode": "PAPER",
+        "opened_at": "2026-01-01T01:00:00Z",
+        "pnl": null,
+        "quantity": "0.09090909",
+        "risk_amount": "99.99999900",
+        "risk_budget": "100.00",
+        "source_ids": [
+          "[U-RISK-ENGINE-001]",
+          "[H]-RISK-ENGINE-001",
+          "[H]-PAPER-001"
+        ],
+        "status": "OPEN",
+        "stop": "98900",
+        "stop_updates": [],
+        "tp": "103000"
+      }
+    },
+    {
+      "kind": "PAPER_STOP_UPDATED",
+      "observed_at": "2026-01-01T01:00:00Z",
+      "payload": {
+        "approved_plan": {
+          "approved_at": "2026-01-01T01:00:00Z",
+          "candidate": {
+            "direction": "LONG",
+            "entry": "100000",
+            "evidence_ids": [
+              "synthetic-signal"
+            ],
+            "observed_at": "2026-01-01T00:45:00Z",
+            "planned_quantity": null,
+            "risk_budget": null,
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-PLAN-001"
+            ],
+            "stop": "97000",
+            "sweep_extreme": "97100",
+            "tp": "103000"
+          },
+          "entry": "100000",
+          "evidence": {
+            "blocked_reason": null,
+            "break_even_r": "1",
+            "break_even_trigger": "FAVORABLE_EXCURSION_R",
+            "entry": "100000",
+            "initial_stop": "98900",
+            "initial_stop_source": "SUPPORTING_ZONE",
+            "invalidation_level": "99000",
+            "max_stop_distance": null,
+            "min_reward_risk": "1",
+            "position_size": "0.09090909",
+            "profile": "STRUCTURE_BE",
+            "reward_distance": "3000",
+            "reward_risk_ratio": "2.727272727272727272727272727",
+            "risk_amount": "99.99999900",
+            "risk_budget": "100.00",
+            "risk_distance": "1100",
+            "risk_per_trade": "0.01",
+            "source_ids": [
+              "[U-RISK-ENGINE-001]",
+              "[H]-RISK-ENGINE-001"
+            ],
+            "supporting_zone_id": "synthetic-zone-1",
+            "supporting_zone_type": "FVG",
+            "symbol": "BTC-USDT",
+            "timeframe": "15m",
+            "tp": "103000",
+            "zone_source_ids": [
+              "[H]-RISK-ZONE-001"
+            ]
+          },
+          "quantity": "0.09090909",
+          "risk_amount": "99.99999900",
+          "risk_budget": "100.00",
+          "source_ids": [
+            "[U-RISK-ENGINE-001]",
+            "[H]-RISK-ENGINE-001"
+          ],
+          "stop": "98900",
+          "tp": "103000"
+        },
+        "candidate": {
+          "direction": "LONG",
+          "entry": "100000",
+          "evidence_ids": [
+            "synthetic-signal"
+          ],
+          "observed_at": "2026-01-01T00:45:00Z",
+          "planned_quantity": null,
+          "risk_budget": null,
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-PLAN-001"
+          ],
+          "stop": "97000",
+          "sweep_extreme": "97100",
+          "tp": "103000"
+        },
+        "closed_at": null,
+        "direction": "LONG",
+        "entry": "100000",
+        "exit_price": null,
+        "filled_at": "2026-01-01T00:45:00Z",
+        "mode": "PAPER",
+        "opened_at": "2026-01-01T01:00:00Z",
+        "pnl": null,
+        "quantity": "0.09090909",
+        "risk_amount": "99.99999900",
+        "risk_budget": "100.00",
+        "source_ids": [
+          "[U-RISK-ENGINE-001]",
+          "[H]-RISK-ENGINE-001",
+          "[H]-PAPER-001"
+        ],
+        "status": "OPEN",
+        "stop": "100000",
+        "stop_updates": [
+          {
+            "measured_r": "1",
+            "new_stop": "100000",
+            "observed_at": "2026-01-01T01:00:00Z",
+            "previous_stop": "98900",
+            "reason": "BREAK_EVEN",
+            "source_ids": [
+              "[H]-RISK-ENGINE-001"
+            ],
+            "threshold_r": "1",
+            "trigger": "FAVORABLE_EXCURSION_R"
+          }
+        ],
+        "tp": "103000"
+      }
+    },
+    {
+      "kind": "PAPER_ORDER_CLOSED",
+      "observed_at": "2026-01-01T01:15:00Z",
+      "payload": {
+        "approved_plan": {
+          "approved_at": "2026-01-01T01:00:00Z",
+          "candidate": {
+            "direction": "LONG",
+            "entry": "100000",
+            "evidence_ids": [
+              "synthetic-signal"
+            ],
+            "observed_at": "2026-01-01T00:45:00Z",
+            "planned_quantity": null,
+            "risk_budget": null,
+            "source_ids": [
+              "[U-TRADING-BRAIN-001]",
+              "[H]-PLAN-001"
+            ],
+            "stop": "97000",
+            "sweep_extreme": "97100",
+            "tp": "103000"
+          },
+          "entry": "100000",
+          "evidence": {
+            "blocked_reason": null,
+            "break_even_r": "1",
+            "break_even_trigger": "FAVORABLE_EXCURSION_R",
+            "entry": "100000",
+            "initial_stop": "98900",
+            "initial_stop_source": "SUPPORTING_ZONE",
+            "invalidation_level": "99000",
+            "max_stop_distance": null,
+            "min_reward_risk": "1",
+            "position_size": "0.09090909",
+            "profile": "STRUCTURE_BE",
+            "reward_distance": "3000",
+            "reward_risk_ratio": "2.727272727272727272727272727",
+            "risk_amount": "99.99999900",
+            "risk_budget": "100.00",
+            "risk_distance": "1100",
+            "risk_per_trade": "0.01",
+            "source_ids": [
+              "[U-RISK-ENGINE-001]",
+              "[H]-RISK-ENGINE-001"
+            ],
+            "supporting_zone_id": "synthetic-zone-1",
+            "supporting_zone_type": "FVG",
+            "symbol": "BTC-USDT",
+            "timeframe": "15m",
+            "tp": "103000",
+            "zone_source_ids": [
+              "[H]-RISK-ZONE-001"
+            ]
+          },
+          "quantity": "0.09090909",
+          "risk_amount": "99.99999900",
+          "risk_budget": "100.00",
+          "source_ids": [
+            "[U-RISK-ENGINE-001]",
+            "[H]-RISK-ENGINE-001"
+          ],
+          "stop": "98900",
+          "tp": "103000"
+        },
+        "candidate": {
+          "direction": "LONG",
+          "entry": "100000",
+          "evidence_ids": [
+            "synthetic-signal"
+          ],
+          "observed_at": "2026-01-01T00:45:00Z",
+          "planned_quantity": null,
+          "risk_budget": null,
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-PLAN-001"
+          ],
+          "stop": "97000",
+          "sweep_extreme": "97100",
+          "tp": "103000"
+        },
+        "closed_at": "2026-01-01T01:15:00Z",
+        "direction": "LONG",
+        "entry": "100000",
+        "exit_price": "100000",
+        "filled_at": "2026-01-01T00:45:00Z",
+        "mode": "PAPER",
+        "opened_at": "2026-01-01T01:00:00Z",
+        "pnl": "0E-8",
+        "quantity": "0.09090909",
+        "risk_amount": "99.99999900",
+        "risk_budget": "100.00",
+        "source_ids": [
+          "[U-RISK-ENGINE-001]",
+          "[H]-RISK-ENGINE-001",
+          "[H]-PAPER-001"
+        ],
+        "status": "CLOSED",
+        "stop": "100000",
+        "stop_updates": [
+          {
+            "measured_r": "1",
+            "new_stop": "100000",
+            "observed_at": "2026-01-01T01:00:00Z",
+            "previous_stop": "98900",
+            "reason": "BREAK_EVEN",
+            "source_ids": [
+              "[H]-RISK-ENGINE-001"
+            ],
+            "threshold_r": "1",
+            "trigger": "FAVORABLE_EXCURSION_R"
+          }
+        ],
+        "tp": "103000"
+      }
+    }
+  ],
+  "paper_example_final_trade": {
+    "approved_plan": {
+      "approved_at": "2026-01-01T01:00:00Z",
+      "candidate": {
+        "direction": "LONG",
+        "entry": "100000",
+        "evidence_ids": [
+          "synthetic-signal"
+        ],
+        "observed_at": "2026-01-01T00:45:00Z",
+        "planned_quantity": null,
+        "risk_budget": null,
+        "source_ids": [
+          "[U-TRADING-BRAIN-001]",
+          "[H]-PLAN-001"
+        ],
+        "stop": "97000",
+        "sweep_extreme": "97100",
+        "tp": "103000"
+      },
+      "entry": "100000",
+      "evidence": {
+        "blocked_reason": null,
+        "break_even_r": "1",
+        "break_even_trigger": "FAVORABLE_EXCURSION_R",
+        "entry": "100000",
+        "initial_stop": "98900",
+        "initial_stop_source": "SUPPORTING_ZONE",
+        "invalidation_level": "99000",
+        "max_stop_distance": null,
+        "min_reward_risk": "1",
+        "position_size": "0.09090909",
+        "profile": "STRUCTURE_BE",
+        "reward_distance": "3000",
+        "reward_risk_ratio": "2.727272727272727272727272727",
+        "risk_amount": "99.99999900",
+        "risk_budget": "100.00",
+        "risk_distance": "1100",
+        "risk_per_trade": "0.01",
+        "source_ids": [
+          "[U-RISK-ENGINE-001]",
+          "[H]-RISK-ENGINE-001"
+        ],
+        "supporting_zone_id": "synthetic-zone-1",
+        "supporting_zone_type": "FVG",
+        "symbol": "BTC-USDT",
+        "timeframe": "15m",
+        "tp": "103000",
+        "zone_source_ids": [
+          "[H]-RISK-ZONE-001"
+        ]
+      },
+      "quantity": "0.09090909",
+      "risk_amount": "99.99999900",
+      "risk_budget": "100.00",
+      "source_ids": [
+        "[U-RISK-ENGINE-001]",
+        "[H]-RISK-ENGINE-001"
+      ],
+      "stop": "98900",
+      "tp": "103000"
+    },
+    "candidate": {
+      "direction": "LONG",
+      "entry": "100000",
+      "evidence_ids": [
+        "synthetic-signal"
+      ],
+      "observed_at": "2026-01-01T00:45:00Z",
+      "planned_quantity": null,
+      "risk_budget": null,
+      "source_ids": [
+        "[U-TRADING-BRAIN-001]",
+        "[H]-PLAN-001"
+      ],
+      "stop": "97000",
+      "sweep_extreme": "97100",
+      "tp": "103000"
+    },
+    "closed_at": "2026-01-01T01:15:00Z",
+    "direction": "LONG",
+    "entry": "100000",
+    "exit_price": "100000",
+    "filled_at": "2026-01-01T00:45:00Z",
+    "mode": "PAPER",
+    "opened_at": "2026-01-01T01:00:00Z",
+    "pnl": "0E-8",
+    "quantity": "0.09090909",
+    "risk_amount": "99.99999900",
+    "risk_budget": "100.00",
+    "source_ids": [
+      "[U-RISK-ENGINE-001]",
+      "[H]-RISK-ENGINE-001",
+      "[H]-PAPER-001"
+    ],
+    "status": "CLOSED",
+    "stop": "100000",
+    "stop_updates": [
+      {
+        "measured_r": "1",
+        "new_stop": "100000",
+        "observed_at": "2026-01-01T01:00:00Z",
+        "previous_stop": "98900",
+        "reason": "BREAK_EVEN",
+        "source_ids": [
+          "[H]-RISK-ENGINE-001"
+        ],
+        "threshold_r": "1",
+        "trigger": "FAVORABLE_EXCURSION_R"
+      }
+    ],
+    "tp": "103000"
+  },
+  "review_regressions": [
+    "NEXT_OPEN_REQUIRED_ON_FIRST_FILL",
+    "EXACT_BUFFER_AND_QUANTITY_FLOOR_LONG_SHORT",
+    "SUPPORT_INVALIDATED_AT_FILL"
+  ],
+  "synthetic_real_swing_full_chain": {
+    "config": {
+      "boundary_proximity": "2000",
+      "break_even_r": "1",
+      "equity": "10000",
+      "max_stop_distance": null,
+      "min_reward_risk": "1",
+      "quantity_step": "1E-8",
+      "risk_fraction": "0.01",
+      "stop_buffer": "1000",
+      "stop_profile": "STRUCTURE_BE",
+      "swing": {
+        "atr_length": 2,
+        "atr_multiplier": "0.1",
+        "bootstrap_candles": 30
+      },
+      "target": "BOUNDARY"
+    },
+    "counts": {
+      "FVG": 12,
+      "PAPER_ORDER_OPENED": 1,
+      "RANGE_CANDIDATE": 1,
+      "RANGE_CONFIRMED": 1,
+      "RANGE_LOW_TOUCH": 1,
+      "RECLAIM": 1,
+      "RISK_APPROVED": 2,
+      "SWEEP": 1,
+      "SWING_HIGH": 4,
+      "SWING_LOW": 5,
+      "TRADE_CANDIDATE": 1,
+      "VALID_HIGH": 3,
+      "VALID_LOW": 2,
+      "iFVG": 7
+    },
+    "trade": {
+      "approved_plan": {
+        "approved_at": "2026-01-01T06:00:00Z",
+        "candidate": {
+          "direction": "LONG",
+          "entry": "92000",
+          "evidence_ids": [
+            "e000028",
+            "e000035",
+            "e000036"
+          ],
+          "observed_at": "2026-01-01T05:45:00Z",
+          "planned_quantity": null,
+          "risk_budget": null,
+          "source_ids": [
+            "[U-TRADING-BRAIN-001]",
+            "[H]-PLAN-001"
+          ],
+          "stop": "76000",
+          "sweep_extreme": "77000",
+          "tp": "120000"
+        },
+        "entry": "92000",
+        "evidence": {
+          "blocked_reason": null,
+          "break_even_r": "1",
+          "break_even_trigger": "FAVORABLE_EXCURSION_R",
+          "entry": "92000",
+          "initial_stop": "81000",
+          "initial_stop_source": "SUPPORTING_ZONE",
+          "invalidation_level": "82000",
+          "max_stop_distance": null,
+          "min_reward_risk": "1",
+          "position_size": "0.00909090",
+          "profile": "STRUCTURE_BE",
+          "reward_distance": "28000",
+          "reward_risk_ratio": "2.545454545454545454545454545",
+          "risk_amount": "99.99990000",
+          "risk_budget": "100.00",
+          "risk_distance": "11000",
+          "risk_per_trade": "0.01",
+          "source_ids": [
+            "[U-RISK-ENGINE-001]",
+            "[H]-RISK-ENGINE-001"
+          ],
+          "supporting_zone_id": "e000036",
+          "supporting_zone_type": "FVG",
+          "symbol": "BTC-USDT",
+          "timeframe": "15m",
+          "tp": "120000",
+          "zone_source_ids": [
+            "[H]-GAP-001",
+            "[H]-RISK-ZONE-001"
+          ]
+        },
+        "quantity": "0.00909090",
+        "risk_amount": "99.99990000",
+        "risk_budget": "100.00",
+        "source_ids": [
+          "[U-RISK-ENGINE-001]",
+          "[H]-RISK-ENGINE-001"
+        ],
+        "stop": "81000",
+        "tp": "120000"
+      },
+      "candidate": {
+        "direction": "LONG",
+        "entry": "92000",
+        "evidence_ids": [
+          "e000028",
+          "e000035",
+          "e000036"
+        ],
+        "observed_at": "2026-01-01T05:45:00Z",
+        "planned_quantity": null,
+        "risk_budget": null,
+        "source_ids": [
+          "[U-TRADING-BRAIN-001]",
+          "[H]-PLAN-001"
+        ],
+        "stop": "76000",
+        "sweep_extreme": "77000",
+        "tp": "120000"
+      },
+      "closed_at": null,
+      "direction": "LONG",
+      "entry": "92000",
+      "exit_price": null,
+      "filled_at": "2026-01-01T05:45:00Z",
+      "mode": "PAPER",
+      "opened_at": "2026-01-01T06:00:00Z",
+      "pnl": null,
+      "quantity": "0.00909090",
+      "risk_amount": "99.99990000",
+      "risk_budget": "100.00",
+      "source_ids": [
+        "[U-RISK-ENGINE-001]",
+        "[H]-RISK-ENGINE-001",
+        "[H]-PAPER-001"
+      ],
+      "status": "OPEN",
+      "stop": "81000",
+      "stop_updates": [],
+      "tp": "120000"
+    }
+  },
+  "verification": {
+    "baseline_tests": 292,
+    "cli_smokes": 7,
+    "errors": 0,
+    "failures": 0,
+    "full_suite_seconds": "13.458",
+    "full_suite_tests": 323,
+    "independent_review": "TWO_MATERIAL_FINDINGS_FIXED_REVIEW_CLEAR",
+    "new_risk_test_methods": 31,
+    "suite_command": "C:/Users/Serdar Arif/Desktop/Agent Trading-backend/.venv/Scripts/python.exe -B -m unittest discover -s tests -v"
+  }
+}

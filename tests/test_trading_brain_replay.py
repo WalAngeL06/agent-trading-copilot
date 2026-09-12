@@ -15,7 +15,7 @@ from agent_trading.trading_brain import BrainConfig, TradingBrain, replay
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT/'tests/data/trading_brain_synthetic.jsonl'
 CONFIG = BrainConfig(swing=SwingConfig(atr_length=2, atr_multiplier=D('.1'), bootstrap_candles=30),
-                     boundary_proximity=D('2000'), stop_buffer=D('1000'))
+                     boundary_proximity=D('2000'), stop_buffer=D('1000'), min_reward_risk=D('.5'))
 
 class ReplayTests(unittest.TestCase):
     def test_synthetic_candles_produce_complete_paper_chain_with_literal_plan(self):
@@ -32,11 +32,11 @@ class ReplayTests(unittest.TestCase):
         self.assertEqual(len(gaps), 1)
         trade, = brain.broker.trades
         self.assertEqual((trade.direction, trade.entry, trade.stop, trade.tp, trade.quantity),
-                         ('LONG', D('92000'), D('76000'), D('100000'), D('.00625')))
-        self.assertEqual(trade.risk_amount, D('100'))
+                         ('LONG', D('92000'), D('81000'), D('100000'), D('.00909090')))
+        self.assertEqual(trade.risk_amount, D('99.9999'))
         self.assertGreater(trade.opened_at, candidate.observed_at)
-        self.assertEqual((trade.status, trade.exit_price, trade.pnl), ('CLOSED',D('100000'),D('50')))
-        self.assertEqual(brain.broker.equity, D('10050'))
+        self.assertEqual((trade.status, trade.exit_price, trade.pnl), ('CLOSED',D('100000'),D('72.7272')))
+        self.assertEqual(brain.broker.equity, D('10072.7272'))
         self.assertEqual((brain.range.state.range_low, brain.range.state.range_high),
                          (D('80000'), D('120000')))
 
@@ -162,7 +162,7 @@ class ReplayTests(unittest.TestCase):
         self.assertEqual(reclaim.payload.phase,'RECLAIMED')
         self.assertFalse(any(e.kind=='RANGE_INVALIDATED' for e in brain.events))
 
-    def test_new_real_15m_bounded_window_has_valid_inside_range_and_exact_paper_plan(self):
+    def test_real_15m_bounded_window_preserves_range_but_default_risk_blocks_orders(self):
         original=tuple(read_candles(ROOT/'tests/data/btcusdt_15m.jsonl'))
         window=tuple(read_candles(ROOT/'tests/data/btcusdt_15m_range_window.jsonl'))
         self.assertEqual(window,original[50:])
@@ -180,10 +180,12 @@ class ReplayTests(unittest.TestCase):
             if forming<=candle.close_time<=state.confirmed_at:
                 self.assertGreaterEqual(candle.low,state.range_low)
                 self.assertLessEqual(candle.high,state.range_high)
-        trade,=brain.broker.trades
-        self.assertEqual((trade.direction,trade.entry,trade.stop,trade.tp,trade.quantity),
-                         ('SHORT',D('77214.6'),D('79996.3'),D('77019.9'),D('.03594923')))
-        self.assertLessEqual(trade.risk_amount,D('100'))
+        blocked = next(e.payload for e in brain.events if e.kind == 'BLOCKED')
+        self.assertEqual(blocked.reason, 'MIN_REWARD_RISK')
+        self.assertEqual((blocked.evidence.entry, blocked.evidence.initial_stop, blocked.evidence.tp),
+                         (D('77215'), D('77590.8'), D('77019.9')))
+        self.assertEqual(brain.broker.trades, ())
+        self.assertFalse(any(e.kind == 'PAPER_ORDER_OPENED' for e in brain.events))
         self.assertFalse(any(e.kind=='RANGE_INVALIDATED' for e in brain.events))
 
     def test_new_real_bounded_window_remains_causal_for_every_prefix(self):
@@ -209,7 +211,7 @@ class ReplayTests(unittest.TestCase):
         brain = replay(candles,CONFIG)
         trade, = brain.broker.trades
         self.assertEqual((trade.direction,trade.entry,trade.stop,trade.tp,trade.quantity),
-                         ('SHORT',D('108000'),D('124000'),D('100000'),D('.00625')))
+                         ('SHORT',D('108000'),D('120000'),D('100000'),D('.00833333')))
 
     def test_opposing_boundary_target_is_configurable(self):
         brain = replay(read_candles(FIXTURE),replace(CONFIG,target='BOUNDARY'))
@@ -229,7 +231,7 @@ class ReplayTests(unittest.TestCase):
     def test_cli_replays_fixture_and_serializes_full_evidence(self):
         completed = subprocess.run([sys.executable,'-B','-m','agent_trading.trading_brain',
             '--candles',str(FIXTURE),'--atr-length','2','--atr-multiplier','.1',
-            '--boundary-proximity','2000','--stop-buffer','1000'],
+            '--boundary-proximity','2000','--stop-buffer','1000','--min-reward-risk','.5'],
             cwd=ROOT,text=True,capture_output=True,check=True)
         report = json.loads(completed.stdout)
         self.assertEqual(report['trades'][0]['entry'],'92000')

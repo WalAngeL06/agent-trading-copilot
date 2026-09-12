@@ -1,4 +1,37 @@
-# Current handoff — frozen range boundary correction
+# Current handoff — modular structure-aware RiskEngine
+
+2026-09-12. Codex; work/risk-engine in
+C:/Users/Serdar Arif/Desktop/Agent Trading/.worktrees/risk-engine.
+Parent e9ff346b151587c8deaf903b9ffc40d289659725. No pre-existing uncommitted work.
+[U-RISK-ENGINE-001] explicitly supersedes the earlier STOP for this risk task only.
+[Spec](specs/risk-engine-v0.1.md), [report](risk-engine.md), [exact examples](research/risk-engine-evidence.json).
+
+Risk models/engine and zone-support adapter are new. Broker requires an
+engine-issued plan; next-open fill reapproves geometry/R:R/size before opening.
+BLOCKED evidence has primary machine reason. Stop management retains original
+plan and monotonic updates, with configurable1R default [H] and fixed profile.
+Runtime/config/CLI compose these modules; exports and offline v0.2 report updated.
+Existing paper/replay tests now use approved plans and revised risk expectations.
+Raw Swing, Range boundaries/selection, manipulation and gap detector files and
+dependencies are preserved. Production API/frontend unchanged.
+
+Verified baseline292 and final full323 tests pass;31 new focused risk methods;
+seven CLI smokes. Evidence examples are synthetic and do not prove profitability.
+Exact [H] defaults and remaining gaps are in the spec/report. Runtime logs stay
+ignored in runs. Completed source/tests/docs belong to the requested feature
+commit; obtain final hash and clean status from Git/final report. No external writes.
+Independent review found skipped-first-fill/exact-Decimal defects; regressions
+and exact next-open/arithmetic fixes verified. Re-review clear; full323 pass
+in13.458s,7 post-fix CLI smokes pass. Full command from this checkout:
+`C:/Users/Serdar Arif/Desktop/Agent Trading-backend/.venv/Scripts/python.exe -B -m unittest discover -s tests -v`.
+Commit/Git status verification follows this documentation freeze; no other files
+remain uncommitted after successful requested checkpoint. Read exact state from Git.
+No merge/push/tag. NEXT: STOP after requested commit; no trailing/strategy feature.
+Older handoff examples/counts are retained below as history, superseded for risk.
+
+---
+
+# Historical handoff — frozen range boundary correction
 
 2026-09-12. Codex; work/trading-brain / Agent Trading-brain.
 Parent9adfe26ad61ed63d019f70c3f69a4756710c4599. Explicit user correction

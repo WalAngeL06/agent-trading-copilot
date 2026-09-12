@@ -1,4 +1,39 @@
-# Current state — frozen PAPER range boundaries corrected
+# Current state — configurable structure-aware PAPER risk
+
+2026-09-12. Codex; work/risk-engine in
+C:/Users/Serdar Arif/Desktop/Agent Trading/.worktrees/risk-engine.
+Exact base e9ff346b151587c8deaf903b9ffc40d289659725.
+[U-RISK-ENGINE-001] authorizes this isolated feature and requested commit/STOP.
+[Spec](specs/risk-engine-v0.1.md), [evidence](risk-engine.md), [ADR013](DECISIONS/013-risk-approved-paper-plans.md).
+
+Implemented RiskEngine, generic SupportingZone/freshness adapter, immutable
+evidenced ApprovedTradePlan/RiskDecision, R:R/geometry/size gates with BLOCKED,
+STRUCTURE_BE/default configurable favorable excursion1R, FIXED_SL_TP, monotonic
+stop updates and approved-plan-only paper broker with actual-fill reapproval.
+Offline report trading-brain-paper-v0.2; pending_plan and original approval plus
+stop history retained. Production analysis API/UX and Swing/Range semantics unchanged.
+
+Baseline292 and final full323 tests pass, zero failures/errors;31 new risk tests.
+Seven CLI smokes pass; existing real/synthetic causal prefixes preserved. Literal
+all-default synthetic approval: LONG100000 / FVG invalidation99000 / SL98900 /
+TP103000 / size.09090909 / R:R2.72727. Same entry/SL with TP100500 blocks
+MIN_REWARD_RISK. Corrected saved synthetic full chain approves with explicit
+opposing-boundary target; default EQ/poor-R:R is blocked. Bounded real15m range
+stays confirmed, with five risk blocks and zero orders under new defaults.
+Exact JSON and limitations are in linked evidence. No empirical validation.
+
+General DD/MTF/zone quality, Breaker/OB detectors, reaction classification,
+SWING_TRAIL/ATR_TRAIL, costs, exchange rules, portfolio/durable order state and LIVE
+remain gaps. Defaults remain provisional [H], not DD attestations. Independent
+read-only review reproduced two defects (skipped first fill and ambient Decimal
+rounding); both fixed with regressions, re-review clear. Final323 suite passed in
+13.458s and7 CLI smokes passed after fixes. Exact feature hash is in Git/final report.
+Commit requested feature then STOP; no merge/push/tag or other-worktree edits.
+Inherited records below are historical where this risk change supersedes them.
+
+---
+
+# Historical state — frozen PAPER range boundaries corrected
 
 2026-09-12. Codex; work/trading-brain at Agent Trading-brain.
 Correction parent9adfe26ad61ed63d019f70c3f69a4756710c4599;

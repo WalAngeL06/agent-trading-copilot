@@ -1,5 +1,16 @@
 # Causal range sweep PAPER strategy v0.1
 
+## Risk amendment — 2026-09-12
+
+[U-RISK-ENGINE-001] authorizes the [RiskEngine spec](risk-engine-v0.1.md).
+It supersedes this document's sweep-only initial stop, geometry-only approval
+and direct-candidate PAPER submission. Structure-aware stops, configurable
+R:R gates and break-even now precede approved-plan-only PAPER execution.
+FIXED_SL_TP preserves the original candidate SL/TP. Existing Swing, Range,
+manipulation and gap detection definitions below remain unchanged. The old
+risk/PAPER literal examples are historical; current [evidence](../risk-engine.md)
+records the changed results. Offline report is trading-brain-paper-v0.2.
+
 2026-09-12. Authority: [U-TRADING-BRAIN-001], explicit urgent implementation.
 Base adbafa485c900164c95ed0e13fce0d267da8b645; isolated work/trading-brain.
 This task supersedes inherited STOP/no-strategy gates only for this slice.

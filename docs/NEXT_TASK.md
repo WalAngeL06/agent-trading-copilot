@@ -1,4 +1,18 @@
-# Current boundary — STOP after separate range correction
+# Current boundary — STOP after RiskEngine feature commit
+
+2026-09-12. [U-RISK-ENGINE-001] authorizes only this isolated RiskEngine from
+e9ff346b151587c8deaf903b9ffc40d289659725 in work/risk-engine.
+Finish full verification/review and commit
+`feat: add configurable structure-aware risk engine`, report hash/tests/approved
+and blocked examples/exact [H] defaults/gaps, then STOP. No merge/push/tag.
+Do not auto-start trailing, zone detectors, strategy semantics, API/UX integration,
+LIVE or another feature. [Spec](specs/risk-engine-v0.1.md), [evidence](risk-engine.md).
+SwingEngine and frozen Range semantics remain unchanged. Further work needs a
+new explicit instruction; historical task descriptions below are not authorization.
+
+---
+
+# Historical boundary — STOP after separate range correction
 
 2026-09-12. [U-RANGE-BOUNDARIES-001] authorized boundary diagnosis/fix,
 raw preservation, tests and real replay, separate correction commit then STOP.

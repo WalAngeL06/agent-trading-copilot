@@ -7,7 +7,9 @@ from .structure import StructureEngine
 from .range import RangeEngine
 from .manipulation import ManipulationEngine
 from .gaps import GapEngine
-from .paper import RiskPolicy, PaperBroker
+from .paper import PaperBroker
+from .risk import RiskEngine
+from .zones import SupportingZoneBook
 from ..market import bar_duration
 from ..models import Candle
 from ..swing import SwingEngine, SwingEventType, SwingSide, ConfirmedSwing
@@ -24,7 +26,8 @@ class TradingBrain:
         self.range = RangeEngine(self.config.boundary_proximity)
         self.manipulation = ManipulationEngine()
         self.gaps = GapEngine()
-        self.risk = RiskPolicy(self.config)
+        self.risk = RiskEngine(self.config.risk_config())
+        self.support = SupportingZoneBook(symbol, timeframe)
         self.broker = PaperBroker(self.risk, self.config.equity)
         self.as_of = None
         self.events = ()
@@ -58,10 +61,12 @@ class TradingBrain:
         for change in self.broker.process(candle):
             candidate = getattr(change.payload, 'candidate', change.payload)
             refs = (self._ids[candidate], self._risk_id)
-            if change.kind == 'PAPER_ORDER_CLOSED':
+            if change.kind in ('PAPER_ORDER_CLOSED', 'PAPER_STOP_UPDATED'):
                 refs += (self._open_id,)
             event_id = self._emit(change.kind, change.payload, refs,
-                                  ('[H]-RISK-001', '[H]-PAPER-001'))
+                                  ('[U-RISK-ENGINE-001]', '[H]-RISK-ENGINE-001', '[H]-PAPER-001'))
+            if change.kind in ('RISK_APPROVED', 'BLOCKED'):
+                self._risk_id = event_id
             if change.kind == 'PAPER_ORDER_OPENED':
                 self._open_id = event_id
         swings = []
@@ -94,6 +99,7 @@ class TradingBrain:
                 self._reclaim_id = None
             else:
                 self._reclaim_id = self._emit('RECLAIM', change, (self._range_id, self._sweep_id))
+        self.support.process(candle)
         for gap in self.gaps.process(candle):
             refs = ()
             if gap.kind == 'iFVG':
@@ -102,6 +108,7 @@ class TradingBrain:
                                  observed_at=gap.origin_at)
                 refs = (self._ids[origin],)
             gap_id = self._emit(gap.kind, gap, refs)
+            self.support.publish(gap, gap_id)
             self._consider(candle, gap, gap_id)
         return self.events[start:]
 
@@ -121,21 +128,17 @@ class TradingBrain:
         tp = (state.eq if self.config.target == 'EQ' else
               state.range_high if gap.direction == 'LONG' else state.range_low)
         refs = (self._range_id, self._reclaim_id, gap_id)
-        candidate = TradeCandidate(gap.direction, candle.close, stop, tp, candle.close_time, refs)
-        if not self.risk.geometry(candidate.direction, candidate.entry, candidate.stop, candidate.tp):
-            self._emit('TRADE_REJECTED', candidate, refs, ('[H]-PLAN-001',))
-            return
-        quantity = self.risk.size(candidate.entry, candidate.stop, self.broker.equity)
-        if quantity is None:
-            self._emit('TRADE_REJECTED', candidate, refs, ('[H]-RISK-001',))
-            return
-        candidate = replace(candidate, planned_quantity=quantity,
-                            risk_budget=self.broker.equity*self.config.risk_fraction)
+        candidate = TradeCandidate(gap.direction, candle.close, stop, tp, candle.close_time, refs,
+                                   sweep_extreme=manipulation.extreme)
         candidate_id = self._emit('TRADE_CANDIDATE', candidate, refs)
-        self._risk_id = self._emit('RISK_APPROVED', candidate, (candidate_id,), ('[H]-RISK-001',))
-        # Keep candidate identity mapped to its signal, not its risk observation.
-        self._ids[candidate] = candidate_id
-        self.broker.submit(candidate)
+        decision = self.risk.evaluate(candidate, self.broker.equity, self.support.zones,
+                                      symbol=self.symbol, timeframe=self.timeframe)
+        support_id = decision.evidence.supporting_zone_id
+        self._risk_id = self._emit('RISK_APPROVED' if decision.plan is not None else 'BLOCKED',
+                                  decision, (candidate_id, support_id))
+        if decision.plan is None:
+            return
+        self.broker.submit(decision.plan)
         self._candidate_emitted = True
 
     def bootstrap(self, candles):
@@ -149,11 +152,12 @@ class TradingBrain:
         return {'as_of': self.as_of, 'candle_count': self.candle_count,
                 'raw_swings': self.swing.confirmed, 'valid_levels': self.structure.valid,
                 'range': self.range.state, 'manipulation': self.manipulation.active,
-                'pending_candidate': self.broker.pending, 'trades': self.broker.trades,
+                'supporting_zones': self.support.zones,
+                'pending_plan': self.broker.pending, 'trades': self.broker.trades,
                 'equity': self.broker.equity, 'events': self.events}
 
     def report(self):
-        return {'schema_version':'trading-brain-paper-v0.1', 'mode':'PAPER',
+        return {'schema_version':'trading-brain-paper-v0.2', 'mode':'PAPER',
                 'symbol':self.symbol, 'timeframe':self.timeframe, 'as_of':self.as_of,
                 'config':self.config, 'candle_count':self.candle_count,
                 'counts':dict(sorted(Counter(e.kind for e in self.events).items())),
@@ -162,7 +166,7 @@ class TradingBrain:
                     {'low':self.range.state.range_low,'high':self.range.state.range_high,
                      'eq':self.range.state.eq},
                 'trades':self.broker.trades,
-                'pending_candidate':self.broker.pending, 'equity':self.broker.equity,
+                'pending_plan':self.broker.pending, 'equity':self.broker.equity,
                 'events':self.events,
                 'limitations': ('PROVISIONAL_H_RULES', 'NOT_EMPIRICALLY_VALIDATED',
                                 'SINGLE_STREAM_SINGLE_RANGE', 'NO_COSTS_OR_PRODUCTION_RISK')}
