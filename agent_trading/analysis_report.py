@@ -3,14 +3,14 @@
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, localcontext
 
+from .analysis_config import BASELINE_TIMEFRAMES
 from .market import bar_duration
 from .market_observations import observation_time
 from .models import to_jsonable
 
 
-REPORT_VERSION = "analysis-report-v0.1"
+REPORT_VERSION = "analysis-report-v0.2"
 EVENT_VERSION = "analysis-events-v0.1"
-TIMEFRAMES = ("4H", "1H", "15m")
 
 
 def interval_floor(stamp: datetime, timeframe: str) -> datetime:
@@ -39,10 +39,11 @@ def exact_spread(bid: Decimal, ask: Decimal) -> Decimal:
         return ask - bid
 
 
-def new_report(analysis_id: str, symbol: str, now: datetime, grace: int) -> dict:
+def new_report(analysis_id: str, symbol: str, now: datetime, grace: int,
+               required_timeframes: tuple[str, ...] = BASELINE_TIMEFRAMES) -> dict:
     now = observation_time(now)
     timeframes = {}
-    for tf in TIMEFRAMES:
+    for tf in required_timeframes:
         freshness = series_freshness(None, tf, now, grace)
         freshness["checked_at"] = None
         timeframes[tf] = {
@@ -59,6 +60,7 @@ def new_report(analysis_id: str, symbol: str, now: datetime, grace: int) -> dict
         "symbol": symbol, "site": "tr", "status": "RUNNING",
         "requested_at": now, "started_at": now, "completed_at": None,
         "decision_as_of": None, "market": {"ticker": None, "spread": None, "orderbook_summary": None},
+        "strategy_context": {"profile_id": None, "required_timeframes": list(required_timeframes)},
         "timeframes": timeframes, "modules": modules,
         "decision": {"action": None, "reason_codes": [], "order_sent": False},
         "explanation": {"deterministic_summary": "Analysis is running; no decision has been evaluated."},

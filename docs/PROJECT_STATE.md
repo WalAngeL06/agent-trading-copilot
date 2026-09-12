@@ -1,25 +1,33 @@
 # Project state
 
 Updated: 2026-09-12. Owner: Codex.
-Chapter: **Ch.1 — Product MVP & UX**.
-Status: **Backend Target #2 analysis service/API/persistence VERIFIED; Ch.1 incomplete.**
+Chapter: **Ch.1 — Product MVP & Backend Foundation**.
+Status: **Autonomous analysis contract v0.2 correction VERIFIED; Ch.1 incomplete.**
 
-Target #1 completed at `cd686755cc1a01d032510806331ccf79267ed5af`.
-The user's [U-ANALYSIS-API-001] explicitly authorized Target #2 in the backend
-worktree. A frozen report contract, bounded public AnalysisService, thin
-FastAPI, stdlib SQLite immutable history/real timeline and deterministic
-explanation now wrap the preserved core/MCP adapter.
-Real BTC ticker +4H/1H/15m +book -> causal core -> report/audit/SQLite succeeded;
-fresh repository/API retrieval verified. [Real product evidence](product-analysis-smoke.md).
-No trading algorithms, execution permissions, UX or deployment added.
-Stop after `feat: add persisted market analysis API`; do not auto-start Target #3.
-Integration and UX remain untouched at Ch.0.
+Target #1: cd686755cc1a01d032510806331ccf79267ed5af.
+Target #2: 6c1af4b6f6cd8c22986b8436dd26d61f64de469d; historical
+[real product evidence](product-analysis-smoke.md) preserved.
+[U-AUTONOMOUS-CONTRACT-001] then authorized the current backend-only correction:
+[analysis v0.2](specs/analysis-api-v0.2.md) uses configured required-timeframe maps
+and honest null profile context; HTTP retains original v0.1 records.
+170 tests passed, default real MCP 4H/1H/15m/core/SQLite smoke passed again,
+and real mixed-version API retrieval matched original JSON. The complete legacy
+v0.1 report schema also matches its checkpoint. [Handoff](HANDOFF.md).
+The intended product is an autonomous trading agent; current POST remains a
+bounded manual/debug/inspection path. Future runtime/modes/outcomes are
+[specification only](DECISIONS/011-autonomous-runtime-contract.md).
+No autonomous loop, Swing/strategy, PAPER/LIVE, UX or deployment implemented.
+Stop after `chore: generalize analysis contract for autonomous trading`.
+Next intelligence task is SWING ENGINE R&D / SPEC, pending explicit instruction.
+Integration/UX stay untouched at Ch.0.
 
 ## Approved product and rubric
 
-The project continues as an **open-source, self-hosted, agentic market
-intelligence / trading copilot** [U-PRODUCT-001]. Preserve the deterministic
-core. Public MCP/analysis/FastAPI/SQLite/JSONL/template backend now exists;
+The project is an **open-source, self-hosted autonomous trading agent**
+[U-AUTONOMOUS-CONTRACT-001], correcting historical copilot/manual framing
+[U-PRODUCT-001]. Approved profiles determine required timeframes; display choices
+do not change decisions. Preserve the deterministic core and layer separation.
+Public MCP/manual-analysis/FastAPI/SQLite/JSONL/template backend now exists;
 shared React/Vite/TypeScript Web/Mini App, thin optional Telegram, agent workflows,
 LLM enhancement and Compose delivery remain planned.
 Authoritative scope: [product-mvp-v0.1](specs/product-mvp-v0.1.md).
@@ -67,17 +75,18 @@ checkpoint before this target:
 - UX: `C:/Users/Serdar Arif/Desktop/Agent Trading-ux`.
 
 Current work is exclusively on `work/copilot-backend`, descended from that
-checkpoint. Target #1 commit is cd686755cc1a01d032510806331ccf79267ed5af;
-the next target commit is `feat: add persisted market analysis API`.
-Read its exact hash from Git/final target report. Root integration remains at
+checkpoint. Targets #1/#2 committed at cd686755 and 6c1af4b respectively.
+The correction commit is `chore: generalize analysis contract for autonomous trading`.
+Read its exact hash from Git/final correction report. Root integration remains at
 `C:/Users/Serdar Arif/Desktop/Agent Trading`; integration and UX branch HEADs
 remain at Ch.0. No merge/push/tag/remote creation. Preserve both worktrees.
 
 ## Test status and invocation
 
 Historical Ch.0 baseline36 and Target #1 baseline79 remain preserved.
-Fresh Target #2 verification: **79 old +71 new =150 passing**, zero failures/errors,
-exit0. New: 12 repository +37 service +18 API +4 product smoke.
+Historical Target #2: 79 old +71 new =150 tests, preserved unchanged.
+Fresh correction: **150 preserved +20 focused =170 passing**, zero failures/errors,
+exit0. New: 3 collection +6 wire +8 configured service +3 versioned API.
 Tests keep normalization/domain/core/audit/SQLite/HTTP real and fake only
 external SDK transport. They need no Node, ATK, credentials, internet or live MCP.
 The complete product suite uses optional FastAPI/HTTPX test dependencies installed
@@ -100,16 +109,20 @@ provenance and no orders; normal offline tests do not establish real connectivit
 
 ## Implemented — product backend and preserved foundation
 
-- Frozen analysis-report-v0.1/API and strict financial-string OpenAPI schemas.
-- Serialized/bounded public AnalysisService with independent initial-cutoff
-  freshness, latest closed15m decision_as_of and causal HTF trimming.
+- Current analysis-report-v0.2/context/dynamic timeframe API; historical v0.1
+  spec/original SQLite JSON preserved with strict version discrimination.
+- Operator-owned immutable required_timeframes, default verified 4H/1H/15m;
+  existing fixed intervals supported, future calendar representation only.
+- Serialized/bounded public manual AnalysisService with independent initial-cutoff
+  freshness, shortest-required-interval closed cutoff and causal trimming;
+  default behavior remains the same latest closed15m, not a universal strategy rule.
 - Five FastAPI analysis/history/health endpoints, typed errors, neutral failed
   decision and no raw MCP payload/request echo.
 - Stdlib SQLite DELETE history/events, atomic idempotency/reservation/finalization,
   startup interruption recovery, exact subsecond ordering and unique core audit.
 - Honest unavailable intelligence, actual acceptance/risk/current core reasons,
   entirely report-derived deterministic explanation.
-- Separate real full-MTF/core/report/SQLite product smoke and API retrieval verified.
+- Same unchanged real smoke verified again for v0.2 (517c6e4d-265b-4a9b-9860-cf7f8aa7e4a2); original real v0.1/v0.2 API/history retrieval matched SQLite.
 - Request-driven readiness with local storage probe, no network GET, expiry and
   failure invalidation; explicit POST validates initial/recovery prerequisites.
 
@@ -134,7 +147,7 @@ provenance and no orders; normal offline tests do not establish real connectivit
 
 ## Not implemented
 
-- Agent workflows or LLM explanation enhancement.
+- AutonomousTradingRuntime/continuous bot loop, approved strategy-profile implementation, Causal Swing Engine, PAPER simulation/accounting, agent workflows or LLM enhancement.
 - MCP wiring into the existing synchronous CLI SHADOW command; product MTF/API
   uses real MCP separately and preserves the CLI default.
 - Web/Mini App, Telegram bot, full chart-history extension, Docker Compose or
@@ -164,11 +177,12 @@ pattern; the current PatternResult API has not been replaced. Separate
 BreakQuality, Deviation and Manipulation specifications remain future work.
 See [SOURCE_REGISTRY](SOURCE_REGISTRY.md) and ADRs 001–005 under [DECISIONS](DECISIONS/).
 
-Intended first intelligence: Market Structure → Range → Deviation → LTF
-confirmation/context. Range is still the next **strategy source-ingestion**
-topic; no confirmed Range source/spec exists. Original longer-term source
-priority is retained: Market Structure, Range, Deviation, Manipulation,
-Momentum/Distribution, Liquidity/Target, Acceptance, Risk and Microstructure.
+Next intelligence task is **SWING ENGINE R&D / SPEC — Causal Swing Engine**.
+Dependencies now begin Swing → Market Structure → Range → Premium/Discount →
+Deviation → Acceptance → Trade Plan → Risk → Execution. Required source-labelled
+swing confirmation/causality definitions remain pending; no algorithm invented.
+Historical longer-term Range/Deviation/Manipulation and other source intake is
+preserved as deferred work; no confirmed Range source/spec exists.
 Postponed topics are history, not permission to build them during this MVP.
 
 Incoming ecosystem [research](research/agentic-market-intelligence-ecosystem-2026-09-12.md)
@@ -215,8 +229,8 @@ Ch.0 historical exit checklist, now verified through Git metadata and baseline:
 
 Ch.0 — Base Setup / Product Re-Scope; Ch.1 — Product MVP & UX;
 Ch.2 — Trading Intelligence; Ch.3 — Agent Workflows; Ch.4 — Validation & Demo.
-**Ch.1 Backend Targets #1 and #2 are verified under their separate explicit
-authorizations. Ch.1 is not complete.** [NEXT_TASK](NEXT_TASK.md) describes
+**Ch.1 Backend Targets #1/#2 and this separately authorized contract correction
+are verified. Ch.1 is not complete.** [NEXT_TASK](NEXT_TASK.md) describes
 future work, not permission to auto-start after the requested commit.
 
 ## Historical runtime evidence / limits

@@ -8,9 +8,9 @@ from pathlib import Path
 import re
 from uuid import uuid4
 
-from .analysis_config import AnalysisConfig
+from .analysis_config import AnalysisConfig, BASELINE_TIMEFRAMES
 from .analysis_report import (
-    TIMEFRAMES, deterministic_summary, exact_spread, new_report, series_freshness,
+    deterministic_summary, exact_spread, new_report, series_freshness,
 )
 from .analysis_repository import RepositoryError, SQLiteAnalysisRepository
 from .config import Config
@@ -120,7 +120,10 @@ class AnalysisService:
         if type(symbol) is not str or symbol not in self.config.allowed_symbols:
             raise ServiceError("INVALID_SYMBOL", 422)
         key_digest = self._request_key(idempotency_key)
-        fingerprint = sha256(("analysis-api-v0.1:" + symbol).encode("ascii")).hexdigest()
+        identity = "analysis-api-v0.1:" + symbol
+        if set(self.config.required_timeframes) != set(BASELINE_TIMEFRAMES):
+            identity += ":required=" + ",".join(sorted(self.config.required_timeframes))
+        fingerprint = sha256(identity.encode("ascii")).hexdigest()
         if not self._repository_ready:
             await self.startup()
         if not self._repository_ready:
@@ -134,7 +137,8 @@ class AnalysisService:
                 raise ServiceError("SERVICE_BUSY")
             async with self._active:
                 now = self._now()
-                draft = new_report(str(uuid4()), symbol, now, self.config.publication_grace_seconds)
+                draft = new_report(str(uuid4()), symbol, now, self.config.publication_grace_seconds,
+                                   self.config.required_timeframes)
                 reservation = await asyncio.to_thread(self.repository.reserve, draft, key_digest, fingerprint)
                 if not reservation.created:
                     return self._replay(reservation)
@@ -176,7 +180,8 @@ class AnalysisService:
                 if frame["latest_closed_candle"] is None:
                     continue
                 kind, reference, close = "CLOSED_CANDLES", f"timeframes.{tf}", frame["latest_close_time"]
-                used = report["decision_as_of"] is not None and close <= report["decision_as_of"]
+                used = (report["decision_as_of"] is not None and
+                        utc_time(close) <= utc_time(report["decision_as_of"]))
             else:
                 continue
             evidence.append({"evidence_id": f"evidence-{len(evidence)+1}", "kind": kind,
@@ -216,7 +221,7 @@ class AnalysisService:
         return {"code": code, "message": _PUBLIC_MESSAGES[code], "stage": stage, "timeframe": timeframe}
 
     def _validate_histories(self, report, histories, cutoff):
-        for tf in TIMEFRAMES:
+        for tf in self.config.required_timeframes:
             items = histories.get(tf, ())
             frame = report["timeframes"][tf]
             if not items:
@@ -235,9 +240,11 @@ class AnalysisService:
             if frame["freshness"]["status"] == "STALE":
                 frame["data_status"] = "FAILED"
                 raise _PrerequisiteError("STALE_TIMEFRAME", tf)
-        decision_as_of = histories["15m"][-1].close_time
+        # Manual inspection policy; future strategy triggers need their own spec.
+        cutoff_timeframe = min(self.config.required_timeframes, key=bar_duration)
+        decision_as_of = histories[cutoff_timeframe][-1].close_time
         causal = []
-        for tf in TIMEFRAMES:
+        for tf in self.config.required_timeframes:
             items = tuple(c for c in histories[tf] if c.close_time <= decision_as_of)[-self.config.history_limit:]
             if not items:
                 report["timeframes"][tf]["data_status"] = "MISSING"
@@ -271,7 +278,7 @@ class AnalysisService:
                             report["market"]["ticker"] = to_jsonable(ticker.value)
                             self._validate_observation(ticker.value)
                             await self._event(report, "TICKER_FETCHED", {"symbol": report["symbol"]})
-                            for tf in TIMEFRAMES:
+                            for tf in self.config.required_timeframes:
                                 stage, timeframe = "candles", tf
                                 read = await adapter.candles(report["symbol"], tf, self.config.history_limit + 1, as_of=cutoff)
                                 histories[tf] = read.value
@@ -297,7 +304,7 @@ class AnalysisService:
                             stage = "mcp"
                         stage = "snapshot"
                         causal, decision_as_of = self._validate_histories(report, histories, cutoff)
-                        core_config = Config(mode="shadow", symbol=report["symbol"], timeframes=TIMEFRAMES,
+                        core_config = Config(mode="shadow", symbol=report["symbol"], timeframes=self.config.required_timeframes,
                                              history_limit=self.config.history_limit, bootstrap_limit=self.config.history_limit,
                                              output_path=str(self.config.audit_dir / (report["analysis_id"] + ".jsonl")))
                         engine = ReplayEngine(core_config, journal=journal)
@@ -351,7 +358,7 @@ class AnalysisService:
             raise ServiceError("PERSISTENCE_UNAVAILABLE", 503, report["analysis_id"]) from None
         if failure is None:
             self._validated = {"at": self._now(), "closes": {
-                tf: utc_time(final["timeframes"][tf]["latest_close_time"]) for tf in TIMEFRAMES}}
+                tf: utc_time(final["timeframes"][tf]["latest_close_time"]) for tf in self.config.required_timeframes}}
             self._last_failure = None
         if cancelled:
             raise asyncio.CancelledError()

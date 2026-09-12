@@ -1,54 +1,73 @@
-# Next backend task — bounded closed-candle chart/history API
+# Next task — SWING ENGINE R&D / SPEC
 
 Updated: 2026-09-12. Ch.1 remains incomplete.
-Backend Target #2 is verified under [U-ANALYSIS-API-001].
-**Await the next explicit user instruction; do not auto-start this proposal.**
+Current contract correction: [U-AUTONOMOUS-CONTRACT-001].
+**Await the next explicit user instruction; do not auto-start implementation.**
 
 ## Starting point
 
-Read AGENTS → PROJECT_STATE → HANDOFF → this file, then
-[analysis API v0.1](specs/analysis-api-v0.1.md),
-[real product evidence](product-analysis-smoke.md), product spec and ADR010.
+Read AGENTS -> PROJECT_STATE -> HANDOFF -> this file, then
+[analysis v0.2](specs/analysis-api-v0.2.md),
+[autonomous runtime ADR011](DECISIONS/011-autonomous-runtime-contract.md),
+[Market Structure draft](specs/market-structure-v0.1.md) and
+[SOURCE_REGISTRY](SOURCE_REGISTRY.md).
+Preserve historical [v0.1](specs/analysis-api-v0.1.md) and smoke evidence.
+
 Backend worktree/branch: Agent Trading-backend / work/copilot-backend.
-Parent checkpoint: cd686755cc1a01d032510806331ccf79267ed5af.
-Obtain Target #2 commit hash from Git/final report; current baseline150.
-Preserve integration/UX at Ch.0. No merge, push, tag or remote creation.
+Correction parent:6c1af4b6f6cd8c22986b8436dd26d61f64de469d.
+Obtain correction hash from Git/final report; verified baseline170 tests.
+Integration/UX remain at Ch.0. No merge/push/tag/remote creation.
 
-## Exact proposed Target #3
+## Exact next trading-intelligence task
 
-Codex defines and Claude reviews a bounded chart-history extension before
-parallel frontend work. Persist the actual normalized closed 4H/1H/15m history
-used by each analysis, then expose it through a typed read-only endpoint or
-versioned report extension with explicit size limits, Decimal strings,
-chronology, original analysis identity/as_of, provenance and available/error
-states. Do not reconstruct historical evidence from fresh exchange reads.
+**SWING ENGINE R&D / SPEC — Causal Swing Engine**, before strategy-engine code.
 
-Today's report deliberately exposes only latest closed candles/counts, not
-large chart arrays. In-memory snapshots contain the histories; JSONL stores
-core audit summaries. Neither source is a persistent full chart dataset.
-Specify schema/version/backward compatibility, repository migration,
-retention and limits before implementing the next extension. Review stable
-v0.1 fields with Claude and provide hand-checked request/response examples.
+Study the existing source-confirmed DD rules [D-DD-MSB-001] and explicitly
+separate their qualitative meaning from unresolved algorithmic definitions.
+The repository lacks the original DD recording/transcript; request missing
+source/clarifications when needed rather than creating an attestation.
+Do not silently substitute generic SMC, a library pivot or a 2/3/5-bar rule.
 
-Possible completion evidence for that separately approved target: chart data
-retrieved after restart remains the original causal series; open/future rows
-never appear; per-symbol/TF isolation, bounded pagination and exact JSON hold;
-the existing150 tests remain green and meaningful new contract tests pass.
+The separately authorized R&D/spec should resolve or explicitly leave pending:
 
-This is a proposal, not implemented work or authorization. No frontend,
-Telegram, LLM, deployment or trading-intelligence code is implied.
+- Observable opposing movement that confirms a swing, and its first knowable
+  closed-candle evaluation (N-1).
+- Candidate identity/replacement/ties, meaningful-versus-incidental extremes
+  and any responsibility linkage needed downstream (necessary N-2).
+- Causal initialization, insufficient/truncated history, retention and
+  immutable evidence identity (necessary N-3).
+- swing_time versus confirmed_at/recognition time, no intrabar precision
+  invented from OHLC, equal-time per-symbol/TF ordering (necessary N-7).
+- Prefix-invariant replay/bootstrap and future-suffix tests, independent state
+  by symbol/timeframe and safe missing/stale/revised-data behavior.
 
-## Preserved boundaries
+Document inputs/state/events/statuses and source-labelled hand-checked causal
+fixtures. Any numerical threshold or confirmation predicate is
+**ALGORITHMIC DEFINITION PENDING** until approved. No SwingEngine or downstream
+implementation is authorized by the present correction. Full
+MarketStructureEngine still needs N-1–N-7, not merely a Swing spec.
 
-Target #2 already provides real public MCP -> MTF/core -> report/SQLite/API,
-deterministic explanation, failures/health/idempotency and real timeline.
-Keep the independent CLI SHADOW flow intact. Request-driven readiness needs
-a successful fresh analysis; no silent stale/CLI fallback.
+Dependency sequence:
+Swing -> Market Structure -> Range -> Premium/Discount -> Deviation ->
+Acceptance -> Trade Plan -> Risk -> Execution.
+This does not authorize entries, sizing, acceptance or real execution.
+Premium/Discount stays context, no universal EQ reclaim; DD HTF side blocks
+and [U-PD-001] remain separate/preserved.
 
-P0 still needs shared UX, optional Telegram and Compose delivery. P0.5 final-demo
-gate needs its own approved meaningful deterministic intelligence slice;
-NO_TRADE / STRATEGY_NOT_CONFIGURED is honest infrastructure, not that slice.
-MarketStructure N-1–N-7 remain ALGORITHMIC DEFINITION PENDING. Range remains
-the next strategy-source intake; no confirmed DD Range source exists.
-Premium/Discount remains context, no universal EQ reaction/reclaim, and DD HTF
-side blocks remain separate. LIVE/private/order/PnL paths remain outside scope.
+## Preserved product boundaries and deferred work
+
+The intended product is an autonomous trading agent. Approved future profiles
+own required timeframes; user display selection cannot choose trading inputs.
+Current manual/debug analysis is bounded, default4H/1H/15m, honest
+NO_TRADE / STRATEGY_NOT_CONFIGURED, Decimal/UTC and real MCP -> core ->
+v0.2/SQLite/API. Original v0.1 records remain unchanged.
+
+AutonomousRuntime, continuous monitoring/deduplication, PAPER simulator and
+LIVE authorization/execution remain specs/future work. LIVE is disabled and
+unimplemented. No private/account/order path or usable live switch exists.
+P0.5 still needs a separately approved meaningful deterministic intelligence
+slice; the unconfigured placeholder does not satisfy it.
+
+Bounded full-chart-history persistence/API is a deferred product extension,
+not the next intelligence foundation. UX/Telegram/LLM/deployment and later
+Range/Deviation/source intake stay outside this next R&D/spec until authorized.

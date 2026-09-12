@@ -1,4 +1,4 @@
-"""Operator-only operational configuration; no strategy/live/request switches."""
+"""Operator-owned analysis requirements/settings; no strategy or live switches."""
 
 from dataclasses import dataclass
 import math
@@ -6,12 +6,18 @@ import os
 from pathlib import Path
 import re
 
+from .market import bar_duration
+
+
+BASELINE_TIMEFRAMES = ("4H", "1H", "15m")
+
 
 @dataclass(frozen=True)
 class AnalysisConfig:
     db_path: Path = Path("runs/product/analyses.sqlite3")
     audit_dir: Path = Path("runs/analyses")
     allowed_symbols: tuple[str, ...] = ("BTC-USDT",)
+    required_timeframes: tuple[str, ...] = BASELINE_TIMEFRAMES
     history_limit: int = 100
     publication_grace_seconds: int = 60
     observation_max_age_seconds: int = 60
@@ -35,6 +41,13 @@ class AnalysisConfig:
                 len(set(symbols)) != len(symbols)):
             raise ValueError("A small explicit instrument allowlist is required")
         object.__setattr__(self, "allowed_symbols", tuple(symbols))
+        frames = self.required_timeframes
+        if (not isinstance(frames, (tuple, list)) or not 1 <= len(frames) <= 16 or
+                any(not isinstance(tf, str) for tf in frames) or len(set(frames)) != len(frames)):
+            raise ValueError("Required timeframes must be a bounded unique collection")
+        for tf in frames:
+            bar_duration(tf)
+        object.__setattr__(self, "required_timeframes", tuple(frames))
         for name, low, high in (("history_limit", 1, 299), ("publication_grace_seconds", 0, 300),
                                 ("observation_max_age_seconds", 1, 300)):
             value = getattr(self, name)
@@ -68,4 +81,7 @@ class AnalysisConfig:
                 fields[field] = float(os.environ[env])
         if "ANALYSIS_ALLOWED_SYMBOLS" in os.environ:
             fields["allowed_symbols"] = tuple(os.environ["ANALYSIS_ALLOWED_SYMBOLS"].split(","))
+        if "ANALYSIS_REQUIRED_TIMEFRAMES" in os.environ:
+            fields["required_timeframes"] = tuple(
+                tf.strip() for tf in os.environ["ANALYSIS_REQUIRED_TIMEFRAMES"].split(","))
         return cls(**fields)

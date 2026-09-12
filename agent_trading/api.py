@@ -9,7 +9,7 @@ from fastapi import FastAPI, Header, Query, Response
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.responses import JSONResponse
 
-from .analysis_api_models import AnalysisReport, AnalysisRequest, HistoryPage
+from .analysis_api_models import AnyAnalysisReport, AnalysisRequest, HistoryPage
 from .analysis_config import AnalysisConfig
 from .analysis_repository import RepositoryError
 from .analysis_service import AnalysisService, ServiceError
@@ -41,7 +41,7 @@ def create_app(config=None, service=None):
         await analysis_service.startup()
         yield
 
-    app = FastAPI(title="Market Analysis Copilot", version="0.1", lifespan=lifespan)
+    app = FastAPI(title="Autonomous Trading Agent Analysis API", version="0.2", lifespan=lifespan)
     app.state.analysis_service = analysis_service
 
     @app.exception_handler(RequestValidationError)
@@ -72,7 +72,7 @@ def create_app(config=None, service=None):
         response.status_code = 200 if result["status"] == "READY" else 503
         return result
 
-    @app.post("/api/v1/analyses", response_model=AnalysisReport, status_code=201)
+    @app.post("/api/v1/analyses", response_model=AnyAnalysisReport, status_code=201)
     async def analyze(body: AnalysisRequest, response: Response,
                       idempotency_key: Annotated[str | None, Header()] = None):
         result = await analysis_service.analyze(body.symbol, idempotency_key=idempotency_key)
@@ -84,7 +84,7 @@ def create_app(config=None, service=None):
                       offset: Annotated[int, Query(ge=0, le=10000)] = 0):
         return await asyncio.to_thread(analysis_service.repository.history, limit, offset)
 
-    @app.get("/api/v1/analyses/{analysis_id}", response_model=AnalysisReport)
+    @app.get("/api/v1/analyses/{analysis_id}", response_model=AnyAnalysisReport)
     async def by_id(analysis_id: UUID):
         result = await asyncio.to_thread(analysis_service.repository.get, str(analysis_id))
         if result is None:

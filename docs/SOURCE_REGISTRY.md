@@ -16,6 +16,8 @@ Agent-authored summaries and external libraries do not become DD strategy truth.
 | [E-MCP-GATE-001] | [E] Local runtime interoperability evidence | Public product-runtime MCP data gate | VERIFIED NARROW RUNTIME GATE | N/A — no strategy/performance validation | [Smoke evidence](runtime-atk-mcp-gate.md): official mcp 2.2.0 + ATK MCP 1.4.6, protocol 2025-11-25, 21 discovered tools; actual BTC-USDT ticker, ten 15m rows (nine closed retained), depth-five book and candle snapshot. 36 baseline + 43 new deterministic tests passed. This evidence supports U-MCP-GATE-001, does not alter original rule provenance, and proves no API/UX/intelligence/PnL or full MTF delivery. |
 | [U-ANALYSIS-API-001] | [U] Explicit user implementation authorization | Ch.1 Backend Target #2 product service/API/persistence | CONFIRMED PROJECT REQUIREMENT | N/A — engineering scope | User attachment dcb7efe6-17be-4d50-bcca-1acf3dd92c6f/pasted-text-1.txt, 2026-09-12. Backend worktree only, parent cd686755; frozen report, real MCP MTF/core, thin FastAPI, stdlib SQLite/JSONL, deterministic explanation, neutral failures, offline tests and separate real product smoke; commit then stop with no merge/push/tag. [Contract](specs/analysis-api-v0.1.md). |
 | [E-ANALYSIS-API-001] | [E] Local public product interoperability evidence | Real MTF/core/report/SQLite/API flow | VERIFIED BOUNDED PRODUCT FLOW | N/A — no strategy/performance validation | [Real product smoke](product-analysis-smoke.md): analysis580b88e9-a183-4889-8cc7-b861fef405a4, five real public MCP reads, 100 closed candles per TF, causal core NO_TRADE/STRATEGY_NOT_CONFIGURED, exact string/UTC report, core audit, ten events, DELETE journal and identical fresh SQLite/API retrieval. 79 old +71 new =150 offline tests passed. No intelligence/order/private/deployment/UX claim; original trading-rule provenance unchanged. |
+| [U-AUTONOMOUS-CONTRACT-001] | [U] Explicit user direction/scope correction | Autonomous agent / analysis contract v0.2 | CONFIRMED PROJECT REQUIREMENT | N/A — no trading algorithm approval | Attachment 44378832-b6a3-4dfb-bd1f-b9cb4af8ab46/pasted-text-1.txt, 2026-09-12. Backend only from 6c1af4b; dynamic strategy-required timeframes, display separation, causal knowledge meaning, future autonomous runtime/modes/outcomes only; preserve default/history/core; Swing R&D/spec next; no loop/intelligence/exchange writes; exact commit then stop. [v0.2](specs/analysis-api-v0.2.md), [ADR011](DECISIONS/011-autonomous-runtime-contract.md). |
+| [E-AUTONOMOUS-CONTRACT-001] | [E] Local contract/baseline compatibility evidence | Dynamic collection and original history | VERIFIED BOUNDED COMPATIBILITY | N/A — no strategy/autonomous/profitability validation | [Handoff](HANDOFF.md): 150 preserved +20 focused =170 offline tests; configured 1H/5m causal core/SQLite/HTTP, unchanged default real smoke 517c6e4d-265b-4a9b-9860-cf7f8aa7e4a2 v0.2, 100 closed candles per baseline TF, 5 public reads, NO_TRADE/STRATEGY_NOT_CONFIGURED/order_sent=false; real original v0.1/v0.2 GET/history matched SQLite. |
 
 Tag vocabulary: [D] DD Finance; [U] user hypothesis/clarification; [G] ChatGPT;
 [C] Claude; [R] external research; [E] empirical validation evidence.
@@ -27,11 +29,11 @@ give every [U] record CONFIRMED PROJECT RULE status. Record a supporting [E]
 artifact and its methodology/limitations before asserting empirical validation.
 
 No confirmed Range source is registered yet; no placeholder source ID asserts
-that unreceived DD material was reviewed. Range remains the next strategy-source
-ingestion topic. The narrow runtime MCP gate is verified under explicit Ch.1
-authorization; Target #2 then delivered its separately authorized API/service/SQLite.
-The next proposed product task is the bounded chart/history extension under the
-user's next instruction. See [NEXT_TASK](NEXT_TASK.md).
+that unreceived DD material was reviewed. Historical Range intake and chart/history
+extension are deferred. Target #1/#2 runtime/backend remain verified; the user's
+subsequent correction makes SWING ENGINE R&D / SPEC the next intelligence task.
+Its opposing-movement/causal definitions are pending, not new DD attestations.
+See [NEXT_TASK](NEXT_TASK.md).
 
 Product approval does not resolve MarketStructureEngine N-1–N-7 or approve a
 Range/Deviation algorithm. P0.5 requires its own narrow, causal intelligence
@@ -40,7 +42,7 @@ validation. Preserve [D-DD-MSB-001] and [U-PD-001], including Premium/Discount
 context, no universal EQ reaction/reclaim and separate DD ordinary side blocks.
 
 Ch.0 froze scope/memory and prepared Git worktrees without implementation.
-Ch.1 Backend Targets #1 and #2 are now verified; subsequent implementation remains gated
+Ch.1 Backend Targets #1/#2 and the contract correction are verified; subsequent implementation remains gated
 by its next user instruction and Ch.1 is not complete.
 Chapter sequence: Ch.0 Base Setup / Product Re-Scope; Ch.1 Product MVP & UX;
 Ch.2 Trading Intelligence; Ch.3 Agent Workflows; Ch.4 Validation & Demo.

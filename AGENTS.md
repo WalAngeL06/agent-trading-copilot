@@ -14,13 +14,22 @@ Read the current state first: [PROJECT_STATE](docs/PROJECT_STATE.md), then
 ## Project goal
 
 Evolve the preserved deterministic foundation into an **open-source,
-self-hosted, agentic market intelligence / trading copilot**. Telegram is an
-optional interface: shared Web/Mini App, REST API and future agent interfaces
-use the same core. Keep pattern detection, context, decisions, acceptance, risk,
-execution and position management separated. READ-ONLY / SHADOW first;
-**LIVE execution is outside the current hackathon MVP**. A functioning data
-pipeline is not strategy or profitability proof. Approved scope:
-[product-mvp-v0.1](docs/specs/product-mvp-v0.1.md), [U-PRODUCT-001].
+self-hosted autonomous trading agent** [U-AUTONOMOUS-CONTRACT-001].
+Future START BOT maintains strategy-required market state and evaluates
+approved strategy/candidate, Acceptance, Trade Plan, Risk and authorized
+execution, with logging/notification. Users configure permissions/risk/symbol
+scope; approved profiles own required timeframes. DISPLAY / INSPECTION TIMEFRAME
+never changes STRATEGY REQUIRED TIMEFRAME. Current symbol-only manual/debug
+analysis remains useful and does not start an autonomous loop.
+Telegram is optional; interfaces use the same core. Preserve separate pattern,
+context, decision, acceptance, risk, execution and position-management layers.
+Conceptual ANALYZE/PAPER/LIVE are defined in
+[ADR011](docs/DECISIONS/011-autonomous-runtime-contract.md); PAPER/LIVE and the
+autonomous runtime are unimplemented. READ-ONLY/intent-only SHADOW first;
+**LIVE remains disabled and outside the current hackathon execution scope**.
+A functioning pipeline is not strategy/profitability proof. Historical scope:
+[product-mvp-v0.1](docs/specs/product-mvp-v0.1.md), [U-PRODUCT-001]; current
+[analysis v0.2](docs/specs/analysis-api-v0.2.md) records the user's direction correction.
 
 ## Approved product priorities and chapter boundary
 
@@ -50,9 +59,11 @@ strategy results, risk approval or execution authorization. See ADRs
 
 P0.5 before the final demo requires at least one approved, narrow, meaningful
 deterministic intelligence slice; no fake signals or relabelled placeholders.
-The current strategy is not completed. First intended intelligence is Market
-Structure → Range → Deviation → LTF confirmation/context, with existing spec
-gates preserved. Advanced models/theories and portfolio management are deferred.
+The current strategy is not completed. Next foundation: Causal Swing Engine
+R&D/spec, followed by Swing → Market Structure → Range → Premium/Discount →
+Deviation → Acceptance → Trade Plan → Risk → Execution dependencies.
+Existing source/spec gates remain; no Swing algorithm is approved or implemented
+by this contract correction. Advanced models/theories/portfolio are deferred.
 
 Chapter model: Ch.0 — Base Setup / Product Re-Scope; Ch.1 — Product MVP & UX;
 Ch.2 — Trading Intelligence; Ch.3 — Agent Workflows; Ch.4 — Validation & Demo.
@@ -61,17 +72,21 @@ architecture, responsibilities, 36 passing tests and two clean sibling worktrees
 The user explicitly started Ch.1 with [U-MCP-GATE-001]; Target #1 passed and
 committed at cd686755cc1a01d032510806331ccf79267ed5af. Then
 [U-ANALYSIS-API-001] authorized **Backend Target #2: analysis service/API/SQLite**.
-Its frozen [contract](docs/specs/analysis-api-v0.1.md), real full-MTF product
-[smoke](docs/product-analysis-smoke.md), immutable history and thin API are
-verified. Ch.1 remains incomplete. Stop after the requested backend commit;
-no subsequent intelligence/UX/deployment scope is implied.
+Target #2 completed at 6c1af4b6f6cd8c22986b8436dd26d61f64de469d; its
+[v0.1 contract](docs/specs/analysis-api-v0.1.md) and [smoke](docs/product-analysis-smoke.md)
+remain preserved. The user then authorized [U-AUTONOMOUS-CONTRACT-001]:
+v0.2 product/configurability correction only. New reports expose actual required
+timeframes/absent profile, with original v0.1 history retained; default real
+analysis and170 tests pass. Stop after
+`chore: generalize analysis contract for autonomous trading`.
+No Swing/strategy/monitoring/UX/deployment work follows automatically; Ch.1 incomplete.
 
 ## Architecture: current vs intended
 
 | Component | Current state |
 |---|---|
 | Data Engine | JSONL replay, preserved public-market-only OKX CLI adapter, and separate async MCP market adapter |
-| MarketSnapshot / MTF histories | Immutable causal snapshot; bounded histories separated by symbol/timeframe |
+| MarketSnapshot / MTF histories | Immutable causal snapshot; bounded independent symbol/timeframe histories; product requirements collection configurable, default verified4H/1H/15m |
 | Market Structure | Spec draft only; MarketStructureEngine blocked by N-1–N-7 |
 | Pattern Engine | Unconfigured range/deviation/manipulation/momentum/distribution detectors |
 | Context | Generic snapshot exists; strategy-specific HTF/Premium/Discount context not implemented |
@@ -82,7 +97,8 @@ no subsequent intelligence/UX/deployment scope is implied.
 | Position Management | Not implemented |
 | Logging | Structured JSONL, schema_version=2; new file for each run |
 | Product-runtime ATK MCP | Verified SDK 2.2.0 → ATK 1.4.6 TR public ticker/4H/1H/15m/book → causal core/report/SQLite; CLI remains separate |
-| FastAPI / analysis service / explanation | Implemented thin five-route API, serialized bounded service and deterministic report-derived template; agent/LLM workflows pending |
+| FastAPI / analysis service / explanation | Same five routes; bounded manual service with required collection, v0.2 context/original v0.1 history and deterministic template; strategy profile/agent/LLM implementation pending |
+| AutonomousTradingRuntime / modes | Future responsibilities/outcomes and ANALYZE/PAPER/LIVE specified only; no new monitoring loop, PAPER simulator or LIVE capability |
 | Shared React/Vite/TypeScript Web/Mini App and Telegram bot | Planned; not implemented; Telegram optional |
 | SQLite / product history | Implemented stdlib DELETE rollback history/real events, atomic finalization/idempotency and startup interruption recovery; core JSONL preserved |
 | Docker Compose / deployment quickstart | Planned; local backend API setup exists, deployment not implemented |
@@ -130,11 +146,11 @@ Do not silently rewrite the architecture or represent planned modules as done.
   No push or remote creation is currently authorized.
 - Document major decisions in [DECISIONS](docs/DECISIONS/), and update HANDOFF,
   PROJECT_STATE when state changes, and NEXT_TASK at each safe completion.
-- Next product work is the bounded closed-candle chart/history extension, with
-  Claude review of frozen v0.1 and the extension, after the user's next instruction.
-  Full public runtime analysis/report/API/persistence is verified. Range remains the next strategy-source
-  ingestion topic; the Market Structure draft stays blocked by N-1–N-7.
-  A product scope approval does not fill missing trading algorithms.
+- Next task: **SWING ENGINE R&D / SPEC**, with source-labelled causal definitions/
+  fixtures under the next explicit instruction. No engine implementation while
+  definitions remain pending. Market Structure stays blocked by N-1–N-7.
+  Chart-history extension and later Range source intake are deferred. Product
+  approval does not fill missing trading algorithms or authorize LIVE.
 
 ## Source tagging
 

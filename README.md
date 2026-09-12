@@ -1,8 +1,30 @@
 # Agent Trading
 
-Piyasa yapısı odaklı bir trading ajanının başlangıç altyapısı.
+Açık kaynak, self-hosted otonom trading ajanının başlangıç altyapısı.
 Python 3.11+ gerekir. Replay ve mevcut CLI SHADOW için ek Python paketi gerekmez.
 Gerçek MCP adaptörü aşağıdaki isteğe bağlı kurulumu kullanır.
+
+## Ürün yönü ve sözleşme v0.2
+
+Nihai hedef START BOT ile gerekli piyasa durumunu sürekli tutan, onaylı strateji,
+Acceptance, Trade Plan ve Risk zincirini çalıştıran bir ajandır. Kullanıcı
+izin/risk/sembol kapsamını belirler; gerekli zaman dilimleri strateji profiline
+aittir. Grafik/görüntüleme seçimi trading kararının girdisini değiştirmez.
+Mevcut POST /api/v1/analyses manuel/debug/test, audit/demo ve inceleme yolu olarak
+korunur. Otonom döngü ve Swing/strateji motoru henüz uygulanmadı.
+
+[Analysis API v0.2](docs/specs/analysis-api-v0.2.md) raporu kullanılan zaman dilimi
+haritası ve strategy_context ile genelleştirir. profile_id şu an null; strateji yok.
+4H/1H/15m doğrulanmış varsayılan temeldir. [v0.1](docs/specs/analysis-api-v0.1.md)
+tarihçesi ve kaydedilmiş eski raporlar değişmeden okunur. decision_as_of nedensel
+bilgi kesim zamanıdır; mevcut manuel yolun en kısa gerekli aralık politikası
+gelecekteki tüm stratejiler için bir kural değildir.
+
+ANALYZE emir üretmez; PAPER simülasyon, LIVE açık yetkilendirilmiş gerçek yürütme
+kavramlarıdır. PAPER/LIVE uygulanmadı; LIVE kapalıdır, kullanılabilir live anahtarı
+ve borsa yazma yolu yoktur. Mevcut SHADOW yalnız niyet kaydeder, PAPER değildir.
+[Otonom runtime ADR’si](docs/DECISIONS/011-autonomous-runtime-contract.md).
+Sıradaki intelligence görevi: **SWING ENGINE R&D / SPEC**.
 
 ## Çalıştırma
 
@@ -120,7 +142,7 @@ Windows’ta backend proje klasöründe, mevcut .venv için:
 Ortam yoksa önce `py -B -m venv .venv` çalıştırın. Python launcher bulunamazsa
 [PROJECT_STATE](docs/PROJECT_STATE.md) içindeki doğrulanmış yorumlayıcıyı kullanın.
 Linux/macOS için .venv/bin/python; bu platformun canlı smoke’u henüz doğrulanmadı.
-Kurulum bir kez paket indirir; **150 testin normal çalışması internetsizdir**.
+Kurulum bir kez paket indirir; **170 testin normal çalışması internetsizdir**.
 API testleri FastAPI/HTTPX kullanır; Node, ATK, hesap veya gerçek MCP oturumu gerekmez.
 Replay ve CLI SHADOW komutları ek API paketleri olmadan çalışmaya devam eder.
 
@@ -160,7 +182,13 @@ ANALYSIS_HISTORY_LIMIT (100), ANALYSIS_PUBLICATION_GRACE_SECONDS (60),
 ANALYSIS_OBSERVATION_MAX_AGE_SECONDS (60), ANALYSIS_MCP_TIMEOUT_SECONDS (20),
 ANALYSIS_ANALYSIS_TIMEOUT_SECONDS (60), ANALYSIS_READY_TTL_SECONDS (60),
 ANALYSIS_SQLITE_TIMEOUT_SECONDS (1) ve küçük ANALYSIS_ALLOWED_SYMBOLS listesi.
-İstemci bu alanları HTTP isteğinde ayarlayamaz; site tr sabittir.
+ANALYSIS_REQUIRED_TIMEFRAMES varsayılan4H,1H,15m koleksiyonunu operatör katmanında
+belirler; boş/tekrarlı/desteklenmeyen aralıklar reddedilir. Mevcut runtime sabit
+1m,3m,5m,15m,30m,1H,2H,4H,6H,12H aralıklarını destekler; günlük/takvim mumları
+henüz desteklenmez. Onaylı profil olmadığından bu bir operasyonel inceleme
+koleksiyonudur; gelecek strateji kendi gereksinimlerini sağlayacaktır.
+İstemci bu alanları, chart_timeframe veya decision_timeframe değerini HTTP
+isteğinde ayarlayamaz; site tr sabittir.
 
 Ayrı **gerçek internet/piyasa** ürün doğrulaması:
 
@@ -174,10 +202,14 @@ Ayrı **gerçek internet/piyasa** ürün doğrulaması:
 [Gerçek ürün kanıtı](docs/product-analysis-smoke.md): beş gerçek MCP okuması,
 100’er kapalı mum, mevcut çekirdek, SQLite ve aynı raporun API’den alınması başarılı.
 
-[Sabit API/UX sözleşmesi](docs/specs/analysis-api-v0.1.md) fiyat/miktarları string,
+[Güncel v0.2 API/UX sözleşmesi](docs/specs/analysis-api-v0.2.md) fiyat/miktarları string,
 tüm zamanları UTC taşır. Ticker/book gözlemleri geçmiş mum kararının girdisi olmaz.
 Market Structure, Range, Deviation ve Premium/Discount NOT_IMPLEMENTED;
 Acceptance/Risk NOT_EVALUATED. Açıklama yalnız rapordan üretilir, LLM yoktur.
+Aynı değişmemiş gerçek smoke komutu v0.2 için de başarılı oldu:
+517c6e4d-265b-4a9b-9860-cf7f8aa7e4a2;100’er kapalı mum, NO_TRADE,
+order_sent=false. Gerçek v0.1/v0.2 kayıtlarının aynı içerikle HTTP/geçmişten
+okunması doğrulandı; [devir kanıtı](docs/HANDOFF.md).
 Tam grafik dizileri, Claude UX incelemesi, auth/CORS, sürekli veri yenileme,
 Linux/container ve deployment sonraki işlerdir. Ch.1 tamamlanmış değildir.
 
@@ -196,8 +228,8 @@ Linux/container ve deployment sonraki işlerdir. Ch.1 tamamlanmış değildir.
 | `okx_mcp_runtime.py` | Sabitlenmiş resmi SDK/ATK process yaşam döngüsü ve public izolasyonu |
 | `market_observations.py` | Snapshot dışındaki immutable Decimal ticker/book gözlemleri |
 | `mcp_smoke.py` | Açıkça çağrılan gerçek TR public MCP smoke |
-| `analysis_config.py` | Sınırlı operatör ürün ayarları |
-| `analysis_report.py` | Sabit rapor, freshness, exact spread ve template açıklama |
+| `analysis_config.py` | Sınırlı operatör ayarları ve gerekli zaman dilimi koleksiyonu |
+| `analysis_report.py` | v0.2 bağlam/zaman dilimi raporu, freshness, exact spread ve açıklama |
 | `analysis_repository.py` | SQLite kalıcı metadata/rapor/olaylar |
 | `analysis_service.py` | Sınırlı gerçek MCP/MTF/çekirdek ürün akışı |
 | `analysis_api_models.py` | Strict OpenAPI/string finansal veri şeması |
