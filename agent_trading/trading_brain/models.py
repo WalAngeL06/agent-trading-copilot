@@ -16,7 +16,7 @@ class BrainConfig:
     equity: Decimal = Decimal('10000')
     risk_fraction: Decimal = Decimal('.01')
     quantity_step: Decimal = Decimal('.00000001')
-    target: str = 'EQ'
+    target: str = 'BOUNDARY'
     stop_profile: str = 'STRUCTURE_BE'
     break_even_r: Decimal = Decimal('1')
     min_reward_risk: Decimal = Decimal('1')

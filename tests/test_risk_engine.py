@@ -331,20 +331,20 @@ class SupportFreshnessTests(unittest.TestCase):
 
 
 class RiskReplayTests(unittest.TestCase):
-    def test_default_poor_rr_is_blocked_and_explicit_boundary_target_approves(self):
+    def test_default_boundary_target_approves_and_explicit_eq_is_blocked(self):
         fixture = ROOT / 'tests/data/trading_brain_synthetic.jsonl'
         config = BrainConfig(swing=SwingConfig(atr_length=2, atr_multiplier=D('.1'), bootstrap_candles=30),
                              boundary_proximity=D('2000'), stop_buffer=D('1000'))
-        blocked = replay(read_candles(fixture), config)
-        decision = next(e.payload for e in blocked.events if e.kind == 'BLOCKED')
-        self.assertEqual(decision.reason, 'MIN_REWARD_RISK')
-        self.assertEqual(blocked.broker.trades, ())
-        self.assertFalse(any(e.kind == 'PAPER_ORDER_OPENED' for e in blocked.events))
-        approved = replay(read_candles(fixture), replace(config, target='BOUNDARY'))
+        approved = replay(read_candles(fixture), config)
         trade, = approved.broker.trades
         self.assertEqual((trade.entry, trade.stop, trade.tp, trade.quantity),
                          (D('92000'), D('81000'), D('120000'), D('.00909090')))
         self.assertEqual(trade.approved_plan.evidence.supporting_zone_type, 'FVG')
+        blocked = replay(read_candles(fixture), replace(config, target='EQ'))
+        decision = next(e.payload for e in blocked.events if e.kind == 'BLOCKED')
+        self.assertEqual(decision.reason, 'MIN_REWARD_RISK')
+        self.assertEqual(blocked.broker.trades, ())
+        self.assertFalse(any(e.kind == 'PAPER_ORDER_OPENED' for e in blocked.events))
 
     def test_replay_prefixes_evidence_and_price_serialization_are_deterministic(self):
         candles = tuple(read_candles(ROOT / 'tests/data/trading_brain_synthetic.jsonl'))

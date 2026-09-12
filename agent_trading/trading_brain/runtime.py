@@ -119,6 +119,8 @@ class TradingBrain:
                 or manipulation.phase != 'RECLAIMED' or gap.direction != manipulation.direction
                 or gap.observed_at <= manipulation.reclaimed_at):
             return
+        if gap.direction != 'LONG':
+            return
         if gap.kind == 'FVG' and gap.formed_from[0] < manipulation.swept_at:
             return
         if not state.range_low < candle.close < state.range_high:

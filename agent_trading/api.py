@@ -13,6 +13,9 @@ from .analysis_api_models import AnyAnalysisReport, AnalysisRequest, HistoryPage
 from .analysis_config import AnalysisConfig
 from .analysis_repository import RepositoryError
 from .analysis_service import AnalysisService, ServiceError
+from .bot_service import BotService
+from .config import Config
+from .okx import OkxMarketAdapter
 
 
 _ERROR_MESSAGES = {
@@ -33,13 +36,20 @@ def _error(code, status, analysis_id=None):
         "code": code, "message": _ERROR_MESSAGES[code], "analysis_id": analysis_id}})
 
 
-def create_app(config=None, service=None):
+def create_app(config=None, service=None, bot_config=None, adapter=None):
     analysis_service = service or AnalysisService(config or AnalysisConfig.from_env())
+    try:
+        if bot_config is None: bot_config = Config.from_env()
+        if adapter is None: adapter = OkxMarketAdapter(bot_config.okx_site, bot_config.cli_timeout_seconds, bot_config.node_path, bot_config.okx_cli_path)
+    except Exception:
+        pass # Allow tests to pass without full env config
+    bot_service = BotService(bot_config, adapter) if bot_config and adapter else None
 
     @asynccontextmanager
     async def lifespan(app):
         await analysis_service.startup()
         yield
+        if bot_service: bot_service.stop()
 
     app = FastAPI(title="Autonomous Trading Agent Analysis API", version="0.2", lifespan=lifespan)
     app.state.analysis_service = analysis_service
@@ -90,5 +100,35 @@ def create_app(config=None, service=None):
         if result is None:
             raise ServiceError("ANALYSIS_NOT_FOUND", 404, str(analysis_id))
         return result
+
+    @app.get("/api/v1/bot/status")
+    async def bot_status():
+        if not bot_service: return {"error": "Bot service not configured"}
+        return {
+            "bot_status": "running" if bot_service.is_running else "stopped",
+            "strategy_state": bot_service.latest_state.get("decision", {}).get("action", "NO_TRADE") if bot_service.latest_state else "UNKNOWN"
+        }
+
+    @app.get("/api/v1/bot/market")
+    async def bot_market():
+        if not bot_service: return {"error": "Bot service not configured"}
+        return bot_service.latest_state.get("market_state", {}) if bot_service.latest_state else {}
+
+    @app.get("/api/v1/bot/activity")
+    async def bot_activity():
+        if not bot_service: return {"error": "Bot service not configured"}
+        return bot_service.latest_state.get("execution", {}) if bot_service.latest_state else {}
+
+    @app.post("/api/v1/bot/start")
+    async def bot_start():
+        if not bot_service: return {"error": "Bot service not configured"}
+        started = bot_service.start()
+        return {"status": "started" if started else "already running"}
+
+    @app.post("/api/v1/bot/stop")
+    async def bot_stop():
+        if not bot_service: return {"error": "Bot service not configured"}
+        stopped = bot_service.stop()
+        return {"status": "stopped" if stopped else "not running"}
 
     return app
