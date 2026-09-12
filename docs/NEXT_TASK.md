@@ -1,3 +1,19 @@
+# Current boundary — STOP after trading-brain commit
+
+2026-09-12. [U-TRADING-BRAIN-001] requested only the isolated causal PAPER
+strategy from adbafa4, full tests, exact commit message and report. This task
+is complete at the commit containing this record. No merge/push/tag or next
+feature is authorized. Worktree/branch stay preserved for review.
+
+Read [spec](specs/trading-brain-v0.1.md) and [evidence](trading-brain-replay.md).
+A later explicitly authorized owner may review [H] responsibility/selection,
+range lifecycle, gap semantics, MTF acceptance/risk, costs/validation or
+integration. These are blockers/future review topics, not instructions to start.
+General DD MarketStructureEngine gates are still open. LIVE remains excluded.
+Historical task descriptions below do not override this STOP boundary.
+
+---
+
 # Current next task — STOP after integration verification
 
 2026-09-12. Only the requested three-commit integration and verification are

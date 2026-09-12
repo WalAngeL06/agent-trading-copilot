@@ -1,3 +1,35 @@
+# Current handoff — causal PAPER trading brain complete
+
+2026-09-12. LAST AGENT Codex. Isolated work/trading-brain;
+C:/Users/Serdar Arif/Desktop/Agent Trading-brain. Base adbafa485c900164c95ed0e13fce0d267da8b645.
+User explicitly requested implementation/commit then STOP; no merge/push/tag.
+
+Completed: separate models, structure/range/manipulation/gap components, risk,
+paper broker, causal runtime/offline CLI; synthetic fixture and31 tests; spec,
+ADR012, source registry, state/next-task and [evidence](trading-brain-replay.md).
+Real BTC4H LONG entry64236.3 / SL63137.6 / EQ TP64342.65 / size0.09101665 BTC;
+real1H FVG SHORT and synthetic full chain also demonstrated. PAPER only.
+SwingEngine, existing production API/decision core and dependencies unchanged.
+
+Full suite281 pass, no errors/failures;1196 real and22 synthetic prefix checks;
+five offline CLI smokes. Independent read-only review fix/re-review passed.
+No pre-existing uncommitted files on this new worktree. The final requested
+commit includes all new strategy/tests/docs and shared-memory changes; verify
+clean Git status and exact hash from final report. Only ignored local runs
+remain outside Git; public durable evidence is research/trading-brain-replay-evidence.json.
+No other branches/worktrees were edited by this task beyond creating its branch.
+
+Known limits: all selection/threshold/gap/plan/risk/fill conventions [H],
+DD N-1–N-7 unresolved, one frozen range/order per replay; no expiry/reseed,
+MTF context, production acceptance/risk, costs, empirical performance validation,
+durable broker restart, autonomous loop or API/UX integration. LIVE excluded.
+
+NEXT: STOP for user review. Do not infer additional implementation/merge
+permission. Read current state/spec/evidence before any separately authorized work.
+Inherited records below are historical, not current instructions to execute.
+
+---
+
 # Current handoff — hackathon integration
 
 2026-09-12. User-authorized integration only in `work/hackathon-integration`

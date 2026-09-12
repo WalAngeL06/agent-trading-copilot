@@ -1,3 +1,33 @@
+# Current state — isolated causal PAPER trading brain
+
+2026-09-12. Codex; work/trading-brain at
+C:/Users/Serdar Arif/Desktop/Agent Trading-brain. Exact base:
+`adbafa485c900164c95ed0e13fce0d267da8b645`. Explicit scope [U-TRADING-BRAIN-001]
+authorizes this strategy slice despite inherited historical STOP/no-strategy gates.
+
+Implemented opt-in separate raw/valid levels, frozen ordered-touch range,
+sweep/reclaim, FVG/iFVG, candidate, provisional risk sizing and next-open local
+PAPER broker. SwingEngine is unchanged; current API/decision pipeline unchanged.
+Real saved BTC1H FVG SHORT and4H iFVG LONG both open/close deterministically;
+synthetic22-bar full chain is preserved as a regression fixture.
+[Spec](specs/trading-brain-v0.1.md), [replay evidence](trading-brain-replay.md),
+[exact JSON graph](research/trading-brain-replay-evidence.json),
+[ADR012](DECISIONS/012-causal-paper-range-slice.md).
+
+Verified full suite281 passing (250 preserved +31 new), zero failures/errors;
+1196 real BTC prefixes and22 synthetic prefixes checked; five offline CLI smokes
+passed. Independent read-only review equality defect fixed/tested; re-review clear.
+Every provisional rule labelled [H]; no empirical DD/profitability validation.
+No exchange writes, LIVE option, API/UX/autonomous integration or production risk.
+
+Commit this completed slice with `feat: add causal range sweep paper strategy`;
+obtain exact final hash/clean status from Git/final report. Preserve other
+worktrees; no merge/push/tag. STOP after that commit. Source/lifecycle/MTF/risk/
+cost/validation blockers are in evidence/spec. Records below are inherited history
+and branch-specific prior permissions, not this worktree's current scope.
+
+---
+
 # Current state — isolated hackathon integration
 
 2026-09-12. Integration branch: `work/hackathon-integration`; worktree:

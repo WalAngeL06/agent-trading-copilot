@@ -4,6 +4,18 @@ This is the primary project instruction file for Codex and Claude. Current
 user instructions take precedence; persist new clarifications in repository
 docs rather than continuing undocumented assumptions from chat history.
 
+## Current isolated PAPER exception — 2026-09-12
+
+[U-TRADING-BRAIN-001] explicitly authorizes only the causal historical PAPER
+slice in work/trading-brain from adbafa485c900164c95ed0e13fce0d267da8b645.
+[Spec](docs/specs/trading-brain-v0.1.md) defines all provisional [H] rules;
+[evidence](docs/trading-brain-replay.md) records real/synthetic results. Preserve
+SwingEngine. PAPER is now implemented only in this opt-in offline runtime;
+LIVE, autonomous loop and strategy wiring into API/UX remain unimplemented.
+The architecture/scope statements below are inherited baseline context where
+superseded by this narrow task. General DD N-1–N-7 gates remain unresolved.
+Commit requested message then STOP. No merge/push/tag or other-worktree edits.
+
 ## Start here
 
 Read the current state first: [PROJECT_STATE](docs/PROJECT_STATE.md), then
