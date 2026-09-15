@@ -9,5 +9,13 @@ description = "Deterministic replay and explainability foundation for a trading 
 requires-python = ">=3.11"
 dependencies = []
 
+[project.optional-dependencies]
+runtime-mcp = ["mcp==2.2.0"]
+product = ["mcp==2.2.0", "fastapi==0.141.1", "uvicorn==0.52.4"]
+test-product = ["fastapi==0.141.1", "httpx==0.28.1"]
+# Optional, research only: PNG export for the offline swing review charts.
+# The test suite and every runtime path stay independent of it.
+research-charts = ["pillow==12.3.0"]
+
 [tool.setuptools.packages.find]
 include = ["agent_trading*"]

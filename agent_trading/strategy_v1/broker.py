@@ -1,0 +1,340 @@
+"""Pending limit PAPER entry, partial take profits, RangeHigh exit and runner.
+
+No exchange client exists here. Stops only ever tighten, and every tightening
+goes through the shipped RiskEngine so the LONG monotonic invariant is enforced
+in one place. One logical trade stays one trade record: partial exits are
+accounted in its ledger, never as separate trades.
+"""
+from dataclasses import replace
+from decimal import Decimal
+from fractions import Fraction
+
+from ..market import bar_duration
+from ..models import Candle
+from ..trading_brain.models import PaperTrade, BrokerEvent
+from ..trading_brain.risk import RiskEngine, exact_difference, exact_product
+from .models import PositionExit, PositionLedger, StopProtection
+
+
+def floor_to_step(value, step):
+    """Deterministic downward rounding onto the instrument quantity grid."""
+    if value <= 0:
+        return Decimal(0)
+    ratio = Fraction(value) / Fraction(step)
+    return exact_product(Decimal(ratio.numerator // ratio.denominator), step)
+
+
+class PendingLimitPaperBroker:
+    """Waits for price to trade back to the configured FVG level.
+
+    It never forces a market fill at an unrelated next open and never fills on
+    or before the candle that published the gap.
+    """
+
+    def __init__(self, risk, equity, profile):
+        if not isinstance(risk, RiskEngine):
+            raise ValueError('strategy broker requires RiskEngine')
+        self.risk, self.equity, self.profile = risk, equity, profile
+        self.pending = None
+        self.pending_plan = None
+        self.trades = ()
+        self._last_candle = None
+        self._pending_bars = 0
+        self.primary_failed_at = None
+        self.secondary_reacted_at = None
+        self.recovery_at = None
+        self.break_even_at = None
+        self.trailing_updates = ()
+
+    # ------------------------------------------------------------------ entry
+    def submit(self, plan, entry_plan):
+        if self.pending_plan is not None or any(t.status == 'OPEN' for t in self.trades):
+            raise ValueError('strategy broker already has a pending/open order')
+        if not self.risk.is_approved(plan):
+            raise ValueError('paper execution requires a RiskEngine-issued approved plan')
+        if plan.direction != 'LONG':
+            raise ValueError('Strategy V1 is LONG_ONLY')
+        self.pending_plan, self.pending = plan, entry_plan
+        self._pending_bars = 0
+
+    def cancel_pending(self, reason, observed_at):
+        """Drop a resting order whose setup died before it could fill.
+
+        Reachable without price ever returning to the entry: long permission can
+        be lost, or the frozen range can be invalidated, while the order rests.
+        """
+        if self.pending_plan is None:
+            return None
+        self.pending_plan = self.pending = None
+        self._pending_bars = 0
+        return BrokerEvent('PAPER_ORDER_CANCELLED', observed_at, reason)
+
+    def process(self, candle, swing_lows=()):
+        """`swing_lows` are entry-timeframe swings confirmed on EARLIER candles.
+
+        The caller appends this candle's own swings only after this returns, so
+        a stop can never tighten on structure that the finished bar itself
+        published and then be used to resolve that same bar's exits.
+        """
+        if not isinstance(candle, Candle) or candle.closed is not True:
+            raise ValueError('paper execution requires a closed Candle')
+        if self._last_candle is not None and (
+                candle.symbol != self._last_candle.symbol
+                or candle.timeframe != self._last_candle.timeframe
+                or candle.close_time != self._last_candle.close_time + bar_duration(candle.timeframe)):
+            raise ValueError('paper candles must be contiguous within one stream')
+        self._last_candle = candle
+        result = []
+        result.extend(self._fill(candle))
+        result.extend(self._manage(candle, swing_lows))
+        return tuple(result)
+
+    def _fill(self, candle):
+        plan = self.pending_plan
+        if plan is None or candle.close_time <= plan.approved_at:
+            return ()                       # never fill on the publishing candle
+        entry = plan.entry
+        self._pending_bars += 1
+        cancel = None
+        if candle.low <= plan.stop:
+            # Defensive only. For a LONG the structural stop sits below the entry,
+            # so any candle reaching the stop also traded the limit: the fill wins
+            # and the position is stopped on the same bar. Inferring the opposite
+            # order would assume intrabar sequencing in the trade's favour.
+            cancel = 'STOP_BREACHED_BEFORE_FILL'
+        elif (self.profile.pending_expiry_bars is not None
+              and self._pending_bars > self.profile.pending_expiry_bars):
+            cancel = 'PENDING_ENTRY_EXPIRED'
+        if cancel is not None and not candle.low <= entry:
+            self.pending_plan = self.pending = None
+            return (BrokerEvent('PAPER_ORDER_CANCELLED', candle.close_time, cancel),)
+        if not candle.low <= entry:
+            return ()
+        fill_price = candle.open if candle.open <= entry else entry
+        self.pending_plan = None
+        decision = self.risk.revalidate_fill(plan, fill_price, self.equity, candle.close_time)
+        if decision.plan is None:
+            self.pending = None
+            return (BrokerEvent('BLOCKED', candle.close_time, decision),
+                    BrokerEvent('PAPER_ORDER_CANCELLED', candle.close_time, decision))
+        approved = decision.plan
+        # Initial R is frozen here and never re-derived, so break-even, trailing
+        # and realised partials can never move a partial target price.
+        initial_r = exact_difference(approved.entry, approved.stop)
+        runner_target = floor_to_step(
+            exact_product(approved.quantity, self.profile.runner_fraction),
+            self.profile.quantity_step)
+        ledger = PositionLedger(approved.quantity, initial_r, self.profile.runner_fraction,
+                                runner_target, approved.quantity)
+        trade = PaperTrade(approved.direction, approved.entry, approved.stop, approved.tp,
+                           approved.quantity, approved.risk_budget, approved.risk_amount,
+                           candle.close_time, approved.candidate, filled_at=candle.close_time,
+                           approved_plan=approved, ledger=ledger)
+        self.trades += (trade,)
+        return (BrokerEvent('RISK_APPROVED', candle.close_time, decision),
+                BrokerEvent('PAPER_ORDER_OPENED', candle.close_time, trade))
+
+    # ------------------------------------------------------------- management
+    def partial_target(self, trade, r_multiple):
+        """entry + r_multiple * frozen initial R."""
+        return exact_difference(
+            trade.entry, exact_product(trade.ledger.initial_r, r_multiple).copy_negate())
+
+    def _realise(self, trade, kind, quantity, price, observed_at, *, trigger_r=None,
+                 target_price=None):
+        """Book one slice against the single logical trade."""
+        ledger = trade.ledger
+        quantity = min(quantity, ledger.remaining_quantity)
+        pnl = exact_product(quantity, exact_difference(price, trade.entry))
+        remaining = exact_difference(ledger.remaining_quantity, quantity)
+        record = PositionExit(kind, quantity, price, pnl, remaining, observed_at,
+                              trigger_r, target_price)
+        ledger = replace(ledger, remaining_quantity=remaining, exits=ledger.exits + (record,))
+        self.equity = exact_difference(self.equity, pnl.copy_negate())
+        return replace(trade, ledger=ledger), record
+
+    def _store(self, trade):
+        self.trades = self.trades[:-1] + (trade,)
+        return trade
+
+    def _close(self, trade, observed_at):
+        ledger = trade.ledger
+        last = ledger.exits[-1]
+        closed = replace(trade, status='CLOSED', exit_price=last.exit_price,
+                         closed_at=observed_at, pnl=ledger.total_realized_pnl)
+        return self._store(closed)
+
+    def _manage(self, candle, swing_lows=()):
+        if not self.trades or self.trades[-1].status != 'OPEN':
+            return ()
+        trade = self.trades[-1]
+        before = trade.stop
+        result = []
+        stopped = self._stop_out(trade, candle)
+        if stopped is not None:
+            return stopped
+        result.extend(self._upside(trade, candle))
+        # Every step below re-reads the stored trade: a stale copy here would
+        # silently roll back the ledger written by the exits above.
+        trade = self.trades[-1]
+        if trade.status != 'OPEN':
+            return tuple(result)
+        managed = self.risk.manage(trade, candle)          # inherited 1R break-even
+        if managed != trade:
+            trade = self._store(managed)
+            result.append(BrokerEvent('PAPER_STOP_UPDATED', candle.close_time, managed))
+        recovered = self._recovery(trade, candle)
+        if recovered is not None and recovered != trade:
+            trade = self._store(recovered)
+            result.append(BrokerEvent('PAPER_STOP_UPDATED', candle.close_time, recovered))
+        result.extend(self._protection(trade, candle, before))
+        result.extend(self._trail(self.trades[-1], candle, swing_lows))
+        return tuple(result)
+
+    def _stop_out(self, trade, candle):
+        """Conservative stop-first: a bar touching the stop awards no upside."""
+        if candle.open <= trade.stop:
+            price = candle.open
+        elif candle.low <= trade.stop:
+            price = trade.stop
+        else:
+            return None
+        runner = trade.ledger.runner_open
+        trade, _record = self._realise(trade, 'RUNNER' if runner else 'STOP',
+                                       trade.ledger.remaining_quantity, price,
+                                       candle.close_time)
+        self._store(trade)
+        events = []
+        if runner:
+            events.append(BrokerEvent('RUNNER_STOPPED', candle.close_time, trade.ledger))
+        closed = self._close(trade, candle.close_time)
+        events.append(BrokerEvent('PAPER_ORDER_CLOSED', candle.close_time, closed))
+        return tuple(events)
+
+    def _upside(self, trade, candle):
+        """Configured R partials in ascending order, then the RangeHigh exit."""
+        ledger = trade.ledger
+        if not ledger.has_upside_target:
+            return ()                              # a runner keeps no fixed target
+        events = []
+        for level in self.profile.partial_take_profits:
+            if level.r_multiple in ledger.filled_r:
+                continue
+            target = self.partial_target(trade, level.r_multiple)
+            if target >= trade.tp:
+                break              # the structural exit owns this level instead
+            if candle.high < target:
+                break              # ascending targets: nothing above can fill
+            quantity = floor_to_step(exact_product(ledger.original_quantity,
+                                                   level.close_fraction),
+                                     self.profile.quantity_step)
+            ledger = replace(ledger, filled_r=ledger.filled_r + (level.r_multiple,))
+            trade = self._store(replace(trade, ledger=ledger))
+            if quantity <= 0:
+                continue           # the grid cannot express this slice
+            price = candle.open if candle.open > target else target
+            trade, record = self._realise(trade, 'PARTIAL_TP', quantity, price,
+                                          candle.close_time, trigger_r=level.r_multiple,
+                                          target_price=target)
+            trade = self._store(trade)
+            ledger = trade.ledger
+            events.append(BrokerEvent('PARTIAL_TP_FILLED', candle.close_time, record))
+        if candle.high < trade.tp:
+            return tuple(events)
+        return tuple(events) + self._range_high(self.trades[-1], candle)
+
+    def _range_high(self, trade, candle):
+        """Close down to exactly the configured runner, then cancel the rest."""
+        ledger = trade.ledger
+        price = candle.open if candle.open > trade.tp else trade.tp
+        quantity = exact_difference(ledger.remaining_quantity, ledger.runner_target_quantity)
+        events = []
+        if quantity > 0:
+            trade, record = self._realise(trade, 'RANGE_HIGH', quantity, price,
+                                          candle.close_time, target_price=trade.tp)
+            trade = self._store(trade)
+            ledger = trade.ledger
+            events.append(BrokerEvent('RANGE_HIGH_PARTIAL_EXIT', candle.close_time, record))
+        # Unfilled R levels die here: the runner is never partially closed by a
+        # stale 2R/3R instruction, and it keeps no fixed upside target.
+        ledger = replace(ledger, range_high_done=True,
+                         partials_cancelled_at=candle.close_time)
+        trade = self._store(replace(trade, ledger=ledger))
+        if ledger.remaining_quantity > 0:
+            events.append(BrokerEvent('RUNNER_OPEN', candle.close_time, ledger))
+        else:
+            events.append(BrokerEvent('PAPER_ORDER_CLOSED', candle.close_time,
+                                      self._close(trade, candle.close_time)))
+        return tuple(events)
+
+    # ------------------------------------------------------------------ stops
+    def _protection(self, trade, candle, before):
+        """Announce the first move that puts the stop at or above entry."""
+        if self.break_even_at is not None or trade.stop < trade.entry:
+            return ()
+        self.break_even_at = candle.close_time
+        reason = trade.stop_updates[-1].reason if trade.stop_updates else 'BREAK_EVEN'
+        return (BrokerEvent('BREAK_EVEN_PROTECTED', candle.close_time,
+                            StopProtection('BREAK_EVEN_PROTECTED', before, trade.stop,
+                                           reason, trade.entry, candle.close_time,
+                                           candle.close_time)),)
+
+    def _trail(self, trade, candle, swing_lows):
+        """Tighten to `confirmed higher low - trailing_buffer` after break-even.
+
+        Only confirmed structure is eligible, never below break-even once
+        break-even is reached, and `tighten_stop` still enforces monotonicity.
+        A runner keeps receiving these updates after the RangeHigh exit.
+        """
+        if (not self.profile.trailing_enabled or self.break_even_at is None
+                or trade.status != 'OPEN'):
+            return ()
+        buffer = self.profile.effective_trailing_buffer
+        best = best_low = None
+        for low in swing_lows:
+            if low.confirmed_at > candle.close_time:
+                continue                      # never act on unconfirmed structure
+            proposed = exact_difference(low.price, buffer)
+            if proposed <= trade.stop or proposed < trade.entry:
+                continue                      # only tighten, never below break-even
+            if best is None or proposed > best:
+                best, best_low = proposed, low
+        if best is None:
+            return ()
+        before = trade.stop
+        trailed = self.risk.tighten_stop(trade, best, candle.close_time, 'STRUCTURAL_TRAIL')
+        if trailed == trade:
+            return ()
+        self._store(trailed)
+        record = StopProtection('TRAILING_STOP_UPDATED', before, trailed.stop,
+                                self.profile.trailing_mode, best_low.price,
+                                best_low.confirmed_at, candle.close_time)
+        self.trailing_updates += (record,)
+        return (BrokerEvent('TRAILING_STOP_UPDATED', candle.close_time, record),)
+
+    def _recovery(self, trade, candle):
+        """PRIMARY fails -> SECONDARY holds -> price returns to entry -> BE.
+
+        Every threshold below is provisional: [H]-SV1-PRIMARY-FAIL-001 and
+        [H]-SV1-RECOVERY-001. The user has not defined an exact failure event.
+        """
+        plan = self.pending
+        if plan is None or plan.secondary is None:
+            return None
+        if self.primary_failed_at is None:
+            if candle.close < plan.primary.lower:      # [H] body close below PRIMARY
+                self.primary_failed_at = candle.close_time
+            return None
+        if self.secondary_reacted_at is None:
+            reached = candle.low <= plan.secondary.upper
+            held = candle.close >= plan.secondary.lower
+            if reached and held:
+                self.secondary_reacted_at = candle.close_time
+            return None
+        if self.recovery_at is not None:
+            return None
+        if candle.high >= trade.entry:                 # recovered to original entry
+            self.recovery_at = candle.close_time
+            return self.risk.tighten_stop(trade, trade.entry, candle.close_time,
+                                          'RECOVERY_BREAK_EVEN')
+        return None

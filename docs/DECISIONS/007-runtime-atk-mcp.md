@@ -10,5 +10,16 @@
   ticker, 4H/1H/15m candles and orderbook → normalized core input in Ch.1. Prefer
   market-only, read-only TR public reads independent of desktop OAuth. Preserve
   CLI foundation evidence; label any fallback transport honestly. No adapter,
-  dependency installation or real-data MCP smoke is performed by this closure.
+  dependency installation or real-data MCP smoke was performed by Ch.0 closure.
 - **Date:** 2026-09-12.
+
+## Ch.1 Backend Target #1 verification
+
+[U-MCP-GATE-001] explicitly authorized the narrow runtime gate before API work.
+The official Python SDK `mcp==2.2.0` v2 Client initializes the pinned installed
+ATK MCP `1.4.6` process, negotiates `2025-11-25`, discovers 21 tools and calls
+the exact required ticker/candles/orderbook tools against real public OKX TR.
+The existing normalizer feeds a candle-only snapshot; live facts retain their
+later observation times. All three smoke reads succeeded; one open candle was
+excluded. [Evidence and actual envelope compatibility](../runtime-atk-mcp-gate.md).
+Full MTF/report/runtime integration and Ch.1 completion remain pending.

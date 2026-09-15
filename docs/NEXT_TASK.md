@@ -1,103 +1,210 @@
-# Next task — Ch.1 pending explicit approval
+# Next task - finish external verification
 
-Updated: 2026-09-12.
-Current chapter: **Ch.0 — Base Setup / Product Re-Scope**.
-**Do not begin this task automatically.** The user must review and explicitly
-approve the formal Ch.0 closure before Ch.1 starts.
+Updated 2026-09-16. Do not create new worktrees or sibling Agent Trading folders.
+Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading`.
 
-## Required reading and verified starting point
+1. Resolve this machine's connection reset to `https://tr.okx.com` and rerun
+   Dashboard Start → actual configured MCP candle reads → strategy state → Stop.
+   Current integration tests pass but do not replace live exchange evidence.
+2. If account status is wanted, the owner supplies read-only OKX credentials
+   directly in the ignored canonical .env. Restart and verify real account reads.
+   Do not copy old credential stores. Generic auto-lend is not Lira Auto Earn.
+3. Optional Telegram setup requires its token and reachable HTTPS WebApp/API.
+   The local browser workflow does not require Telegram.
+4. Consider durable PAPER session/position recovery as a separately specified
+   feature. Current Start creates a fresh historical bootstrap session.
 
-Read AGENTS.md, PROJECT_STATE, HANDOFF, [product-mvp-v0.1](specs/product-mvp-v0.1.md),
-[SOURCE_REGISTRY](SOURCE_REGISTRY.md) and ADRs 006–009. Read the Market Structure
-spec before any intelligence work; N-1–N-7 remain unresolved.
+Current deliverable and tests: [PROJECT_STATE](PROJECT_STATE.md),
+[consolidation evidence](product-consolidation.md). No automatic push or LIVE
+execution. Old chapter/worktree entries below are historical reference only.
 
-Integration stays `strategy-v0.1`. The checkpoint is the Ch.0 documentation
-commit with message `chore: freeze hackathon product scope and ch0 plan`;
-take its exact hash from Git/final closure report. Verify both prepared
-worktrees start at that exact commit and are clean:
-- Backend `work/copilot-backend`: `C:/Users/Serdar Arif/Desktop/Agent Trading-backend`.
-- UX `work/copilot-ux`: `C:/Users/Serdar Arif/Desktop/Agent Trading-ux`.
+---
+## Historical next-task notes (superseded)
 
-The preserved baseline has 36 existing tests. No product implementation has
-started. No additional tag, remote or push is authorized.
+# Current boundary — STOP after public publish
 
-## First Ch.1 deliverable — shared product API contract
+2026-09-12. The owner then explicitly authorized the README and a public push,
+superseding the earlier no-README / no-push boundary. Published to
+`https://github.com/WalAngeL06/agent-trading-copilot` (public, default branch
+`work/final-demo`, only that branch pushed). Credential sweep over all 22
+published commits found no secrets, no `.env` and no tunnel URLs.
 
-Codex defines, Claude reviews, before parallel feature implementation.
-Specify routes/request lifecycle, schema version, exact Decimal string fields,
-symbol/timeframe limits, analysis identity, candle `as_of`, live observation
-times, freshness/error/loading states, facts/evidence references, module
-availability, deterministic result/reasons, template explanation, history and
-sanitized MCP provenance. Keep future intelligence state labels separate from
-operational status and the current NO_TRADE/STRATEGY_NOT_CONFIGURED placeholder.
+STOP. Do not redesign the UI, add a second dashboard, touch strategy or backtest,
+add charts, enable real-money execution, push other branches or merge to main.
 
-Freeze request/response examples and expected contract behavior before the
-frontend and backend independently implement against them. This closure does
-not create an API schema, OpenAPI file or application code.
+Open owner-device step: send `/start` to `@agentiic_trading_bot`, tap Open Dashboard
+and confirm the Mini App shows real state. Tunnel URLs are ephemeral; regenerate
+them and rewrite `.env` plus restart both services before any later demo.
+Decide separately whether the concurrent `/dashboard` endpoint in
+`agent_trading/api.py` is kept or discarded; it is currently uncommitted.
 
-## Highest early technical risk — prove actual runtime ATK MCP
+---
 
-Application runtime → MCP client → official OKX Agent Trade Kit → real
-BTC-USDT ticker, candles 4H/1H/15m and orderbook → exact normalization →
-causal MarketSnapshot/core input.
+# Current boundary — STOP after final demo runtime repair
 
-Use market-only/read-only TR public reads and bounded timeouts. Desktop
-Codex/Claude MCP, OAuth completion and CLI probes are not product-runtime
-proof. Preserve existing CLI foundation; label any fallback honestly.
-Record useful call provenance without secrets, floats in prices or future/open
-candles. Keep separately observed ticker/book data out of past candle decisions.
+2026-09-12. Commit the verified tracked repair as
+`fix: repair final demo runtime wiring`, report the requested evidence, then STOP.
+Do not merge, push, tag, fill credentials, start LIVE execution or modify Strategy
+V1 semantics. The ignored local `.env` remains for the owner to fill manually.
 
-Acceptance: real calls run inside the backend service/runtime and their actual
-results feed the report and normalized core inputs. Add meaningful MCP/contract
-checks alongside the preserved baseline. Do not send exchange orders.
+---
 
-## Parallel responsibilities after contract review
+# Historical boundary — STOP after RiskEngine feature commit
 
-Codex: backend, runtime MCP adapter, FastAPI, core integration, persistence,
-backend tests, root configuration/Compose/integration and shared-memory files.
-Claude: React/Vite/TypeScript shared Web/Mini App, Analysis/History UX,
-Telegram bot/interface and frontend tests.
-Do not overlap file ownership. Trading-intelligence core files have one owner
-at a time. Integration receives reviewed commits and relevant verification.
+2026-09-12. [U-RISK-ENGINE-001] authorizes only this isolated RiskEngine from
+e9ff346b151587c8deaf903b9ffc40d289659725 in work/risk-engine.
+Finish full verification/review and commit
+`feat: add configurable structure-aware risk engine`, report hash/tests/approved
+and blocked examples/exact [H] defaults/gaps, then STOP. No merge/push/tag.
+Do not auto-start trailing, zone detectors, strategy semantics, API/UX integration,
+LIVE or another feature. [Spec](specs/risk-engine-v0.1.md), [evidence](risk-engine.md).
+SwingEngine and frozen Range semantics remain unchanged. Further work needs a
+new explicit instruction; historical task descriptions below are not authorization.
 
-## P0 continuation
+---
 
-Build BTC report/API, live market facts, one Lightweight Charts chart and
-timeframe selector, evidence/results, template explanation, SQLite History,
-shared browser/Mini App, thin Telegram launcher and easy Docker Compose setup.
-Include loading/errors/staleness/missing-module states. Telegram and optional
-LLM must not be required for useful normal web/API output. No usable LIVE switch.
+# Historical boundary — STOP after separate range correction
 
-## P0.5 — required before the final demo
+2026-09-12. [U-RANGE-BOUNDARIES-001] authorized boundary diagnosis/fix,
+raw preservation, tests and real replay, separate correction commit then STOP.
+Do not merge/push/tag or begin another feature. Worktree remains work/trading-brain.
+Read [corrected spec](specs/trading-brain-v0.1.md) and [evidence](trading-brain-replay.md).
+Original4H/1H trades are withdrawn; full fixtures have no orders; explicit bounded
+15m/synthetic chains remain. No new reseed/expiry policy or missing DD rules approved.
+Historical task descriptions below do not override this STOP boundary.
 
-Deliver at least one narrow, approved, deterministic market-intelligence slice
-with source-labelled causal fixtures and meaningful WAIT, NO_VALID_SETUP or
-supported candidate behavior. Do not satisfy this by renaming the unconfigured
-placeholder or presenting only data quality as a completed strategy.
+---
 
-First intended intelligence: Market Structure → Range → Deviation → LTF
-confirmation/context. Product approval does not resolve missing algorithms.
-Resolve/approve the required definitions before coding; no full
-MarketStructureEngine while N-1–N-7 are open. If the slice is not approved or
-complete, record the unmet gate and seek the needed specific source/decision.
+# Current next task — STOP after integration verification
 
-## Preserved next strategy-source task — Range
+2026-09-12. Only the requested three-commit integration and verification are
+authorized on `work/hackathon-integration`. Run full Python tests, frontend
+`npm install`, `npm run build`, `npm test`, and verify clean Git status. Report
+HEAD, source/included commits and results, then STOP. No new features, push/tag
+or automatic continuation of the historical source-branch plans below.
 
-No confirmed DD Range source is registered. When source ingestion is authorized,
-obtain DD material or explicitly confirmed rules, preserve provenance and create
-`docs/research/range-source-notes.md` and `docs/specs/range-v0.1.md`.
-Specify boundaries, lifecycle, availability, edge cases and future tests;
-mark unresolved behavior **ALGORITHMIC DEFINITION PENDING**.
-Do not invent touch counts, windows, ATR, retracement, volume or tolerances.
+---
 
-Existing longer-term source priorities and DD history are in PROJECT_STATE.
-P1/P2 and excluded features remain governed by the product spec, not these
-historical research topics. Premium/Discount is context, not an entry trigger;
-EQ reaction/reclaim is not globally mandatory.
+# Next task — Web App shell complete; awaiting instruction
 
-## Current stopping boundary
+Updated: 2026-09-12. Worktree/branch: Agent Trading-webapp / work/webapp.
+Current frontend authority: [U-WEBAPP-SHELL-001].
 
-This formal closure prepares documentation, a checkpoint commit and untouched
-worktrees only. Stop and wait. Ch.1 begins only after user review and explicit
-approval; no package install, features, Python behavior changes, LIVE, tags,
-remote or push during this closure.
+Stop after the requested frontend checkpoint. Do not auto-start integration,
+strategy algorithms, Swing, execution, bot, authentication or deployment.
+
+When explicitly authorized later, read [shell handoff](webapp-shell.md), the
+local spec and current analysis v0.2 contract. Review/freeze bot lifecycle,
+strategy capabilities/versioned save and event contracts with the backend owner.
+Replace src/api/index.ts's mock factory with a typed adapter. Preserve Decimal
+strings/UTC, original report versions, actual errors/unconfigured outcomes,
+unavailable modules and disabled LIVE execution.
+
+Swing work is independent and is not a prerequisite for this shell.
+The prior backend intelligence next-task record is retained below as history;
+it is not the next instruction for this worktree.
+
+---
+
+---
+
+# Next task — STOP after OKX capability audit
+
+## Current branch boundary [U-OKX-CAP-001]
+
+2026-09-12. `work/okx-capabilities` in Agent Trading-okx was created from
+`9d842077581f51b8264344fb331d1123665955e7` for capability research only.
+[Results](research/okx-tr-capabilities-2026-09-12.md);
+[exact runtime names and evidence](research/okx-tr-capabilities-2026-09-12.json).
+
+Commit `research: verify OKX account earn and execution capabilities`, then
+STOP. No merge/push/tag or automatic integration. No Swing, strategy, frontend,
+trades, fund movement, Earn enablement or LIVE work is authorized here.
+
+A possible separately approved next integration is an owner-only read contract
+for trading/funding balance, savings balance and balance-derived Auto Earn
+flags. Independent TR authentication is required: connected desktop reads work,
+local CLI and fresh self-hosted MCP have no private auth. Read-only server mode,
+an explicit client allowlist, schema discovery, exact Decimal/UTC handling,
+private-log sanitization and nonzero OKX-code gates precede a real-account read
+proof. Earn simulation returned 50038; do not promise simulated Earn or tested
+write support.
+
+## Preserved backend next-task context
+
+The historical checkpoint plan below is preserved as context and must not
+auto-start from this capability branch.
+
+# Next task — SWING ENGINE R&D / SPEC
+
+Updated: 2026-09-12. Ch.1 remains incomplete.
+Current contract correction: [U-AUTONOMOUS-CONTRACT-001].
+**Await the next explicit user instruction; do not auto-start implementation.**
+
+## Starting point
+
+Read AGENTS -> PROJECT_STATE -> HANDOFF -> this file, then
+[analysis v0.2](specs/analysis-api-v0.2.md),
+[autonomous runtime ADR011](DECISIONS/011-autonomous-runtime-contract.md),
+[Market Structure draft](specs/market-structure-v0.1.md) and
+[SOURCE_REGISTRY](SOURCE_REGISTRY.md).
+Preserve historical [v0.1](specs/analysis-api-v0.1.md) and smoke evidence.
+
+Backend worktree/branch: Agent Trading-backend / work/copilot-backend.
+Correction parent:6c1af4b6f6cd8c22986b8436dd26d61f64de469d.
+Obtain correction hash from Git/final report; verified baseline170 tests.
+Integration/UX remain at Ch.0. No merge/push/tag/remote creation.
+
+## Exact next trading-intelligence task
+
+**SWING ENGINE R&D / SPEC — Causal Swing Engine**, before strategy-engine code.
+
+Study the existing source-confirmed DD rules [D-DD-MSB-001] and explicitly
+separate their qualitative meaning from unresolved algorithmic definitions.
+The repository lacks the original DD recording/transcript; request missing
+source/clarifications when needed rather than creating an attestation.
+Do not silently substitute generic SMC, a library pivot or a 2/3/5-bar rule.
+
+The separately authorized R&D/spec should resolve or explicitly leave pending:
+
+- Observable opposing movement that confirms a swing, and its first knowable
+  closed-candle evaluation (N-1).
+- Candidate identity/replacement/ties, meaningful-versus-incidental extremes
+  and any responsibility linkage needed downstream (necessary N-2).
+- Causal initialization, insufficient/truncated history, retention and
+  immutable evidence identity (necessary N-3).
+- swing_time versus confirmed_at/recognition time, no intrabar precision
+  invented from OHLC, equal-time per-symbol/TF ordering (necessary N-7).
+- Prefix-invariant replay/bootstrap and future-suffix tests, independent state
+  by symbol/timeframe and safe missing/stale/revised-data behavior.
+
+Document inputs/state/events/statuses and source-labelled hand-checked causal
+fixtures. Any numerical threshold or confirmation predicate is
+**ALGORITHMIC DEFINITION PENDING** until approved. No SwingEngine or downstream
+implementation is authorized by the present correction. Full
+MarketStructureEngine still needs N-1–N-7, not merely a Swing spec.
+
+Dependency sequence:
+Swing -> Market Structure -> Range -> Premium/Discount -> Deviation ->
+Acceptance -> Trade Plan -> Risk -> Execution.
+This does not authorize entries, sizing, acceptance or real execution.
+Premium/Discount stays context, no universal EQ reclaim; DD HTF side blocks
+and [U-PD-001] remain separate/preserved.
+
+## Preserved product boundaries and deferred work
+
+The intended product is an autonomous trading agent. Approved future profiles
+own required timeframes; user display selection cannot choose trading inputs.
+Current manual/debug analysis is bounded, default4H/1H/15m, honest
+NO_TRADE / STRATEGY_NOT_CONFIGURED, Decimal/UTC and real MCP -> core ->
+v0.2/SQLite/API. Original v0.1 records remain unchanged.
+
+AutonomousRuntime, continuous monitoring/deduplication, PAPER simulator and
+LIVE authorization/execution remain specs/future work. LIVE is disabled and
+unimplemented. No private/account/order path or usable live switch exists.
+P0.5 still needs a separately approved meaningful deterministic intelligence
+slice; the unconfigured placeholder does not satisfy it.
+
+Bounded full-chart-history persistence/API is a deferred product extension,
+not the next intelligence foundation. UX/Telegram/LLM/deployment and later
+Range/Deviation/source intake stay outside this next R&D/spec until authorized.

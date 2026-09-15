@@ -1,22 +1,41 @@
 # Product MVP v0.1 — Hackathon Scope Freeze
 
-Status: **APPROVED PRODUCT SCOPE — DOCUMENTATION ONLY; IMPLEMENTATION NOT STARTED**.
+Status: **APPROVED PRODUCT SCOPE — frozen at Ch.0**.
 Date: 2026-09-12. Chapter: **Ch.0 — Base Setup / Product Re-Scope**.
 Integration branch: `strategy-v0.1`.
 Base checkpoint: `364a3a7d50024520065e74a9c9e9da899d4e3897`.
 Sources: [U-PRODUCT-001] and [U-RUBRIC-001], the user's formal Ch.0 closure
 instruction; see [SOURCE_REGISTRY](../SOURCE_REGISTRY.md).
 
-This freezes product requirements, not trading algorithms or an API schema.
-The existing Python application, tests, dependencies and runtime configuration
-are preserved. All product components below are planned unless explicitly
-identified as existing. Ch.1 requires a separate, explicit user approval after
-review of this closure.
+This freezes product requirements, not trading algorithms. Historical Ch.0
+tables/checklists below are preserved. Target #1 runtime gate completed at
+cd686755cc1a01d032510806331ccf79267ed5af. Explicit [U-ANALYSIS-API-001]
+subsequently authorized Target #2: [frozen analysis API](analysis-api-v0.1.md),
+bounded real public MTF/core service, SQLite/report/history and deterministic
+explanation are now verified; [real product evidence](../product-analysis-smoke.md).
+Shared UX/Telegram/deployment, P0.5 intelligence and other planned modules are
+still pending. **Ch.1 is incomplete.**
+
+Current direction amendment [U-AUTONOMOUS-CONTRACT-001]: the intended product is
+an autonomous trading agent, with START BOT maintaining strategy-required state.
+Manual analysis is retained for debug/test/audit/demo and inspection. Required
+timeframes belong to approved profiles; a chart/display selector cannot alter
+trading inputs. Historical 4H/1H/15m references below describe the verified baseline,
+not a permanent architecture limit. [Analysis v0.2](analysis-api-v0.2.md) supersedes
+the fixed v0.1 wire assumptions while preserving original analysis history.
+[ADR011](../DECISIONS/011-autonomous-runtime-contract.md) specifies future runtime,
+ANALYZE/PAPER/LIVE and outcomes only. No autonomous loop, Swing/strategy, PAPER or
+LIVE execution is implemented/authorized by this correction. Swing R&D/spec is
+the next intelligence task; chart-history extension is deferred.
+Stop after `chore: generalize analysis contract for autonomous trading`.
 
 ## A. Product vision
 
-Evolve the existing project into an **open-source, self-hosted, agentic market
-intelligence / trading copilot**. Preserve the deterministic trading core and
+Evolve the existing project into an **open-source, self-hosted autonomous trading
+agent** under [U-AUTONOMOUS-CONTRACT-001]. The future runtime maintains states
+required by an approved strategy; users configure permissions/risk/symbols.
+Current manual analysis is a secondary inspection/debug path.
+Preserve the deterministic trading core and
 its causal evidence. Telegram is an optional interface; the same application
 services must be usable from the browser, REST API and potentially another
 agent/MCP interface later.
@@ -174,7 +193,7 @@ Analysis. Settings can be a small panel. Do not add a Shadow Position screen
 before a proper position model exists.
 
 Analysis includes symbol, operational market-data status, one candle chart,
-4H / 1H / 15m selector, freshness and `as_of`, deterministic result, evidence,
+timeframe display/inspection selector (current baseline 4H/1H/15m), freshness and `as_of`, deterministic result, evidence,
 template explanation and explicit errors/missing modules. Distinguish closed
 candles from separately observed live ticker/book information. Use readable
 mobile typography, accessible state labels, loading progress and retry behavior.

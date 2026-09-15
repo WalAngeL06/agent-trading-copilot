@@ -1,16 +1,263 @@
+# Current project state - 2026-09-16
+
+Owner: Codex. Branch: `strategy-v0.1`. Canonical root:
+`C:/Users/Serdar Arif/Desktop/Agent Trading`.
+
+## Product consolidation
+
+[U-PRODUCT-CONSOLIDATION-001] supersedes historical Ch.0 stop and isolated
+worktree restrictions for this task. The existing product has been consolidated
+into this root, without creating/moving/deleting any worktree or sibling folder.
+
+- Canonical existing React/Vite UI: `src/`; Dashboard and Strategy Settings.
+- FastAPI → BotService → existing multi-timeframe StrategyV1 → read-only ATK MCP.
+- PAPER only. No exchange writes or live execution imported or added.
+- GET/PUT `/api/v1/strategy/config`: strict transport fields, Decimal strings,
+  engine validation, atomic local persistence, running-state lock.
+- Configuration is stored in ignored `config/strategy.json`, never localStorage.
+- BotService consumes configured bias/range/entry histories in causal order and
+  waits at shared boundaries until delayed higher-timeframe bars arrive.
+- Market/account state, timestamps, equity, decisions and activity are backend
+  observations. Lira Auto Earn stays unavailable via API.
+- Embedded emergency HTML exists only in preserved historical nested sources;
+  canonical `/dashboard` is a redirect to `WEBAPP_URL`, not a second UI.
+- `run.ps1` starts backend and frontend in separate visible windows.
+- Root `.env` was created from empty local defaults; no credential stores copied.
+
+## Verified now
+
+590 Python tests passed; 10 frontend tests passed; production frontend build
+passed. Windows launcher and service startup passed. Real browser save/reload,
+nondefault persistence across process restart, restore, Start/Stop, and disabled
+Save while running passed. Desktop and mobile layouts inspected.
+
+## Current blockers and limits
+
+The real public MCP process initializes and discovers tools, but OKX TR candle
+calls fail with NetworkError/MCP_TOOL_ERROR. Independent Node and PowerShell
+requests also receive a connection reset from `tr.okx.com`. Consequently a
+successful live market loop is **not verified** in this session. The UI reports
+ERROR and the agent stops; no fabricated CONNECTED state. Private credentials
+are absent in the canonical environment: AUTH_MISSING, not connected account
+proof. Optional Telegram delivery is unverified because no token is configured.
+
+PAPER restarts replay historical bootstrap with simulated equity; positions are
+not durable across restart. Existing strategy hypotheses remain provisional.
+No strategy profitability or empirical validation is claimed.
+
+## Git and local data
+
+Source bases: `work/final-demo` 1e4356f for product runtime/history;
+`work/backtest-v1` baa77e9 for strategy/backtest/spec/tests; the existing working
+UI from `Agent Trading-final-ui/src` supplies the preserved visual design.
+Original canonical HEAD was 24e1f46. Experimental uncommitted live code in the
+nested final folder was not imported. Source-folder uncommitted work is intact.
+
+Requested checkpoint message:
+`refactor: consolidate production webapp and local configuration`.
+No push, tag or remote change. Several registered sibling worktrees have stale
+paths; metadata is unchanged. No pruning performed. Pre-existing untracked
+folders/files remain outside the product commit:
+
+- Nested projects: Agent Trading-auth, -backend, -backtest, -brain, -final-ui,
+  -final, -integration, -okx, -strategy-v1, -swing, -ux, -webapp.
+- User folders: Yeni klasör, odin-videolar, öğrenme-dd finance ve odin.
+- grep.exe.stackdump.
+
+Run tests with `.venv/Scripts/python.exe -B -m unittest discover -s tests -v`.
+The system `py` interpreter lacks FastAPI; use the root virtual environment.
+[Detailed evidence](product-consolidation.md), [handoff](HANDOFF.md),
+[next task](NEXT_TASK.md), [plan](plans/2026-09-16-product-consolidation.md).
+
+---
+## Historical checkpoint records (superseded where stated above)
+
+# Current state — final demo runtime wiring repaired
+
+2026-09-12. Codex; `work/final-demo` in `Agent Trading-final`, based on
+`31fded92a018958165b6c28554937fd71b9adc09`. Default FastAPI lifecycle now
+constructs BotService and optional Telegram independently of TradingBrain start.
+The BotService market loop uses the pinned public read-only ATK MCP runtime, not
+the legacy CLI adapter. Private read snapshots map the existing account/Earn
+contracts to sanitized auth, equity summary and Auto Earn state. Readiness and
+the frontend consume observed market/private timestamps and connectivity.
+
+Fresh verification: 360 Python tests, 11 frontend tests and production frontend
+build pass. Default FastAPI startup/liveness and a real public bot-start smoke
+passed with `market_source=OKX_ATK_MCP`, PAPER execution and zero exchange writes.
+Local `.env` was created with empty values only and remains ignored; tracked
+`.env.example` contains placeholders only. No Strategy V1 semantics changed.
+
+---
+
+# Historical state — configurable structure-aware PAPER risk
+
+2026-09-12. Codex; work/risk-engine in
+C:/Users/Serdar Arif/Desktop/Agent Trading/.worktrees/risk-engine.
+Exact base e9ff346b151587c8deaf903b9ffc40d289659725.
+[U-RISK-ENGINE-001] authorizes this isolated feature and requested commit/STOP.
+[Spec](specs/risk-engine-v0.1.md), [evidence](risk-engine.md), [ADR013](DECISIONS/013-risk-approved-paper-plans.md).
+
+Implemented RiskEngine, generic SupportingZone/freshness adapter, immutable
+evidenced ApprovedTradePlan/RiskDecision, R:R/geometry/size gates with BLOCKED,
+STRUCTURE_BE/default configurable favorable excursion1R, FIXED_SL_TP, monotonic
+stop updates and approved-plan-only paper broker with actual-fill reapproval.
+Offline report trading-brain-paper-v0.2; pending_plan and original approval plus
+stop history retained. Production analysis API/UX and Swing/Range semantics unchanged.
+
+Baseline292 and final full323 tests pass, zero failures/errors;31 new risk tests.
+Seven CLI smokes pass; existing real/synthetic causal prefixes preserved. Literal
+all-default synthetic approval: LONG100000 / FVG invalidation99000 / SL98900 /
+TP103000 / size.09090909 / R:R2.72727. Same entry/SL with TP100500 blocks
+MIN_REWARD_RISK. Corrected saved synthetic full chain approves with explicit
+opposing-boundary target; default EQ/poor-R:R is blocked. Bounded real15m range
+stays confirmed, with five risk blocks and zero orders under new defaults.
+Exact JSON and limitations are in linked evidence. No empirical validation.
+
+General DD/MTF/zone quality, Breaker/OB detectors, reaction classification,
+SWING_TRAIL/ATR_TRAIL, costs, exchange rules, portfolio/durable order state and LIVE
+remain gaps. Defaults remain provisional [H], not DD attestations. Independent
+read-only review reproduced two defects (skipped first fill and ambient Decimal
+rounding); both fixed with regressions, re-review clear. Final323 suite passed in
+13.458s and7 CLI smokes passed after fixes. Exact feature hash is in Git/final report.
+Commit requested feature then STOP; no merge/push/tag or other-worktree edits.
+Inherited records below are historical where this risk change supersedes them.
+
+---
+
+# Historical state — frozen PAPER range boundaries corrected
+
+2026-09-12. Codex; work/trading-brain at Agent Trading-brain.
+Correction parent9adfe26ad61ed63d019f70c3f69a4756710c4599;
+original baseadbafa485c900164c95ed0e13fce0d267da8b645.
+[U-RANGE-BOUNDARIES-001] supersedes symmetric outside-touch semantics.
+Every candidate candle wick breach invalidates BEFORE confirmation; inside-only
+touches/equality allowed; terminal RANGE_INVALIDATED retains frozen pair and
+breach evidence. Raw swings/valid levels continue unchanged; only confirmed
+ranges can manipulate. SwingEngine and production API unchanged.
+
+Original full-fixture4H/1H trades are invalid and withdrawn. Four299-candle
+BTC default replays now yield zero PAPER orders. A separately labelled249-bar
+15m suffix from Sep09 21:15 UTC yields a valid default-config SHORT:
+entry77214.6 / SL79996.3 / EQ TP77019.9 / size0.03594923 BTC. This bounded
+context changes seeding, not rules;1140 suffixes checked with fixed defaults.
+Corrected25-candle synthetic full chain has inside touches80800/119000 and
+only a post-confirmation77000 sweep. [Spec](specs/trading-brain-v0.1.md),
+[evidence](trading-brain-replay.md), [exact JSON](research/trading-brain-replay-evidence.json).
+
+Full292 tests pass, zero failures/errors (281 before +11 correction methods);
+6 CLI smokes;1196 original real +249 bounded real +25 synthetic prefix checks.
+Independent read-only correction review found no material defects. No empirical
+strategy validation, live writes, merge/push/tag or automatic reseed added.
+Commit `fix: enforce frozen range boundaries before confirmation` separately;
+read exact final hash/clean status from Git/report. STOP after commit.
+Inherited historical records below do not assert current valid PAPER examples.
+
+---
+
+# Current state — isolated hackathon integration
+
+2026-09-12. Integration branch: `work/hackathon-integration`; worktree:
+`C:/Users/Serdar Arif/Desktop/Agent Trading-integration`. Exact base:
+`50146110f727048677b7d6c6643221f00d77cf22`. User requested cherry-picks
+`75d1200898185b22cb582230f1891a81630b0e3d`, `d6933cf`, `8322fab`, followed
+by full Python and frontend install/build/test verification and clean Git status.
+Documentation conflicts preserve the source records as historical context.
+No new features or behavior changes are authorized. Fresh verification and exact
+HEAD are recorded in the final integration report; inherited counts below are
+historical. STOP after verification; no push/tag. Other worktrees are preserved.
+
+---
+
+# Project state — isolated Web App shell
+
+Updated: 2026-09-12. Owner: Codex. Worktree: Agent Trading-webapp.
+Branch: work/webapp. Base: 9d842077581f51b8264344fb331d1123665955e7.
+Authority: [U-WEBAPP-SHELL-001], explicit two-screen frontend instruction.
+
+Dashboard and Strategy Settings are implemented with React/Vite/TypeScript.
+All trading controls/data are local/mock; the optional Telegram SDK initializes
+the WebView shell. No real execution, backend/core edit, bot or chart was added.
+LIVE is a confirmed local preference and is blocked at startup.
+Config is browser-local; bot state/activity reset on reload.
+
+Verified: npm install/build exit 0; 10 Node checks pass; browser checks at
+390x844 and 1280x900 with no horizontal overflow/console errors. Independent
+read-only review findings were fixed and re-reviewed with no important issues.
+See [shell handoff](webapp-shell.md) for files, limits and backend gaps.
+Final checkpoint is the commit containing this record, using the requested
+message; obtain its exact hash/status from Git/final report. No merge/push/tag.
+
+Stop after this shell checkpoint. This worktree's frontend scope does not
+authorize Swing or backend implementation. The backend checkpoint record below
+is preserved as history; frontend/planned claims there are superseded locally.
+
+---
+
 # Project state
 
+## Current isolated task — OKX capabilities [U-OKX-CAP-001]
+
+2026-09-12, Codex. Capability research completed only on
+`work/okx-capabilities` in `C:/Users/Serdar Arif/Desktop/Agent Trading-okx`,
+from `9d842077581f51b8264344fb331d1123665955e7`.
+[Report](research/okx-tr-capabilities-2026-09-12.md);
+[sanitized discovery/evidence](research/okx-tr-capabilities-2026-09-12.json).
+
+Connected TR MCP 1.5.0 exposes 165 tools; 13 distinct read tools succeeded.
+Trading/funding reads and Earn status are verified on the real connected
+account. USDT Auto Lend is supported but off; Auto Staking is unsupported for
+that observed currency. Flexible/fixed/on-chain holdings lists are empty.
+Spot orders/fills and pending trailing listing succeed. Spot/trailing and Earn
+writes are discovered only, never executed. Simulated Earn read returns 50038.
+Local CLI has no key profiles and no OAuth login; fresh read-only ATK 1.4.6
+SDK discovery returns 31 tools but private modules require auth (AUTH_MISSING).
+
+170 existing tests pass in this worktree, zero failures/errors. The existing
+backend interpreter was reused without installing dependencies, and imports
+were verified to resolve to this OKX checkout. Product source/tests/dependencies
+are unchanged. No account adapter/private endpoint, Swing, strategy, frontend
+or LIVE integration was added. Zero exchange writes/transfers/settings changes.
+Commit only this coherent research; no merge/push/tag. STOP after the commit.
+A future owner-only balance/Earn read contract needs separate approval and
+independent TR read authentication. Connected desktop auth is not product proof.
+
+## Preserved backend checkpoint context
+
+The remainder records the inherited 9d84207 backend state and its prior task;
+it does not authorize that historical next task or any additional work here.
+
+
 Updated: 2026-09-12. Owner: Codex.
-Chapter: **Ch.0 — Base Setup / Product Re-Scope**.
-Status: **Product scope frozen; documentation/Git closure only. Ch.1 not started.**
+Chapter: **Ch.1 — Product MVP & Backend Foundation**.
+Status: **Autonomous analysis contract v0.2 correction VERIFIED; Ch.1 incomplete.**
+
+Target #1: cd686755cc1a01d032510806331ccf79267ed5af.
+Target #2: 6c1af4b6f6cd8c22986b8436dd26d61f64de469d; historical
+[real product evidence](product-analysis-smoke.md) preserved.
+[U-AUTONOMOUS-CONTRACT-001] then authorized the current backend-only correction:
+[analysis v0.2](specs/analysis-api-v0.2.md) uses configured required-timeframe maps
+and honest null profile context; HTTP retains original v0.1 records.
+170 tests passed, default real MCP 4H/1H/15m/core/SQLite smoke passed again,
+and real mixed-version API retrieval matched original JSON. The complete legacy
+v0.1 report schema also matches its checkpoint. [Handoff](HANDOFF.md).
+The intended product is an autonomous trading agent; current POST remains a
+bounded manual/debug/inspection path. Future runtime/modes/outcomes are
+[specification only](DECISIONS/011-autonomous-runtime-contract.md).
+No autonomous loop, Swing/strategy, PAPER/LIVE, UX or deployment implemented.
+Stop after `chore: generalize analysis contract for autonomous trading`.
+Next intelligence task is SWING ENGINE R&D / SPEC, pending explicit instruction.
+Integration/UX stay untouched at Ch.0.
 
 ## Approved product and rubric
 
-The project continues as an **open-source, self-hosted, agentic market
-intelligence / trading copilot** [U-PRODUCT-001]. Preserve the deterministic
-core. A shared React/Vite/TypeScript Web/Mini App, thin Telegram bot, FastAPI,
-bounded orchestration, actual runtime ATK MCP, SQLite/JSONL and deterministic
-explanation are planned. Telegram and LLM enhancement are optional.
+The project is an **open-source, self-hosted autonomous trading agent**
+[U-AUTONOMOUS-CONTRACT-001], correcting historical copilot/manual framing
+[U-PRODUCT-001]. Approved profiles determine required timeframes; display choices
+do not change decisions. Preserve the deterministic core and layer separation.
+Public MCP/manual-analysis/FastAPI/SQLite/JSONL/template backend now exists;
+shared React/Vite/TypeScript Web/Mini App, thin optional Telegram, agent workflows,
+LLM enhancement and Compose delivery remain planned.
 Authoritative scope: [product-mvp-v0.1](specs/product-mvp-v0.1.md).
 
 | User-confirmed hackathon criterion [U-RUBRIC-001] | Weight |
@@ -49,46 +296,76 @@ The shared-memory files and Market Structure draft were committed at 364a3a7;
 the older "uncommitted docs" state is historical and superseded. Existing tags
 remain preserved. No push/remote exists. This closure creates no tag.
 
-Only after the Ch.0 commit succeeds and integration status is clean, create
-`work/copilot-backend` and `work/copilot-ux` from that exact checkpoint:
+Ch.0 commit/worktree creation is verified complete. Exact checkpoint:
+`24e1f465a886e2941a8ce2fce8fb51d53b643405`. Both branches were clean at that
+checkpoint before this target:
 - Backend: `C:/Users/Serdar Arif/Desktop/Agent Trading-backend`.
 - UX: `C:/Users/Serdar Arif/Desktop/Agent Trading-ux`.
 
-These operations follow this document's commit. Verify the actual hash,
-branch/path, checkout cleanliness and same starting commit with `git status`,
-`git log -3 --oneline` and `git worktree list --porcelain`; the final closure
-report records their completion. Preserve/report existing branches/worktrees
-instead of recreating or destroying them. Both checkouts stay untouched.
-Root integration remains at `C:/Users/Serdar Arif/Desktop/Agent Trading`.
+Current work is exclusively on `work/copilot-backend`, descended from that
+checkpoint. Targets #1/#2 committed at cd686755 and 6c1af4b respectively.
+The correction commit is `chore: generalize analysis contract for autonomous trading`.
+Read its exact hash from Git/final correction report. Root integration remains at
+`C:/Users/Serdar Arif/Desktop/Agent Trading`; integration and UX branch HEADs
+remain at Ch.0. No merge/push/tag/remote creation. Preserve both worktrees.
 
 ## Test status and invocation
 
-Last verified baseline: **36 existing tests passing**, 0 failures/errors, on
-2026-09-12 at the shared-memory checkpoint.
-Fresh Ch.0 closure verification on 2026-09-12: **36 tests passed, zero
-failures/errors**, exit 0, with `py -B -m unittest discover -s tests -v`.
-Only documentation and Git setup are changed; application, tests, dependencies
-and runtime configuration are preserved. Infrastructure tests are not empirical
-validation of DD strategy behavior or evidence of product-runtime MCP.
+Historical Ch.0 baseline36 and Target #1 baseline79 remain preserved.
+Historical Target #2: 79 old +71 new =150 tests, preserved unchanged.
+Fresh correction: **150 preserved +20 focused =170 passing**, zero failures/errors,
+exit0. New: 3 collection +6 wire +8 configured service +3 versioned API.
+Tests keep normalization/domain/core/audit/SQLite/HTTP real and fake only
+external SDK transport. They need no Node, ATK, credentials, internet or live MCP.
+The complete product suite uses optional FastAPI/HTTPX test dependencies installed
+once in ignored .venv; host/global Python remains unchanged. Base CLI/replay
+still need no Python dependencies. No empirical strategy validation is claimed.
 
-Full suite from the root:
+Full suite from backend root, after `pip install -e '.[product,test-product]'`:
 
-`py -B -m unittest discover -s tests -v`
+`./.venv/Scripts/python.exe -B -m unittest discover -s tests -v`
 
-Set `PYTHONDONTWRITEBYTECODE=1` for subprocesses during this docs-only closure.
-If the launcher is unavailable, use the verified local interpreter:
+Linux/macOS: .venv/bin/python (real platform smoke pending).
+Suppress application bytecode with -B. py launcher is currently unavailable in
+the sandbox profile; verified host fallback to create/use a virtual environment:
 
 `C:/Users/Serdar Arif/AppData/Local/Programs/Python/Python314/python.exe`
 
-Python 3.11+ remains the project requirement; this path is a host-specific
-fallback, not a portable dependency. Linux/macOS can use `python3`.
+Python >=3.11 remains portable requirement; fallback path is host-specific.
+Dependency check passed. Real smoke completed separately with exact public
+provenance and no orders; normal offline tests do not establish real connectivity.
 
-## Implemented — preserved foundation
+## Implemented — product backend and preserved foundation
+
+- Current analysis-report-v0.2/context/dynamic timeframe API; historical v0.1
+  spec/original SQLite JSON preserved with strict version discrimination.
+- Operator-owned immutable required_timeframes, default verified 4H/1H/15m;
+  existing fixed intervals supported, future calendar representation only.
+- Serialized/bounded public manual AnalysisService with independent initial-cutoff
+  freshness, shortest-required-interval closed cutoff and causal trimming;
+  default behavior remains the same latest closed15m, not a universal strategy rule.
+- Five FastAPI analysis/history/health endpoints, typed errors, neutral failed
+  decision and no raw MCP payload/request echo.
+- Stdlib SQLite DELETE history/events, atomic idempotency/reservation/finalization,
+  startup interruption recovery, exact subsecond ordering and unique core audit.
+- Honest unavailable intelligence, actual acceptance/risk/current core reasons,
+  entirely report-derived deterministic explanation.
+- Same unchanged real smoke verified again for v0.2 (517c6e4d-265b-4a9b-9860-cf7f8aa7e4a2); original real v0.1/v0.2 API/history retrieval matched SQLite.
+- Request-driven readiness with local storage probe, no network GET, expiry and
+  failure invalidation; explicit POST validates initial/recovery prerequisites.
 
 - Deterministic incremental replay; Decimal prices/quantities and UTC times.
 - Immutable MarketSnapshot; bounded symbol/timeframe-separated histories.
 - Official ATK public-market **CLI** adapter: ticker, candles and orderbook,
   exact normalization, closed filtering and allowlisted reads.
+- Separate async runtime **MCP** market adapter with authoritative discovery,
+  schema/name gates, sanitized provenance, bounded failures and the existing
+  candle normalizer. New immutable ticker/book observations remain outside
+  candle snapshots. Explicit public-network smoke builds an existing snapshot.
+- Optional `runtime-mcp` dependency: official `mcp==2.2.0` (mcp-types 2.2.0).
+  Installed/verified in the ignored backend `.venv`; host Python stays unchanged.
+  The pinned ATK MCP 1.4.6 child uses an isolated empty home, fixed TR URL,
+  market/read-only arguments, disabled toolkit logs/update checks and cleanup.
 - Real BTC-USDT bootstrap, configurable 4H / 1H / 15m snapshots; bootstrap does
   not call the decision chain.
 - SHADOW bounded/continuous polling; intent-only execution, zero real-order path.
@@ -98,8 +375,11 @@ fallback, not a portable dependency. Linux/macOS can use `python3`.
 
 ## Not implemented
 
-- Product-runtime MCP client/adapter, FastAPI, agent orchestration or explanation.
-- Web/Mini App, Telegram bot, SQLite, Docker Compose or product quickstart.
+- AutonomousTradingRuntime/continuous bot loop, approved strategy-profile implementation, Causal Swing Engine, PAPER simulation/accounting, agent workflows or LLM enhancement.
+- MCP wiring into the existing synchronous CLI SHADOW command; product MTF/API
+  uses real MCP separately and preserves the CLI default.
+- Web/Mini App, Telegram bot, full chart-history extension, Docker Compose or
+  deployment quickstart. Local backend API setup is documented in README.
 - Real strategy, MarketStructureEngine, Range/Deviation/Manipulation detectors.
 - Momentum/Distribution, strategy HTF/Premium/Discount context, real Acceptance
   rules, production Risk/sizing, Position Manager, fill/PnL accounting or LIVE.
@@ -125,23 +405,26 @@ pattern; the current PatternResult API has not been replaced. Separate
 BreakQuality, Deviation and Manipulation specifications remain future work.
 See [SOURCE_REGISTRY](SOURCE_REGISTRY.md) and ADRs 001–005 under [DECISIONS](DECISIONS/).
 
-Intended first intelligence: Market Structure → Range → Deviation → LTF
-confirmation/context. Range is still the next **strategy source-ingestion**
-topic; no confirmed Range source/spec exists. Original longer-term source
-priority is retained: Market Structure, Range, Deviation, Manipulation,
-Momentum/Distribution, Liquidity/Target, Acceptance, Risk and Microstructure.
+Next intelligence task is **SWING ENGINE R&D / SPEC — Causal Swing Engine**.
+Dependencies now begin Swing → Market Structure → Range → Premium/Discount →
+Deviation → Acceptance → Trade Plan → Risk → Execution. Required source-labelled
+swing confirmation/causality definitions remain pending; no algorithm invented.
+Historical longer-term Range/Deviation/Manipulation and other source intake is
+preserved as deferred work; no confirmed Range source/spec exists.
 Postponed topics are history, not permission to build them during this MVP.
 
 Incoming ecosystem [research](research/agentic-market-intelligence-ecosystem-2026-09-12.md)
 from the parallel Kaynak Tarama task is preserved as [R-COPILOT-001]. Its library,
 deployment and compatibility proposals remain references, not approved scope,
-installed dependencies, a completed runtime integration or new DD semantics.
+installed full product stack or new DD semantics. The SDK 2.2.0 / ATK 1.4.6
+combination alone is now verified for this narrow public runtime gate.
 
 ## Product boundaries and responsibilities
 
-Actual product-runtime MCP is mandatory; desktop Codex/Claude access and current
-CLI probes are not its proof. Validate application → MCP client → toolkit →
-real ticker/MTF candles/orderbook → normalized core input early in Ch.1.
+Actual product-runtime MCP is mandatory; desktop Codex/Claude access and CLI
+probes are not its proof. The narrow backend gate now verifies application →
+MCP client → toolkit → real ticker/4H/1H/15m/orderbook → normalized causal core
+→ report/SQLite/API. A functioning pipeline is not strategy validation.
 
 Preferred explanation: deterministic report → template explanation → optional
 LLM enhancement. LLMs cannot determine/override prices, structural state,
@@ -160,8 +443,7 @@ Trading-intelligence core files have one owner at a time.
 
 ## Ch.0 exit / chapter model
 
-This is the pre-commit document-freeze checklist. The final two operations
-are verified afterward through Git metadata and the final closure report.
+Ch.0 historical exit checklist, now verified through Git metadata and baseline:
 
 - [x] Deterministic foundation checkpoint.
 - [x] Real OKX shadow-data pipeline.
@@ -170,13 +452,14 @@ are verified afterward through Git metadata and the final closure report.
 - [x] Hackathon MVP scope frozen.
 - [x] Product architecture documented.
 - [x] Agent responsibilities defined.
-- [ ] Final Ch.0 checkpoint commit.
-- [ ] Clean worktrees created from that checkpoint.
+- [x] Final Ch.0 checkpoint commit.
+- [x] Clean worktrees created from that checkpoint.
 
 Ch.0 — Base Setup / Product Re-Scope; Ch.1 — Product MVP & UX;
 Ch.2 — Trading Intelligence; Ch.3 — Agent Workflows; Ch.4 — Validation & Demo.
-**Ch.1 has not started and requires explicit user approval after closure review.**
-[NEXT_TASK](NEXT_TASK.md) describes future tasks, not an instruction to auto-start.
+**Ch.1 Backend Targets #1/#2 and this separately authorized contract correction
+are verified. Ch.1 is not complete.** [NEXT_TASK](NEXT_TASK.md) describes
+future work, not permission to auto-start after the requested commit.
 
 ## Historical runtime evidence / limits
 

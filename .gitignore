@@ -8,3 +8,10 @@ runs/
 *.egg-info/
 dist/
 build/
+
+node_modules/
+.webapp-qa/
+config/strategy.json
+config/.strategy-*.tmp
+.playwright-cli/
+output/playwright/
