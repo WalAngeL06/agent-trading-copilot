@@ -79,3 +79,27 @@ test('invalid runtime status is rejected instead of inventing STOPPED or PAPER',
   const api = new BackendApi(undefined, 'http://localhost:8000', request);
   await assert.rejects(api.getDashboard(), /Unsupported runtime state/);
 });
+
+test('local earn preference is saved separately and never converted into verification', async () => {
+  let preference: string | null = null;
+  const calls: string[] = [];
+  const wire = transport();
+  const request = async (url: RequestInfo | URL, init?: RequestInit) => {
+    const path = new URL(String(url)).pathname;
+    if (path.endsWith('/preferences')) {
+      calls.push(path);
+      preference = JSON.parse(String(init?.body)).lira_auto_earn;
+      return Response.json({lira_auto_earn: preference});
+    }
+    if (path.endsWith('/status')) return Response.json({bot_status: 'stopped', execution_mode: 'PAPER', account_auth: 'CONNECTED', auto_earn_status: 'OFF', lira_auto_earn: {status: 'UNKNOWN', source: null, verified: false, api_verification: 'NOT_EXPOSED', user_preference: preference}});
+    return wire.request(url, init);
+  };
+  const api = new BackendApi(undefined, 'http://localhost:8000', request);
+  const state = await api.saveLiraPreference('ENABLED');
+  assert.equal(state.liraAutoEarn.userPreference, 'ENABLED');
+  assert.equal(state.liraAutoEarn.verified, false);
+  assert.equal(state.liraAutoEarn.status, 'UNKNOWN');
+  assert.equal(state.accountAuth, 'CONNECTED');
+  assert.deepEqual(calls, ['/api/v1/account/preferences']);
+  assert.equal((await api.saveLiraPreference(null)).liraAutoEarn.userPreference, null);
+});

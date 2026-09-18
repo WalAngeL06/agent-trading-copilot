@@ -326,4 +326,4 @@ class VersionedApiTests(unittest.TestCase):
         self.assertEqual(set(schema["paths"]), {
             "/health/live", "/health/ready", "/api/v1/analyses", "/api/v1/analyses/{analysis_id}",
             "/api/v1/bot/status", "/api/v1/bot/market", "/api/v1/bot/activity",
-            "/api/v1/bot/start", "/api/v1/bot/stop", "/api/v1/strategy/config"})
+            "/api/v1/bot/start", "/api/v1/bot/stop", "/api/v1/strategy/config", "/api/v1/account/preferences"})

@@ -1,4 +1,4 @@
-import type { BacktestResult, DashboardSnapshot, StrategyProfile } from '../types/control.ts';
+import type { BacktestResult, DashboardSnapshot, StrategyProfile, LiraPreference } from '../types/control.ts';
 
 export interface ProfileStorage {
   getItem(key: string): string | null;
@@ -13,6 +13,7 @@ export interface TradingControlApi {
   getStrategy(): Promise<StrategyProfile>;
   getBacktestResult(): Promise<BacktestResult | null>;
   saveStrategy(profile: StrategyProfile): Promise<StrategyProfile>;
+  saveLiraPreference(preference: LiraPreference): Promise<DashboardSnapshot>;
   startBot(): Promise<DashboardSnapshot>;
   stopBot(): Promise<DashboardSnapshot>;
 }

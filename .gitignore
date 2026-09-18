@@ -13,5 +13,7 @@ node_modules/
 .webapp-qa/
 config/strategy.json
 config/.strategy-*.tmp
+config/preferences.json
+config/.preferences-*.tmp
 .playwright-cli/
 output/playwright/

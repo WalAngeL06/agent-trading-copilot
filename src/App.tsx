@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { TradingControlApi } from './api/control.ts';
-import type { DashboardSnapshot, StrategyProfile } from './types/control.ts';
+import type { DashboardSnapshot, StrategyProfile, LiraPreference } from './types/control.ts';
 import { Dashboard } from './pages/Dashboard.tsx';
 import { StrategySettings } from './pages/StrategySettings.tsx';
 import { Icon } from './components/Icon.tsx';
@@ -88,6 +88,15 @@ export function App({ api, environment }: {
     }
   }
 
+  async function saveLiraPreference(preference: LiraPreference) {
+    if (busy) return;
+    setBusy(true);
+    setError('');
+    try { setData(await api.saveLiraPreference(preference)); }
+    catch (problem) { setError(problem instanceof Error ? problem.message : 'Preference could not be saved.'); }
+    finally { setBusy(false); }
+  }
+
   async function saveStrategy(profile: StrategyProfile): Promise<StrategyProfile> {
     setBusy(true);
     try {
@@ -139,6 +148,7 @@ export function App({ api, environment }: {
               onStart={() => void agentAction('start')}
               onStop={() => void agentAction('stop')}
               onStrategy={() => navigate('strategy')}
+              onLiraPreference={preference => void saveLiraPreference(preference)}
             />
             : <StrategySettings
                 saved={data.strategy}

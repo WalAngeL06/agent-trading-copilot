@@ -17,6 +17,7 @@ from .bot_service import BotService
 from .config import Config
 from .strategy_settings import StrategySettings, StrategyStore
 from .demo_config import DemoConfig
+from .account_preferences import AccountPreferences, AccountPreferenceStore
 from .okx_mcp_runtime import open_atk_mcp
 
 
@@ -43,7 +44,8 @@ def _iso(value):
 
 
 def create_app(config=None, service=None, bot_config=None, bot_service=None,
-               mcp_factory=None, demo_config=None, strategy_path="config/strategy.json"):
+               mcp_factory=None, demo_config=None, strategy_path="config/strategy.json",
+               preferences_path="config/preferences.json"):
     analysis_service = service or AnalysisService(config or AnalysisConfig.from_env())
     demo = demo_config or DemoConfig.from_env()
     if bot_service is None:
@@ -59,6 +61,7 @@ def create_app(config=None, service=None, bot_config=None, bot_service=None,
         )
 
     strategy_store = StrategyStore(strategy_path)
+    preferences_store = AccountPreferenceStore(preferences_path)
     bot_service.strategy_profile = strategy_store.current.to_profile()
     control_lock = asyncio.Lock()
 
@@ -169,6 +172,7 @@ def create_app(config=None, service=None, bot_config=None, bot_service=None,
             "symbol": bot_service.config.symbol,
             "account_auth": bot_service.private_state["account_auth"],
             "auto_earn_status": bot_service.private_state["auto_earn_status"],
+            "lira_auto_earn": preferences_store.lira_status(),
             "last_market_update": _iso(bot_service.last_market_update),
             "last_private_update": _iso(bot_service.last_private_update),
             "balance": bot_service.private_state["balance"],
@@ -185,6 +189,18 @@ def create_app(config=None, service=None, bot_config=None, bot_service=None,
             **activity,
             "events": bot_service.ui_events
         }
+
+    @app.get("/api/v1/account/preferences", response_model=AccountPreferences)
+    async def account_preferences():
+        return preferences_store.current
+
+    @app.put("/api/v1/account/preferences", response_model=AccountPreferences)
+    async def save_account_preferences(body: AccountPreferences):
+        try:
+            return preferences_store.save(body)
+        except OSError:
+            return JSONResponse(status_code=503, content={"error": {
+                "code": "PREFERENCES_WRITE_FAILED", "message": "Local preference could not be saved."}})
 
     @app.get("/api/v1/strategy/config", response_model=StrategySettings)
     async def strategy_config():

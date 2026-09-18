@@ -5,6 +5,7 @@ import type {
   BacktestResult,
   DashboardSnapshot,
   LatestTradeSummary,
+  LiraPreference,
   MarketSummary,
   StrategyProfile,
   StrategyState,
@@ -27,6 +28,7 @@ interface BotStatusWire {
   balance?: unknown;
   account_auth?: unknown;
   auto_earn_status?: unknown;
+  lira_auto_earn?: unknown;
 }
 
 interface MarketWire {
@@ -124,6 +126,7 @@ export class BackendApi implements TradingControlApi {
       throw new Error('Unsupported runtime state. Refresh after checking the backend.');
     }
     const strategy = await this.getStrategy();
+    const lira = record(statusData.lira_auto_earn);
     const sourceAvailable = statusData.market_source === 'OKX_ATK_MCP';
     const marketSummary: MarketSummary = {
       symbol: stringOrNull(statusData.symbol) ?? 'UNKNOWN',
@@ -146,6 +149,12 @@ export class BackendApi implements TradingControlApi {
       market: marketSummary,
       accountAuth: accountStatus(statusData.account_auth),
       autoEarn: 'UNKNOWN',
+      liraAutoEarn: {
+        status: 'UNKNOWN', verified: false,
+        apiVerification: lira.api_verification === 'NOT_EXPOSED' ? 'NOT_EXPOSED' : 'UNKNOWN',
+        userPreference: lira.user_preference === 'ENABLED' || lira.user_preference === 'DISABLED'
+          ? lira.user_preference : null,
+      },
       lastMarketUpdate: stringOrNull(statusData.last_market_update),
       lastPrivateUpdate: stringOrNull(statusData.last_private_update),
       balance: stringOrNull(statusData.balance),
@@ -171,6 +180,14 @@ export class BackendApi implements TradingControlApi {
 
   async startBot(): Promise<DashboardSnapshot> {
     await this.fetchJson('/api/v1/bot/start', { method: 'POST' });
+    return this.getDashboard();
+  }
+
+  async saveLiraPreference(preference: LiraPreference): Promise<DashboardSnapshot> {
+    await this.fetchJson('/api/v1/account/preferences', {
+      method: 'PUT', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({lira_auto_earn: preference}),
+    });
     return this.getDashboard();
   }
 

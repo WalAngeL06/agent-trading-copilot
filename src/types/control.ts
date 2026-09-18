@@ -88,6 +88,7 @@ export interface LatestTradeSummary {
 
 export type AccountStatus = 'CONNECTED' | 'AUTH_MISSING' | 'ERROR' | 'UNKNOWN';
 export type AutoEarnStatus = 'ON' | 'OFF' | 'UNKNOWN';
+export type LiraPreference = 'ENABLED' | 'DISABLED' | null;
 
 export interface DashboardSnapshot {
   bot: {
@@ -100,6 +101,12 @@ export interface DashboardSnapshot {
   market: MarketSummary;
   accountAuth: AccountStatus;
   autoEarn: AutoEarnStatus;
+  liraAutoEarn: {
+    status: 'UNKNOWN';
+    verified: false;
+    apiVerification: 'NOT_EXPOSED' | 'UNKNOWN';
+    userPreference: LiraPreference;
+  };
   lastMarketUpdate: string | null;
   lastPrivateUpdate: string | null;
   balance: string | null;

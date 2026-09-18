@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
 
@@ -44,9 +45,10 @@ class TelegramBot:
         self.chat_ids.add(chat_id)
         text = message["text"]
         if text.startswith("/start"):
+            url = urlsplit(self.webapp_url)
             markup = {"inline_keyboard": [[{
                 "text": "Open Dashboard", "web_app": {"url": self.webapp_url},
-            }]]}
+            }]]} if url.scheme == 'https' and url.hostname not in {'localhost', '127.0.0.1', '::1'} else None
             self.send_message(chat_id, "Welcome to Agent Trading Copilot!", markup)
         elif text.startswith("/status"):
             status = (self.status_callback() if self.status_callback else

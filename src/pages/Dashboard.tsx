@@ -1,6 +1,7 @@
 import type {
   AccountStatus,
   DashboardSnapshot,
+  LiraPreference,
   StrategyState,
 } from '../types/control.ts';
 import { Card } from '../components/Card.tsx';
@@ -40,12 +41,13 @@ function valueOrUnavailable(value: string | null | undefined): React.ReactNode {
     : <span className="unavailable-value">Unavailable</span>;
 }
 
-export function Dashboard({ data, busy, onStart, onStop, onStrategy }: {
+export function Dashboard({ data, busy, onStart, onStop, onStrategy, onLiraPreference }: {
   data: DashboardSnapshot;
   busy: boolean;
   onStart: () => void;
   onStop: () => void;
   onStrategy: () => void;
+  onLiraPreference: (preference: LiraPreference) => void;
 }) {
   const running = data.bot.status === 'RUNNING';
   const marketTone: BadgeTone = data.market.connection === 'CONNECTED'
@@ -180,9 +182,21 @@ export function Dashboard({ data, busy, onStart, onStop, onStrategy }: {
           </div>
           <div className="capability-row">
             <span><Icon name="shield" size={16}/>Lira Auto Earn</span>
-            <span>Status unavailable via API</span>
+            <span>{data.liraAutoEarn.apiVerification === 'NOT_EXPOSED'
+              ? 'API status not exposed' : 'Verification unavailable'}</span>
+          </div>
+          <div className="capability-row">
+            <label htmlFor="lira-preference">Lira Auto Earn preference</label>
+            <select id="lira-preference" disabled={busy}
+              value={data.liraAutoEarn.userPreference ?? ''}
+              onChange={event => onLiraPreference((event.target.value || null) as LiraPreference)}>
+              <option value="">Not specified</option>
+              <option value="ENABLED">ENABLED</option>
+              <option value="DISABLED">DISABLED</option>
+            </select>
           </div>
         </div>
+        <p className="capability-note">Your local preference only. Not verified by OKX; changing it does not change your OKX account.</p>
         <p className="capability-note">Market source: OKX ATK / MCP</p>
       </Card>
 
