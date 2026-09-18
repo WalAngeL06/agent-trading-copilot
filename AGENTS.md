@@ -9,8 +9,11 @@ docs rather than continuing undocumented assumptions from chat history.
 Canonical project root: `C:\Users\Serdar Arif\Desktop\Agent Trading`.
 Do not create sibling `Agent Trading-*` directories or new Git worktrees unless
 the user explicitly requests it. Use the canonical project directory for all
-normal development. Preserve existing nested folders and registered worktrees;
-several registered sibling paths are stale and must not be pruned blindly.
+normal development. Integration branch: `main` (2026-09-19 owner-approved
+branch consolidation). Retired `work/*` branches survive as `archive/*` tags;
+their former worktree folders sit in the locally excluded `_archive/`
+directory. Do not develop in, delete or re-register those folders. Start new
+work on a short-lived branch from `main`, merge it after review, then delete it.
 
 [U-PRODUCT-CONSOLIDATION-001] authorizes consolidation of the existing React/Vite
 UI, FastAPI, read-only MCP and PAPER multi-timeframe strategy in this root.
@@ -236,12 +239,10 @@ When switching Codex ↔ Claude:
 
 If agents work simultaneously, use separate Git worktrees **and branches**;
 never the same working directory. Merge/cherry-pick only reviewed commits.
-`strategy-v0.1` remains the integration branch. Ch.0 created
-`work/copilot-backend` and `work/copilot-ux` in sibling worktrees from its exact
-documentation checkpoint. Only the backend worktree is authorized for this
-target; integration and UX remain at the checkpoint. Preserve/report existing
-branches/worktrees instead of recreating or destroying them. No merge, tag,
-push or remote creation is authorized by this target.
+`main` is the integration branch. On 2026-09-19 `strategy-v0.1` was
+fast-forwarded into `main` and deleted; the Ch.0-era `work/*` branches survive
+only as `archive/*` tags. Push, tag or remote changes still need explicit
+user authorization.
 
 Codex owns backend, runtime MCP adapter, FastAPI, core integration, persistence,
 backend tests and Compose/integration. Claude owns React/Vite/TypeScript,

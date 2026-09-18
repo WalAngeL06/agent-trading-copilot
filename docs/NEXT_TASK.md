@@ -1,11 +1,13 @@
 # Next task - finish external verification
 
-Updated 2026-09-16. Do not create new worktrees or sibling Agent Trading folders.
-Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading`.
+Updated 2026-09-19. Do not create new worktrees or sibling Agent Trading folders.
+Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
 
-1. Resolve this machine's connection reset to `https://tr.okx.com` and rerun
-   Dashboard Start → actual configured MCP candle reads → strategy state → Stop.
-   Current integration tests pass but do not replace live exchange evidence.
+1. Public product-runtime verification is complete: fresh REST, Python HTTPS,
+   MCP lifecycle/discovery, ATK ticker/candles, normalization, BotService polling
+   and Dashboard CONNECTED all pass without runtime changes. Do not carry forward
+   the old "network blocked" conclusion. Evidence:
+   [fresh diagnosis](fresh-atk-runtime-diagnosis.md).
 2. If account status is wanted, the owner supplies read-only OKX credentials
    directly in the ignored canonical .env. Restart and verify real account reads.
    Do not copy old credential stores. Generic auto-lend is not Lira Auto Earn.
@@ -13,6 +15,12 @@ Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading`.
    The local browser workflow does not require Telegram.
 4. Consider durable PAPER session/position recovery as a separately specified
    feature. Current Start creates a fresh historical bootstrap session.
+5. Owner: review `_archive/` (it holds `.env` files with filled keys and local
+   run data) and delete it when satisfied. Decide separately whether to push
+   `main` and the `archive/*` tags to GitHub and make `main` the default branch.
+6. Archived, unreviewed candidates: the BacktestPage UI in `archive/final-ui`.
+   The LIVE_SMOKE path in `archive/final-demo` stays out of scope unless the
+   owner explicitly authorizes live execution work.
 
 Current deliverable and tests: [PROJECT_STATE](PROJECT_STATE.md),
 [consolidation evidence](product-consolidation.md). No automatic push or LIVE

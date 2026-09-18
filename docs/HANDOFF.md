@@ -1,4 +1,23 @@
-# Current handoff - product consolidation, 2026-09-16
+# Current handoff - branch consolidation, 2026-09-19
+
+Claude; canonical root `C:/Users/Serdar Arif/Desktop/Agent Trading`, branch
+`main`. The Git layout changed; read "Git and local data" in
+[PROJECT_STATE](PROJECT_STATE.md) first.
+
+- Reviewed, fixed and committed the previously uncommitted Lira Auto Earn local
+  preference and Telegram HTTPS-only Open Dashboard button (`98c75ab`). Review
+  fix: the first preference save returned 503 on a fresh clone because
+  `config/` did not exist; a regression test covers it.
+- Committed the pending 2026-09-16 fresh runtime diagnosis documentation.
+- `main` is the only development branch; old `work/*` branches are `archive/*`
+  tags; former worktree folders are in the locally excluded `_archive/`.
+- Verified: 593 Python tests, 11 frontend tests and the production build pass.
+- Not done: no push or remote change and no files deleted. The owner decides on
+  `_archive/` and on publishing `main` to GitHub.
+
+---
+
+# Previous handoff - product consolidation, 2026-09-16
 
 Codex; canonical root `C:/Users/Serdar Arif/Desktop/Agent Trading`,
 branch `strategy-v0.1`. See [PROJECT_STATE](PROJECT_STATE.md) and
@@ -17,8 +36,12 @@ Windows startup, README and canonical-root policy updated. PAPER only.
 590 Python tests, 10 frontend tests, build and desktop/mobile browser checks pass.
 Browser save/reload and nondefault process-restart persistence pass; verification
 risk restored to 1%. Real browser Start/Stop and running settings lock pass.
-Public MCP initializes but TR market transport resets; successful live polling
-remains blocked. Account AUTH_MISSING and Telegram disabled are honest states.
+Fresh follow-up diagnosis now passes public MCP initialization, tools/list,
+ticker/candles, normalization, real multi-timeframe BotService processing and
+Dashboard CONNECTED. Repeated observation timestamps confirm polling. No runtime
+code changed. Previous network-blocked attribution is withdrawn; old failure is
+not reproduced. Account AUTH_MISSING and Telegram disabled remain honest states.
+See [fresh diagnosis](fresh-atk-runtime-diagnosis.md).
 No private credentials copied. Agent left STOPPED. Local services may remain open
 in their visible windows for review; close them or use existing services before
 running run.ps1 again.
@@ -38,8 +61,11 @@ untracked before this task and remain untracked outside the commit:
 
 No new worktree, sibling directory, branch, tag or remote was created. Existing
 stale registrations are preserved. Runtime config/.env/logs/screenshots are
-ignored. No remaining authored product files should be left uncommitted after
-the checkpoint; inspect git status to distinguish preserved untracked data.
+ignored. Consolidation implementation is committed at e826277. The fresh diagnosis
+updates only this handoff, PROJECT_STATE, NEXT_TASK, product-consolidation and the
+new fresh-atk-runtime-diagnosis report; these documentation changes were
+committed on 2026-09-19 together with the branch-consolidation records. The
+ignored fresh diagnostic probes and screenshot remain local. For current state, inspect git status to distinguish preserved untracked data.
 
 ---
 ## Historical handoffs (not current status)

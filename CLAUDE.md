@@ -5,8 +5,11 @@
 Canonical project root: `C:\Users\Serdar Arif\Desktop\Agent Trading`.
 Do not create sibling `Agent Trading-*` directories or new Git worktrees unless
 the user explicitly requests it. Use the canonical project directory for all
-normal development. Preserve existing nested folders and registered worktrees;
-several registered sibling paths are stale and must not be pruned blindly.
+normal development. Integration branch: `main` (2026-09-19 owner-approved
+branch consolidation). Retired `work/*` branches survive as `archive/*` tags;
+their former worktree folders sit in the locally excluded `_archive/`
+directory. Do not develop in, delete or re-register those folders. Start new
+work on a short-lived branch from `main`, merge it after review, then delete it.
 
 [U-PRODUCT-CONSOLIDATION-001] authorizes consolidation of the existing React/Vite
 UI, FastAPI, read-only MCP and PAPER multi-timeframe strategy in this root.

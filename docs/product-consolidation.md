@@ -1,5 +1,10 @@
 # Product consolidation evidence
 
+**Fresh 2026-09-16 follow-up supersedes the market FAIL/BLOCKED below:** all public
+product-runtime layers and Dashboard CONNECTED now pass without runtime changes.
+The original verification table is historical. The prior broad network-blocked
+attribution is withdrawn. See [fresh diagnosis](fresh-atk-runtime-diagnosis.md).
+
 2026-09-16, local Windows verification. Authority: [U-PRODUCT-CONSOLIDATION-001].
 
 | Requested check | Result |

@@ -1,6 +1,6 @@
 # Current project state - 2026-09-16
 
-Owner: Codex. Branch: `strategy-v0.1`. Canonical root:
+Owner: Codex. Branch: `main` (formerly `strategy-v0.1`). Canonical root:
 `C:/Users/Serdar Arif/Desktop/Agent Trading`.
 
 ## Product consolidation
@@ -19,6 +19,9 @@ into this root, without creating/moving/deleting any worktree or sibling folder.
   waits at shared boundaries until delayed higher-timeframe bars arrive.
 - Market/account state, timestamps, equity, decisions and activity are backend
   observations. Lira Auto Earn stays unavailable via API.
+- Optional local Lira Auto Earn preference (GET/PUT
+  `/api/v1/account/preferences`, ignored `config/preferences.json`): a user
+  declaration only, never sent to or verified by OKX; status stays UNKNOWN.
 - Embedded emergency HTML exists only in preserved historical nested sources;
   canonical `/dashboard` is a redirect to `WEBAPP_URL`, not a second UI.
 - `run.ps1` starts backend and frontend in separate visible windows.
@@ -26,6 +29,8 @@ into this root, without creating/moving/deleting any worktree or sibling folder.
 
 ## Verified now
 
+2026-09-19, after committing the Lira preference: 593 Python tests, 11
+frontend tests and the production build pass. At consolidation (2026-09-16):
 590 Python tests passed; 10 frontend tests passed; production frontend build
 passed. Windows launcher and service startup passed. Real browser save/reload,
 nondefault persistence across process restart, restore, Start/Stop, and disabled
@@ -33,13 +38,17 @@ Save while running passed. Desktop and mobile layouts inspected.
 
 ## Current blockers and limits
 
-The real public MCP process initializes and discovers tools, but OKX TR candle
-calls fail with NetworkError/MCP_TOOL_ERROR. Independent Node and PowerShell
-requests also receive a connection reset from `tr.okx.com`. Consequently a
-successful live market loop is **not verified** in this session. The UI reports
-ERROR and the agent stops; no fabricated CONNECTED state. Private credentials
-are absent in the canonical environment: AUTH_MISSING, not connected account
-proof. Optional Telegram delivery is unverified because no token is configured.
+Fresh diagnosis at 2026-09-16 01:13-01:16 Europe/Istanbul supersedes the
+previous connectivity conclusion. Raw REST and venv Python HTTPS pass. The
+unchanged product runtime passes MCP subprocess/handshake, ATK initialization,
+tools/list, ticker, candles, adapter normalization and configured BotService
+4H/1H/15m processing. The actual Dashboard displays CONNECTED while running;
+subsequent market observation timestamps advance. No reproducible product
+failure was found and no runtime fix was applied. The earlier blanket
+"network blocked" conclusion is withdrawn; its original cause is unproven.
+Canonical .env has no OKX or Telegram credentials: private AUTH_MISSING is
+independent of successful public connectivity. See
+[fresh runtime diagnosis](fresh-atk-runtime-diagnosis.md).
 
 PAPER restarts replay historical bootstrap with simulated equity; positions are
 not durable across restart. Existing strategy hypotheses remain provisional.
@@ -47,22 +56,35 @@ No strategy profitability or empirical validation is claimed.
 
 ## Git and local data
 
-Source bases: `work/final-demo` 1e4356f for product runtime/history;
-`work/backtest-v1` baa77e9 for strategy/backtest/spec/tests; the existing working
-UI from `Agent Trading-final-ui/src` supplies the preserved visual design.
-Original canonical HEAD was 24e1f46. Experimental uncommitted live code in the
-nested final folder was not imported. Source-folder uncommitted work is intact.
+Consolidation (2026-09-16) source bases: `work/final-demo` 1e4356f for product
+runtime/history, `work/backtest-v1` baa77e9 for strategy/backtest/spec/tests and
+the `Agent Trading-final-ui/src` visual design; original canonical HEAD 24e1f46.
 
-Requested checkpoint message:
-`refactor: consolidate production webapp and local configuration`.
-No push, tag or remote change. Several registered sibling worktrees have stale
-paths; metadata is unchanged. No pruning performed. Pre-existing untracked
-folders/files remain outside the product commit:
+2026-09-19 branch consolidation (Claude, owner-approved): `strategy-v0.1` was
+fast-forwarded into `main` and deleted; `main` is the only development branch.
+All 13 `work/*` branches were checked to be contained in `main` (only the
+intentionally dropped `src/api/mock.ts` and `validation.ts` differ) and were
+replaced by annotated `archive/*` tags. Uncommitted work found in three
+worktree folders was first saved, unreviewed, as `wip(archive)` commits:
+`archive/final-demo` (experimental LIVE_SMOKE exchange-order path; never merge
+without separate review and authorization), `archive/final-ui` (alternate UI
+including `BacktestPage.tsx`) and `archive/backtest-v1` (frontend backtest API
+draft). Restore a branch with `git switch -c work/<name> archive/<name>`.
 
-- Nested projects: Agent Trading-auth, -backend, -backtest, -brain, -final-ui,
-  -final, -integration, -okx, -strategy-v1, -swing, -ux, -webapp.
-- User folders: Yeni klasör, odin-videolar, öğrenme-dd finance ve odin.
-- grep.exe.stackdump.
+The twelve nested `Agent Trading-*` folders, `.worktrees/risk-engine` and
+`grep.exe.stackdump` were moved, not deleted, into `_archive/` (excluded in
+`.git/info/exclude`, never committed); their stale worktree registrations were
+pruned. `_archive/` still holds ignored local data: `.env` files with filled
+keys in `-final` and `-auth`, `runs/`, `data/` and virtual environments. The
+owner reviews and deletes it. User folders (Yeni klasör, odin-videolar,
+öğrenme-dd finance ve odin) are untouched and untracked.
+
+Remote `origin` (public GitHub) is unchanged: its `main` is still 6671358 and
+its default branch is `work/final-demo`. Publishing `main` and the tags is a
+separate owner decision. The session worktree
+`.claude/worktrees/gracious-meninsky-11af1e` (branch
+`claude/worktree-question-1778f7`, no unique commits) remains until the desktop
+app removes it.
 
 Run tests with `.venv/Scripts/python.exe -B -m unittest discover -s tests -v`.
 The system `py` interpreter lacks FastAPI; use the root virtual environment.
