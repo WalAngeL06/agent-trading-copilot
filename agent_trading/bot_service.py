@@ -1,8 +1,10 @@
 import asyncio
 from datetime import datetime, timezone
 import logging
+import math
 
 from .config import Config
+from .okx_mcp import sanitized_failure
 from .okx_mcp_runtime import open_atk_mcp
 from .okx_private_config import load_private_config
 from .okx_private_runtime import read_private_snapshots
@@ -27,8 +29,13 @@ class BotService:
                  private_reader=read_private_snapshots,
                  private_config_loader=load_private_config,
                  telegram_token="", webapp_url="http://127.0.0.1:5173",
-                 telegram=None):
+                 telegram=None, retry_delays=(5, 15, 30, 60, 120, 300)):
         self.config = config
+        self.retry_delays = tuple(retry_delays)
+        if not self.retry_delays or any(
+                type(delay) not in (int, float) or not math.isfinite(delay) or delay < 0
+                for delay in self.retry_delays):
+            raise ValueError("retry_delays must be nonnegative finite seconds")
         self.mcp_factory = mcp_factory
         self.node_path = node_path
         self.server_path = server_path
@@ -225,6 +232,9 @@ class BotService:
 
     async def _accept_market_read(self, adapter, *, bootstrap):
         histories, observed_at = await self._fetch_candles(adapter, datetime.now(timezone.utc))
+        self._apply_market_read(histories, observed_at)
+
+    def _apply_market_read(self, histories, observed_at):
         roles = self.strategy_profile.timeframes
         # A higher timeframe may publish later than a lower one at the same
         # boundary. Do not advance past a missing candle and consume it later.
@@ -254,27 +264,43 @@ class BotService:
         self._check_notifications()
 
     async def _run_loop(self):
+        # Reading OKX can fail transiently (network, MCP process). Those failures
+        # reconnect with backoff and keep the strategy state. Data the strategy
+        # rejects (history gap, processing error) stops the agent instead.
+        failures = 0
         try:
-            async with self.mcp_factory(
-                node_path=self.node_path, server_path=self.server_path,
-                timeout=self.mcp_timeout) as adapter:
-                await self._accept_market_read(adapter, bootstrap=True)
-                while self.is_running:
-                    await asyncio.sleep(self.config.poll_interval_seconds)
-                    try:
-                        await self._accept_market_read(adapter, bootstrap=False)
-                    except Exception:
-                        self.market_connected = False
-                        self._add_ui_event("OKX ATK", "market read failed", "warning")
+            while self.is_running:
+                processing = False
+                try:
+                    async with self.mcp_factory(
+                        node_path=self.node_path, server_path=self.server_path,
+                        timeout=self.mcp_timeout) as adapter:
+                        while self.is_running:
+                            histories, observed_at = await self._fetch_candles(
+                                adapter, datetime.now(timezone.utc))
+                            processing = True
+                            self._apply_market_read(histories, observed_at)
+                            processing = False
+                            if failures:
+                                failures = 0
+                                self._add_ui_event("OKX ATK", "market reconnected")
+                            await asyncio.sleep(self.config.poll_interval_seconds)
+                except Exception as exc:
+                    self.market_connected = False
+                    if processing:
                         self.market_status = "ERROR"
-                        logging.warning("Bot market read failed")
+                        self._add_ui_event("OKX ATK", "market data rejected; agent stopped", "warning")
+                        logging.warning("Bot market data rejected (%s)", type(exc).__name__)
                         break
+                    delay = self.retry_delays[min(failures, len(self.retry_delays) - 1)]
+                    failures += 1
+                    self.market_status = "RECONNECTING"
+                    self._add_ui_event("OKX ATK", f"market read failed; retrying in {delay:g}s", "warning")
+                    logging.warning("Bot market read failed (%s); retrying in %gs",
+                                    sanitized_failure(exc).code, delay)
+                    await asyncio.sleep(delay)
         except asyncio.CancelledError:
             pass
-        except Exception:
-            self._add_ui_event("OKX ATK", "market connection failed", "warning")
-            self.market_status = "ERROR"
-            logging.warning("Bot market runtime failed")
         finally:
             self.market_connected = False
             self.is_running = False

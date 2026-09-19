@@ -74,7 +74,7 @@ export interface MarketSummary {
   lastPrice: string | null;
   observedAt: string | null;
   source: 'OKX_AGENT_TRADE_KIT_MCP' | 'UNAVAILABLE';
-  connection: 'CONNECTED' | 'WAITING' | 'ERROR' | 'UNKNOWN';
+  connection: 'CONNECTED' | 'WAITING' | 'RECONNECTING' | 'ERROR' | 'UNKNOWN';
   dataOrigin: 'MOCK' | 'BACKEND';
 }
 

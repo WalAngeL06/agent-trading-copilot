@@ -54,7 +54,9 @@ export function Dashboard({ data, busy, onStart, onStop, onStrategy, onLiraPrefe
     ? 'positive'
     : data.market.connection === 'ERROR'
       ? 'danger'
-      : 'neutral';
+      : data.market.connection === 'RECONNECTING'
+        ? 'warning'
+        : 'neutral';
   const trade = data.latestTrade;
 
   return <div className="dashboard">

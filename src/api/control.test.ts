@@ -103,3 +103,14 @@ test('local earn preference is saved separately and never converted into verific
   assert.deepEqual(calls, ['/api/v1/account/preferences']);
   assert.equal((await api.saveLiraPreference(null)).liraAutoEarn.userPreference, null);
 });
+
+test('a reconnecting market is shown as reconnecting while the agent keeps running', async () => {
+  const wire = transport();
+  const request = async (url: RequestInfo | URL, init?: RequestInit) => {
+    if (new URL(String(url)).pathname.endsWith('/status')) return Response.json({bot_status: 'running', execution_mode: 'PAPER', market_status: 'RECONNECTING', market_connected: false, market_source: 'OKX_ATK_MCP', account_auth: 'AUTH_MISSING', symbol: 'BTC-USDT', last_market_update: null, last_private_update: null});
+    return wire.request(url, init);
+  };
+  const state = await new BackendApi(undefined, 'http://localhost:8000', request).getDashboard();
+  assert.equal(state.market.connection, 'RECONNECTING');
+  assert.equal(state.bot.status, 'RUNNING');
+});

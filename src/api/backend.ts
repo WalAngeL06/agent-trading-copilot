@@ -133,7 +133,7 @@ export class BackendApi implements TradingControlApi {
       lastPrice: stringOrNull(marketData.last_price),
       observedAt: stringOrNull(marketData.observed_at),
       source: sourceAvailable ? 'OKX_AGENT_TRADE_KIT_MCP' : 'UNAVAILABLE',
-      connection: ['CONNECTED', 'WAITING', 'ERROR'].includes(String(statusData.market_status))
+      connection: ['CONNECTED', 'WAITING', 'RECONNECTING', 'ERROR'].includes(String(statusData.market_status))
         ? statusData.market_status as MarketSummary['connection'] : 'UNKNOWN',
       dataOrigin: 'BACKEND',
     };
