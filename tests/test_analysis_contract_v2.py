@@ -10,6 +10,7 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
+from env_isolation import BLANK_LOCAL_SETTINGS, isolated_environment
 from pydantic import TypeAdapter, ValidationError
 
 from analysis_fixtures import Clock, PRICE, Runtime, candle
@@ -38,6 +39,17 @@ def alternate_runtime(clock):
 def validate(report):
     return TypeAdapter(analysis_api_models.AnyAnalysisReport).validate_python(report)
 
+
+
+_environment = isolated_environment()
+
+
+def setUpModule():
+    _environment.start()
+
+
+def tearDownModule():
+    _environment.stop()
 
 class CollectionTests(unittest.TestCase):
     def test_invalid_required_collection_is_rejected_before_runtime(self):

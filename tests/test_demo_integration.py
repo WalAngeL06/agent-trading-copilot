@@ -10,6 +10,7 @@ import unittest
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
+from env_isolation import BLANK_LOCAL_SETTINGS, isolated_environment
 
 from agent_trading.account_snapshots import (
     AccountConfiguration,
@@ -27,6 +28,17 @@ from agent_trading.telegram_bot import TelegramBot
 
 NOW = datetime(2026, 9, 12, 12, 0, tzinfo=timezone.utc)
 
+
+
+_environment = isolated_environment()
+
+
+def setUpModule():
+    _environment.start()
+
+
+def tearDownModule():
+    _environment.stop()
 
 class _PublicAdapter:
     def __init__(self):
@@ -205,7 +217,8 @@ class ApiDemoTests(unittest.TestCase):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             from agent_trading.api import create_app
-            with patch.dict("os.environ", {"ALLOWED_ORIGINS": "https://front.example",
+            with patch.dict("os.environ", {**BLANK_LOCAL_SETTINGS,
+                                           "ALLOWED_ORIGINS": "https://front.example",
                                            "API_ACCESS_TOKEN": "k" * 32}, clear=True):
                 app = create_app(config=AnalysisConfig(db_path=root / "history.sqlite3",
                                                        audit_dir=root / "audit"))

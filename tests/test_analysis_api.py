@@ -5,12 +5,24 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
+from env_isolation import BLANK_LOCAL_SETTINGS, isolated_environment
 from analysis_fixtures import Clock, PRICE, Runtime, candle
 from agent_trading.analysis_config import AnalysisConfig
 from agent_trading.analysis_repository import RepositoryError
 from agent_trading.analysis_service import AnalysisService
 from agent_trading.api import create_app
 
+
+
+_environment = isolated_environment()
+
+
+def setUpModule():
+    _environment.start()
+
+
+def tearDownModule():
+    _environment.stop()
 
 class ApiTests(unittest.TestCase):
     def setUp(self):

@@ -8,6 +8,7 @@ import unittest
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
+from env_isolation import BLANK_LOCAL_SETTINGS, isolated_environment
 
 from agent_trading.api import create_app
 from agent_trading.analysis_config import AnalysisConfig
@@ -15,6 +16,17 @@ from agent_trading.bot_service import BotService
 from agent_trading.config import Config
 from test_demo_integration import _PublicAdapter, _PublicFactory
 
+
+
+_environment = isolated_environment()
+
+
+def setUpModule():
+    _environment.start()
+
+
+def tearDownModule():
+    _environment.stop()
 
 class SettingsApiTests(unittest.TestCase):
     def setUp(self):
