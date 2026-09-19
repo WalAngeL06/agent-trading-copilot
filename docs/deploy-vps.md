@@ -27,8 +27,8 @@ ayarları), `agent-runs` (PAPER oturumu, analiz geçmişi), `caddy-data`
    curl -sS -o /dev/null -w "%{http_code}\n" "https://tr.okx.com/api/v5/market/ticker?instId=BTC-USDT"
    ```
 
-   Ev WiFi'ında bu bağlantı TLS aşamasında kesiliyordu; VPS'in bulunduğu ağda
-   çalıştığından emin ol.
+   Geliştirme bilgisayarının ağında bu bağlantı zaman zaman TLS aşamasında
+   kesildi (örneğin 19 Eylül 2026); VPS'in ağında çalıştığından emin ol.
 
 ## Kurulum
 
@@ -40,8 +40,10 @@ ayarları), `agent-runs` (PAPER oturumu, analiz geçmişi), `caddy-data`
    - `DOMAIN=bot.ornek.com`
    - `API_ACCESS_TOKEN=` en az 24 karakterlik rastgele anahtar:
      `python3 -c "import secrets; print(secrets.token_urlsafe(32))"`
-   - İsteğe bağlı Telegram: `TELEGRAM_BOT_TOKEN=` ve `TELEGRAM_ALLOWED_USER_IDS=`
-     (bota `/start` yazınca kendi kullanıcı ID'ni söyler).
+   - Telegram: `TELEGRAM_BOT_TOKEN=` ve `TELEGRAM_ALLOWED_USER_IDS=`. Telegram
+     kullanıyorsan izin listesi üretimde zorunlu: boş kalırsa bot, kendisine
+     yazan herkese `/status` cevabı ve bildirim gönderir. Kendi ID'ni bota
+     `/start` yazarak öğrenirsin.
    - İsteğe bağlı hesap okuması: `OKX_API_KEY`, `OKX_SECRET_KEY`, `OKX_PASSPHRASE`.
      Sadece **okuma** izni ver; OKX'te anahtarı VPS'in IP'siyle sınırla.
    - `WEBAPP_URL`, `ALLOWED_ORIGINS` ve `VITE_BACKEND_URL` compose tarafından

@@ -107,15 +107,21 @@ Names only; put your own values in the ignored `.env`:
 
 Local URL defaults are provided in `.env.example`. Restart the relevant service
 after changing environment configuration. Public market reads do not require
-private credentials. Missing credentials show AUTH_MISSING. The account API's
-generic auto-lend flag is not OKX TR Lira Auto Earn: the UI shows
-**Lira Auto Earn — Status unavailable via API**.
+private credentials. Missing credentials show AUTH_MISSING. Neither the installed
+ATK nor the OKX TR API exposes a read-only Lira Auto Earn status, and the generic
+per-currency auto-lend/staking flags are not treated as one. The UI shows
+**Lira Auto Earn · API verification: NOT EXPOSED** next to an optional local
+**User preference** (ENABLED/DISABLED, stored in `config/preferences.json`), which
+is never sent to or verified by OKX.
 
 ## Safety
 
 - Secrets remain local; `.env` and runtime files are ignored by Git.
 - Grant read-only API permissions. Withdrawal permission should never be granted.
 - PAPER is the safe default and the only supported execution mode.
+- Production deployments must set `TELEGRAM_ALLOWED_USER_IDS`. While it is
+  empty the Telegram bot keeps working but answers `/status` and sends
+  notifications to anyone who messages it.
 - Every `/api/` route requires the owner access key (`Authorization: Bearer`)
   or Telegram Mini App data signed for an allowlisted user. Without either
   setting the API stays open for local use only: the backend refuses to start
@@ -131,7 +137,9 @@ create a bot using BotFather, set its token and point `WEBAPP_URL` to the HTTPS
 address of this same React WebApp. Set `VITE_BACKEND_URL` to a backend address
 reachable from that device and include the frontend origin in `ALLOWED_ORIGINS`.
 Set `TELEGRAM_ALLOWED_USER_IDS` so only you can use the bot and the Mini App; the
-bot's `/start` reply shows your user ID. Telegram `/start` launches the WebApp
+bot's `/start` reply shows your user ID. Leave it empty only for local testing.
+`/status` reports `Lira Auto Earn: ENABLED|DISABLED|NOT SPECIFIED` from your local
+preference and `API verification: NOT EXPOSED`; OKX never verifies that value. Telegram `/start` launches the WebApp
 and `/status` reports runtime state. Existing
 `/dashboard` links redirect to `WEBAPP_URL`; update old links to the frontend.
 

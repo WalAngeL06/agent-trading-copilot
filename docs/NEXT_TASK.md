@@ -3,10 +3,14 @@
 Updated 2026-09-19. Do not create new worktrees or sibling Agent Trading folders.
 Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
 
-1. Network: on 2026-09-19 the owner's home WiFi reset TLS connections to
-   tr.okx.com and www.okx.com while other HTTPS worked; the owner confirmed the
-   WiFi cause. Locally the agent shows RECONNECTING. The 2026-09-16
-   [diagnosis](fresh-atk-runtime-diagnosis.md) passed on a working network.
+1. Network: the application connects to OKX through ATK/MCP whenever network
+   access is available; the 2026-09-16
+   [diagnosis](fresh-atk-runtime-diagnosis.md) verified every public layer. This
+   is environment-specific, not a product defect: on
+   2026-09-19 (latest check 14:51 Europe/Istanbul) TLS to `*.okx.com` was reset
+   while other HTTPS worked. Before concluding either way run
+   `curl -sS -o /dev/null -w "%{http_code}\n" "https://tr.okx.com/api/v5/market/ticker?instId=BTC-USDT"`.
+   While it fails the agent shows RECONNECTING and recovers on its own.
 2. VPS, together with the owner: the owner provides an Ubuntu VPS and a domain
    pointing at it and confirms tr.okx.com is reachable there. Then run the draft
    deployment from [deploy-vps.md](deploy-vps.md) and fix what the first real run
@@ -17,7 +21,9 @@ Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
 4. The canonical `.env` already holds OKX read-only keys and a Telegram token
    (values not displayed); account reads could not be verified locally because
    of the network. On the VPS prefer a new read-only key restricted to its IP,
-   and set `API_ACCESS_TOKEN` and `TELEGRAM_ALLOWED_USER_IDS`.
+   and set `API_ACCESS_TOKEN` and `TELEGRAM_ALLOWED_USER_IDS`. The allowlist is
+   empty today, so the bot answers anyone who messages it; do not guess the ID,
+   the owner reads it from the bot's `/start` reply.
 5. Owner: review `_archive/` (it holds `.env` files with filled keys and local
    run data) and delete it when satisfied. Decide separately whether to push
    `main` and the `archive/*` tags to GitHub and make `main` the default branch.

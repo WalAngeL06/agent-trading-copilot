@@ -69,17 +69,21 @@ class BotService:
             "account_auth": "UNKNOWN", "auto_earn_status": "UNKNOWN", "balance": None,
         }
         self.ui_events = []
+        # The app wires the local preference store here; OKX never verifies it.
+        self.lira_status = lambda: {"user_preference": None, "api_verification": "NOT_EXPOSED"}
 
     def _get_telegram_status(self):
         bot_status = "RUNNING" if self.is_running else "STOPPED"
         strategy = (self.latest_state.get("decision", {}).get("action", "UNKNOWN")
                     if self.latest_state else "UNKNOWN")
         market = "CONNECTED" if self.market_connected else "DISCONNECTED"
+        lira = self.lira_status()
         return (f"Trading Bot: {bot_status}\n"
                 f"Execution Mode: PAPER\n"
                 f"Market Connection: {market} (OKX ATK MCP)\n"
                 f"Account Auth: {self.private_state['account_auth']}\n"
-                f"Auto Earn: {self.private_state['auto_earn_status']}\n"
+                f"Lira Auto Earn: {lira['user_preference'] or 'NOT SPECIFIED'}\n"
+                f"API verification: {lira['api_verification'].replace('_', ' ')}\n"
                 f"Strategy State: {strategy}")
 
     def startup(self):

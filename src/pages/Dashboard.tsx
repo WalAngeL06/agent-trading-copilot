@@ -183,12 +183,11 @@ export function Dashboard({ data, busy, onStart, onStop, onStrategy, onLiraPrefe
             <StatusBadge tone={accountTone(data.accountAuth)}>{data.accountAuth}</StatusBadge>
           </div>
           <div className="capability-row">
-            <span><Icon name="shield" size={16}/>Lira Auto Earn</span>
-            <span>{data.liraAutoEarn.apiVerification === 'NOT_EXPOSED'
-              ? 'API status not exposed' : 'Verification unavailable'}</span>
+            <span><Icon name="shield" size={16}/>Lira Auto Earn · API verification</span>
+            <StatusBadge>{data.liraAutoEarn.apiVerification === 'NOT_EXPOSED' ? 'NOT EXPOSED' : 'UNKNOWN'}</StatusBadge>
           </div>
           <div className="capability-row">
-            <label htmlFor="lira-preference">Lira Auto Earn preference</label>
+            <label htmlFor="lira-preference">Lira Auto Earn · User preference</label>
             <select id="lira-preference" disabled={busy}
               value={data.liraAutoEarn.userPreference ?? ''}
               onChange={event => onLiraPreference((event.target.value || null) as LiraPreference)}>

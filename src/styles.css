@@ -599,7 +599,8 @@ main {
   border-bottom: 1px solid #2d4037;
 }
 
-.capability-row > span:first-child {
+.capability-row > span:first-child,
+.capability-row > label:first-child {
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -610,6 +611,11 @@ main {
 
 .capability-row svg {
   color: #708b7f;
+}
+
+.capability-row > select {
+  width: auto;
+  min-width: 140px;
 }
 
 .capability-note {

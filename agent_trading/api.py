@@ -73,6 +73,7 @@ def create_app(config=None, service=None, bot_config=None, bot_service=None,
 
     strategy_store = StrategyStore(strategy_path)
     preferences_store = AccountPreferenceStore(preferences_path)
+    bot_service.lira_status = preferences_store.lira_status
     bot_service.strategy_profile = strategy_store.current.to_profile()
     control_lock = asyncio.Lock()
 

@@ -15,16 +15,33 @@ Owner: Codex. Branch: `main` (formerly `strategy-v0.1`). Canonical root:
   for the same symbol and strategy profile; a stale session starts fresh with a
   warning. A `.active` marker restarts an owner-started agent after a backend
   restart; Stop clears it.
+- Telegram access: the canonical `.env` currently has an empty
+  `TELEGRAM_ALLOWED_USER_IDS`, so the bot works but answers `/status` and sends
+  notifications to anyone who messages it. Production must set it.
+- Telegram `/status` reports `Lira Auto Earn: <local preference>` and
+  `API verification: NOT EXPOSED`, like the WebApp; no generic Auto Earn line.
 - Tests no longer read the developer's `.env` (they had been polling Telegram and
   reading the OKX account with real credentials): 620 tests in ~15 s. Frontend
   15 tests and the production build pass.
 - Draft VPS deployment: `compose.yaml`, `deploy/Dockerfile`, `deploy/Caddyfile`,
   [deploy guide](deploy-vps.md). Not yet run on a real VPS (no Docker here).
 - Backtest candles restored to the ignored local `data/` (btc_long, btc_deep).
+- Lira Auto Earn (researched 2026-09-19): no read-only status exists. ATK 1.4.6
+  has only the write tool `earn_auto_set` (`POST /api/v5/account/set-auto-earn`);
+  the 2026-09-12 TR MCP catalog (165 tools) has no auto-earn read tool; balance
+  `autoLendStatus`/`autoStakingStatus` are generic per-currency Simple Earn flags
+  with no official link to Lira Auto Earn. API verification stays NOT_EXPOSED and
+  the UI shows it next to the optional local user preference.
+- Network: the application connects to OKX through ATK/MCP whenever network
+  access is available; the 2026-09-16 01:13 diagnosis verified every public layer
+  end to end. Environment observations, not a product defect: on 2026-09-19 (checks through 14:51 Europe/Istanbul) this
+  machine's network reset TLS whenever the SNI was `*.okx.com`, while another SNI
+  to the same IP completed normally. Re-check before concluding either way:
+  `curl -sS -o /dev/null -w "%{http_code}\n" "https://tr.okx.com/api/v5/market/ticker?instId=BTC-USDT"`
 
 Verified on this machine: browser access gate against a live backend, and
-RECONNECTING with Start/Stop marker lifecycle while the home network resets TLS
-to tr.okx.com (owner confirmed the WiFi cause; target runtime is a VPS).
+RECONNECTING with the Start/Stop marker lifecycle while OKX was unreachable from
+this machine.
 
 ## Product consolidation
 
@@ -41,7 +58,7 @@ into this root, without creating/moving/deleting any worktree or sibling folder.
 - BotService consumes configured bias/range/entry histories in causal order and
   waits at shared boundaries until delayed higher-timeframe bars arrive.
 - Market/account state, timestamps, equity, decisions and activity are backend
-  observations. Lira Auto Earn stays unavailable via API.
+  observations. Lira Auto Earn API verification: NOT EXPOSED (see above).
 - Optional local Lira Auto Earn preference (GET/PUT
   `/api/v1/account/preferences`, ignored `config/preferences.json`): a user
   declaration only, never sent to or verified by OKX; status stays UNKNOWN.
