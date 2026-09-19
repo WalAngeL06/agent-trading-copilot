@@ -11,6 +11,7 @@ import type {
   StrategyState,
 } from '../types/control.ts';
 import { STRATEGY_STATES } from '../types/control.ts';
+import { AccessDeniedError, browserAccessHeaders } from './access.ts';
 
 const viteEnv = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const DEFAULT_API_BASE = viteEnv?.VITE_BACKEND_URL || 'http://localhost:8000';
@@ -98,16 +99,22 @@ export class BackendApi implements TradingControlApi {
   readonly strategyStorage = 'BACKEND';
   private apiBase: string;
   private request: typeof fetch;
+  private access: () => Record<string, string>;
 
-  constructor(_storage?: ProfileStorage, apiBase = DEFAULT_API_BASE, request: typeof fetch = fetch) {
+  constructor(_storage?: ProfileStorage, apiBase = DEFAULT_API_BASE, request: typeof fetch = fetch,
+    access: () => Record<string, string> = browserAccessHeaders) {
     this.apiBase = apiBase;
     this.request = (...args) => request(...args);
+    this.access = access;
   }
 
   private async fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
+    const headers = new Headers(options?.headers);
+    for (const [name, value] of Object.entries(this.access())) headers.set(name, value);
     const response = await this.request(this.apiBase + url, {
-      ...options, signal: AbortSignal.timeout(15000),
+      ...options, headers, signal: AbortSignal.timeout(15000),
     });
+    if (response.status === 401) throw new AccessDeniedError();
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
       throw new Error(body?.error?.message || 'Backend request failed (' + response.status + ').');

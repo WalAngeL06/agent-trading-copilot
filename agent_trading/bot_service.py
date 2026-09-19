@@ -29,7 +29,8 @@ class BotService:
                  private_reader=read_private_snapshots,
                  private_config_loader=load_private_config,
                  telegram_token="", webapp_url="http://127.0.0.1:5173",
-                 telegram=None, retry_delays=(5, 15, 30, 60, 120, 300)):
+                 telegram=None, retry_delays=(5, 15, 30, 60, 120, 300),
+                 telegram_allowed_user_ids=()):
         self.config = config
         self.retry_delays = tuple(retry_delays)
         if not self.retry_delays or any(
@@ -54,7 +55,8 @@ class BotService:
         self.last_private_update = None
         self.latest_state = {}
         self.telegram = telegram or (TelegramBot(
-            telegram_token, webapp_url, status_callback=self._get_telegram_status)
+            telegram_token, webapp_url, status_callback=self._get_telegram_status,
+            allowed_user_ids=telegram_allowed_user_ids)
             if telegram_token else None)
         self.seen_event_ids = set()
         self.private_state = {

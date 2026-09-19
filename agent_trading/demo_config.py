@@ -7,7 +7,9 @@ import re
 from urllib.parse import urlsplit
 
 
-DEMO_ENV_FIELDS = ("TELEGRAM_BOT_TOKEN", "WEBAPP_URL", "ALLOWED_ORIGINS")
+DEMO_ENV_FIELDS = ("TELEGRAM_BOT_TOKEN", "WEBAPP_URL", "ALLOWED_ORIGINS",
+                   "API_ACCESS_TOKEN", "TELEGRAM_ALLOWED_USER_IDS")
+MIN_ACCESS_TOKEN_LENGTH = 24
 LOCAL_FRONTEND_ORIGINS = ("http://localhost:5173", "http://127.0.0.1:5173")
 
 
@@ -46,6 +48,25 @@ def _url(value, default):
     return value
 
 
+def _access_token(value):
+    value = value.strip()
+    if value and (len(value) < MIN_ACCESS_TOKEN_LENGTH
+                  or any(ord(char) <= 32 or ord(char) == 127 for char in value)):
+        raise ValueError(f"API_ACCESS_TOKEN must be at least {MIN_ACCESS_TOKEN_LENGTH} "
+                         "printable characters without spaces")
+    return value
+
+
+def _user_ids(value):
+    ids = []
+    for item in value.split(",") if value.strip() else ():
+        item = item.strip()
+        if not re.fullmatch(r"[1-9][0-9]{0,15}", item):
+            raise ValueError("TELEGRAM_ALLOWED_USER_IDS must be comma-separated Telegram user IDs")
+        ids.append(int(item))
+    return tuple(dict.fromkeys(ids))
+
+
 def _origin(value):
     parsed = urlsplit(value)
     if (parsed.scheme not in ("http", "https") or not parsed.netloc or parsed.username
@@ -59,6 +80,8 @@ class DemoConfig:
     telegram_bot_token: str = field(default="", repr=False)
     webapp_url: str = "http://127.0.0.1:5173"
     allowed_origins: tuple[str, ...] = LOCAL_FRONTEND_ORIGINS
+    api_access_token: str = field(default="", repr=False)
+    telegram_allowed_user_ids: tuple[int, ...] = ()
 
     @classmethod
     def from_env(cls, env_file=".env", *, env=None):
@@ -78,4 +101,6 @@ class DemoConfig:
                 origin = _origin(item.strip())
                 if origin not in origins:
                     origins.append(origin)
-        return cls(token, webapp_url, tuple(origins))
+        return cls(token, webapp_url, tuple(origins),
+                   _access_token(values.get("API_ACCESS_TOKEN", "")),
+                   _user_ids(values.get("TELEGRAM_ALLOWED_USER_IDS", "")))

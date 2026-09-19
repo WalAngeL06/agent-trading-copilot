@@ -142,7 +142,8 @@ class ApiDemoTests(unittest.TestCase):
             (root / ".env").write_text(
                 "TELEGRAM_BOT_TOKEN=secret-token\n"
                 "WEBAPP_URL=https://front.example/app\n"
-                "ALLOWED_ORIGINS=https://front.example\n",
+                "ALLOWED_ORIGINS=https://front.example\n"
+                "TELEGRAM_ALLOWED_USER_IDS=42\n",
                 encoding="utf-8",
             )
             config = AnalysisConfig(db_path=root / "history.sqlite3", audit_dir=root / "audit")
@@ -158,6 +159,7 @@ class ApiDemoTests(unittest.TestCase):
                 self.assertIsNotNone(app.state.bot_service.telegram)
                 self.assertEqual(app.state.bot_service.telegram.webapp_url,
                                  "https://front.example/app")
+                self.assertEqual(app.state.bot_service.telegram.allowed_user_ids, {42})
                 self.assertNotIn("secret-token", output.getvalue())
             finally:
                 os.chdir(previous)
@@ -203,7 +205,8 @@ class ApiDemoTests(unittest.TestCase):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             from agent_trading.api import create_app
-            with patch.dict("os.environ", {"ALLOWED_ORIGINS": "https://front.example"}, clear=True):
+            with patch.dict("os.environ", {"ALLOWED_ORIGINS": "https://front.example",
+                                           "API_ACCESS_TOKEN": "k" * 32}, clear=True):
                 app = create_app(config=AnalysisConfig(db_path=root / "history.sqlite3",
                                                        audit_dir=root / "audit"))
             with TestClient(app) as client:

@@ -6,8 +6,9 @@ from urllib.request import Request, urlopen
 
 
 class TelegramBot:
-    def __init__(self, token: str, webapp_url: str, status_callback=None):
+    def __init__(self, token: str, webapp_url: str, status_callback=None, allowed_user_ids=()):
         self.token = token
+        self.allowed_user_ids = frozenset(allowed_user_ids)
         self.webapp_url = webapp_url
         self.status_callback = status_callback
         self.base_url = f"https://api.telegram.org/bot{self.token}"
@@ -42,6 +43,12 @@ class TelegramBot:
         if not isinstance(chat, dict) or "id" not in chat:
             return
         chat_id = chat["id"]
+        sender = message.get("from")
+        user_id = sender.get("id") if isinstance(sender, dict) else None
+        if self.allowed_user_ids and user_id not in self.allowed_user_ids:
+            if type(user_id) is int:
+                self.send_message(chat_id, f"This bot is private. Your Telegram user ID is {user_id}.")
+            return
         self.chat_ids.add(chat_id)
         text = message["text"]
         if text.startswith("/start"):
@@ -49,7 +56,11 @@ class TelegramBot:
             markup = {"inline_keyboard": [[{
                 "text": "Open Dashboard", "web_app": {"url": self.webapp_url},
             }]]} if url.scheme == 'https' and url.hostname not in {'localhost', '127.0.0.1', '::1'} else None
-            self.send_message(chat_id, "Welcome to Agent Trading Copilot!", markup)
+            greeting = "Welcome to Agent Trading Copilot!"
+            if not self.allowed_user_ids and type(user_id) is int:
+                greeting += (f"\nYour Telegram user ID is {user_id}. Add it to "
+                             "TELEGRAM_ALLOWED_USER_IDS to make this bot private.")
+            self.send_message(chat_id, greeting, markup)
         elif text.startswith("/status"):
             status = (self.status_callback() if self.status_callback else
                       "Bot status is unavailable. Use the WebApp for details.")

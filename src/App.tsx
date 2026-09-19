@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { TradingControlApi } from './api/control.ts';
 import type { DashboardSnapshot, StrategyProfile, LiraPreference } from './types/control.ts';
 import { Dashboard } from './pages/Dashboard.tsx';
 import { StrategySettings } from './pages/StrategySettings.tsx';
 import { Icon } from './components/Icon.tsx';
 import { ConfirmDialog } from './components/ConfirmDialog.tsx';
+import { AccessGate } from './components/AccessGate.tsx';
+import { AccessDeniedError, saveAccessKey } from './api/access.ts';
 
 type Page = 'dashboard' | 'strategy';
 
@@ -19,6 +21,9 @@ export function App({ api, environment }: {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [accessRequired, setAccessRequired] = useState(false);
+  const [keyRejected, setKeyRejected] = useState(false);
+  const keySubmitted = useRef(false);
   const reportDirty = useCallback((value: boolean) => setDirty(value), []);
 
   const load = useCallback(async () => {
@@ -26,8 +31,12 @@ export function App({ api, environment }: {
     setError('');
     try {
       setData(await api.getDashboard());
-    } catch {
-      setError('Control center could not load. Try again.');
+      setAccessRequired(false);
+    } catch (problem) {
+      if (problem instanceof AccessDeniedError) {
+        setAccessRequired(true);
+        setKeyRejected(keySubmitted.current);
+      } else setError('Control center could not load. Try again.');
     } finally {
       setLoading(false);
     }
@@ -38,7 +47,7 @@ export function App({ api, environment }: {
   }, [load]);
 
   useEffect(() => {
-    if (busy) return;
+    if (busy || accessRequired) return;
     let active = true;
     let pending = false;
     const timer = window.setInterval(async () => {
@@ -47,12 +56,14 @@ export function App({ api, environment }: {
       try {
         const snapshot = await api.getDashboard();
         if (active) { setData(snapshot); setError(''); }
-      } catch {
-        if (active) setError('Backend unavailable. Displayed values are from the last successful read.');
+      } catch (problem) {
+        if (!active) return;
+        if (problem instanceof AccessDeniedError) setAccessRequired(true);
+        else setError('Backend unavailable. Displayed values are from the last successful read.');
       } finally { pending = false; }
     }, 2500);
     return () => { active = false; window.clearInterval(timer); };
-  }, [api, busy]);
+  }, [api, busy, accessRequired]);
 
   useEffect(() => {
     if (!dirty) return;
@@ -82,7 +93,8 @@ export function App({ api, environment }: {
     try {
       setData(await (action === 'start' ? api.startBot() : api.stopBot()));
     } catch (problem) {
-      setError(problem instanceof Error ? problem.message : 'Agent action failed. Try again.');
+      if (problem instanceof AccessDeniedError) setAccessRequired(true);
+      else setError(problem instanceof Error ? problem.message : 'Agent action failed. Try again.');
     } finally {
       setBusy(false);
     }
@@ -93,8 +105,18 @@ export function App({ api, environment }: {
     setBusy(true);
     setError('');
     try { setData(await api.saveLiraPreference(preference)); }
-    catch (problem) { setError(problem instanceof Error ? problem.message : 'Preference could not be saved.'); }
+    catch (problem) {
+      if (problem instanceof AccessDeniedError) setAccessRequired(true);
+      else setError(problem instanceof Error ? problem.message : 'Preference could not be saved.');
+    }
     finally { setBusy(false); }
+  }
+
+  function unlock(key: string) {
+    saveAccessKey(key);
+    keySubmitted.current = true;
+    setKeyRejected(false);
+    void load();
   }
 
   async function saveStrategy(profile: StrategyProfile): Promise<StrategyProfile> {
@@ -138,7 +160,9 @@ export function App({ api, environment }: {
         >Try again</button>}
       </div>}
 
-      {loading && !data
+      {accessRequired
+        ? <AccessGate telegram={environment === 'TELEGRAM'} rejected={keyRejected} onSubmit={unlock}/>
+        : loading && !data
         ? <div className="loading-state" role="status">Loading control terminal…</div>
         : data && (
           page === 'dashboard'
@@ -159,7 +183,7 @@ export function App({ api, environment }: {
         )}
     </main>
 
-    <nav className="bottom-nav" aria-label="Main navigation">
+    {!accessRequired && <nav className="bottom-nav" aria-label="Main navigation">
       <button
         type="button"
         className={page === 'dashboard' ? 'nav-item nav-item--active' : 'nav-item'}
@@ -176,7 +200,7 @@ export function App({ api, environment }: {
       >
         <Icon name="strategy"/><span>Strategy</span>
       </button>
-    </nav>
+    </nav>}
 
     {pendingPage && <ConfirmDialog
       title="Discard unsaved changes?"

@@ -1825,3 +1825,14 @@ tbody tr:last-child td {
     transition: none !important;
   }
 }
+
+.access-gate {
+  max-width: 440px;
+  margin: 48px auto 0;
+}
+
+.access-gate form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

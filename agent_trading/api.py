@@ -19,6 +19,7 @@ from .strategy_settings import StrategySettings, StrategyStore
 from .demo_config import DemoConfig
 from .account_preferences import AccountPreferences, AccountPreferenceStore
 from .okx_mcp_runtime import open_atk_mcp
+from .access import AccessPolicy, is_public_deployment
 
 
 _ERROR_MESSAGES = {
@@ -48,6 +49,11 @@ def create_app(config=None, service=None, bot_config=None, bot_service=None,
                preferences_path="config/preferences.json"):
     analysis_service = service or AnalysisService(config or AnalysisConfig.from_env())
     demo = demo_config or DemoConfig.from_env()
+    access = AccessPolicy(demo.api_access_token, demo.telegram_bot_token,
+                          demo.telegram_allowed_user_ids)
+    if not access.enabled and is_public_deployment(demo.webapp_url, demo.allowed_origins):
+        raise ValueError("A public WEBAPP_URL or ALLOWED_ORIGINS requires API_ACCESS_TOKEN or "
+                         "TELEGRAM_ALLOWED_USER_IDS; refusing to expose an unprotected API.")
     if bot_service is None:
         runtime_config = analysis_service.config
         bot_service = BotService(
@@ -58,6 +64,7 @@ def create_app(config=None, service=None, bot_config=None, bot_service=None,
             mcp_timeout=runtime_config.mcp_timeout_seconds,
             telegram_token=demo.telegram_bot_token,
             webapp_url=demo.webapp_url,
+            telegram_allowed_user_ids=demo.telegram_allowed_user_ids,
         )
 
     strategy_store = StrategyStore(strategy_path)
@@ -77,6 +84,18 @@ def create_app(config=None, service=None, bot_config=None, bot_service=None,
     app = FastAPI(title="Autonomous Trading Agent Analysis API", version="0.2", lifespan=lifespan)
     app.state.analysis_service = analysis_service
     app.state.bot_service = bot_service
+
+    # Registered before CORS so CORS stays outermost: preflights pass and
+    # rejections still carry CORS headers the browser can read.
+    @app.middleware("http")
+    async def require_access(request, call_next):
+        if (request.method != "OPTIONS" and request.url.path.startswith("/api/")
+                and not access.permits(request.headers.get("authorization"),
+                                       request.headers.get("x-telegram-init-data"))):
+            return JSONResponse(status_code=401, content={"error": {
+                "code": "UNAUTHORIZED",
+                "message": "An access key or an allowed Telegram account is required."}})
+        return await call_next(request)
 
     from fastapi.middleware.cors import CORSMiddleware
     app.add_middleware(

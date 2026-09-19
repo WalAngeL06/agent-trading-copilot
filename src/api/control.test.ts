@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { BackendApi } from './backend.ts';
+import { AccessDeniedError, buildAccessHeaders } from './access.ts';
 import { createDefaultStrategy } from '../types/control.ts';
 
 function transport() {
@@ -113,4 +114,34 @@ test('a reconnecting market is shown as reconnecting while the agent keeps runni
   const state = await new BackendApi(undefined, 'http://localhost:8000', request).getDashboard();
   assert.equal(state.market.connection, 'RECONNECTING');
   assert.equal(state.bot.status, 'RUNNING');
+});
+
+test('every request carries the access headers, including writes with a JSON body', async () => {
+  const wire = transport();
+  const seen: Headers[] = [];
+  const request = async (url: RequestInfo | URL, init?: RequestInit) => {
+    seen.push(new Headers(init?.headers));
+    return wire.request(url, init);
+  };
+  const api = new BackendApi(undefined, 'http://localhost:8000', request, () => buildAccessHeaders('signed-init-data', 'owner-key'));
+  await api.saveStrategy(createDefaultStrategy());
+  assert.equal(seen.length, 2);
+  for (const headers of seen) {
+    assert.equal(headers.get('X-Telegram-Init-Data'), 'signed-init-data');
+    assert.equal(headers.get('Authorization'), 'Bearer owner-key');
+  }
+  assert.equal(seen[0].get('Content-Type'), 'application/json');
+});
+
+test('access headers include only the credentials that exist', () => {
+  assert.deepEqual(buildAccessHeaders('', ''), {});
+  assert.deepEqual(buildAccessHeaders(undefined, ' owner-key '), {Authorization: 'Bearer owner-key'});
+  assert.deepEqual(buildAccessHeaders('signed', undefined), {'X-Telegram-Init-Data': 'signed'});
+});
+
+test('an unauthorized response asks for access instead of a generic failure', async () => {
+  const request = async () => Response.json({error: {code: 'UNAUTHORIZED', message: 'Access required.'}}, {status: 401});
+  const api = new BackendApi(undefined, 'http://localhost:8000', request as typeof fetch);
+  await assert.rejects(api.getDashboard(), AccessDeniedError);
+  await assert.rejects(api.startBot(), AccessDeniedError);
 });
