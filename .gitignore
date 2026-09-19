@@ -17,3 +17,6 @@ config/preferences.json
 config/.preferences-*.tmp
 .playwright-cli/
 output/playwright/
+
+# Local historical candles for offline backtests (not versioned)
+data/
