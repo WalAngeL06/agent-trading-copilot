@@ -1,7 +1,30 @@
-# Current project state - 2026-09-16
+# Current project state - 2026-09-19
 
 Owner: Codex. Branch: `main` (formerly `strategy-v0.1`). Canonical root:
 `C:/Users/Serdar Arif/Desktop/Agent Trading`.
+
+## VPS hardening - 2026-09-19 (Claude, owner-requested)
+
+- Market loop reconnects with backoff (5 s up to 5 min, RECONNECTING status) and
+  keeps the strategy state; history gaps and rejected data still stop the agent.
+- Owner-only API: `API_ACCESS_TOKEN` bearer key or Telegram Mini App initData
+  (HMAC per Telegram docs) from `TELEGRAM_ALLOWED_USER_IDS`. A non-local
+  `WEBAPP_URL`/`ALLOWED_ORIGINS` without either refuses to start. The Telegram
+  bot answers and notifies allowlisted users only. WebApp shows an access gate.
+- Durable PAPER session in `runs/product/paper_session.pickle`, resumed on Start
+  for the same symbol and strategy profile; a stale session starts fresh with a
+  warning. A `.active` marker restarts an owner-started agent after a backend
+  restart; Stop clears it.
+- Tests no longer read the developer's `.env` (they had been polling Telegram and
+  reading the OKX account with real credentials): 620 tests in ~15 s. Frontend
+  15 tests and the production build pass.
+- Draft VPS deployment: `compose.yaml`, `deploy/Dockerfile`, `deploy/Caddyfile`,
+  [deploy guide](deploy-vps.md). Not yet run on a real VPS (no Docker here).
+- Backtest candles restored to the ignored local `data/` (btc_long, btc_deep).
+
+Verified on this machine: browser access gate against a live backend, and
+RECONNECTING with Start/Stop marker lifecycle while the home network resets TLS
+to tr.okx.com (owner confirmed the WiFi cause; target runtime is a VPS).
 
 ## Product consolidation
 
@@ -50,8 +73,8 @@ Canonical .env has no OKX or Telegram credentials: private AUTH_MISSING is
 independent of successful public connectivity. See
 [fresh runtime diagnosis](fresh-atk-runtime-diagnosis.md).
 
-PAPER restarts replay historical bootstrap with simulated equity; positions are
-not durable across restart. Existing strategy hypotheses remain provisional.
+PAPER uses simulated equity; since 2026-09-19 its session survives restarts
+(see VPS hardening above). Existing strategy hypotheses remain provisional.
 No strategy profitability or empirical validation is claimed.
 
 ## Git and local data

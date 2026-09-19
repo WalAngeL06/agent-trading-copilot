@@ -19,15 +19,21 @@ the repository root. `/dashboard` redirects to the WebApp; there is one UI.
 - Configurable R-based partial take profits and runner management.
 - Optional read-only account equity/status and Telegram integration.
 - Local strategy configuration that survives backend restarts.
+- Durable PAPER session: positions and strategy state survive backend restarts.
+- Automatic reconnect to OKX market data with backoff (RECONNECTING status).
+- Owner-only API: an access key or allowlisted Telegram users.
 - PAPER execution only. No LIVE switch, exchange order submission or ANALYZE execution mode.
 - Existing analysis/history API and offline backtest CLI remain available.
 
 Strategy rules include documented provisional hypotheses; infrastructure and
 replay tests do not establish profitability. PAPER uses configured simulated
-equity (default 10,000), not the connected account balance. Each Start creates
-a new in-memory PAPER session and replays the bootstrap history; Stop ends its
-market processing. PAPER positions are not recovered across restart. Prices on
-the Dashboard are the latest closed entry-candle price, with an observation time.
+equity (default 10,000), not the connected account balance. The PAPER session
+(positions, trades, strategy state) is saved in `runs/product/` after every
+processed candle. Start resumes it while the symbol and strategy settings are
+unchanged; changing settings starts a fresh session with a new bootstrap. After a
+backend restart the agent starts again by itself if the owner left it running;
+Stop keeps it stopped. Prices on the Dashboard are the latest closed entry-candle
+price, with an observation time.
 
 ## Quick Start
 
@@ -95,6 +101,9 @@ Names only; put your own values in the ignored `.env`:
 - `VITE_BACKEND_URL`
 - `WEBAPP_URL`
 - `ALLOWED_ORIGINS`
+- `API_ACCESS_TOKEN`: browser access key (at least 24 characters)
+- `TELEGRAM_ALLOWED_USER_IDS`: Telegram users allowed to use the bot and Mini App
+- `DOMAIN`: server DNS name, used only by `compose.yaml`
 
 Local URL defaults are provided in `.env.example`. Restart the relevant service
 after changing environment configuration. Public market reads do not require
@@ -107,11 +116,13 @@ generic auto-lend flag is not OKX TR Lira Auto Earn: the UI shows
 - Secrets remain local; `.env` and runtime files are ignored by Git.
 - Grant read-only API permissions. Withdrawal permission should never be granted.
 - PAPER is the safe default and the only supported execution mode.
-- The backend binds to loopback. Its control API is intended for one local user;
-  it has no remote operator authentication. Add authenticated access before
-  exposing controls beyond your machine.
-- Start/stop and settings saves use confirmed backend state. A failed market
-  read stops processing and reports ERROR; restart to bootstrap after recovery.
+- Every `/api/` route requires the owner access key (`Authorization: Bearer`)
+  or Telegram Mini App data signed for an allowlisted user. Without either
+  setting the API stays open for local use only: the backend refuses to start
+  when `WEBAPP_URL` or `ALLOWED_ORIGINS` points beyond this machine.
+- Start/stop and settings saves use confirmed backend state. Failed market reads
+  reconnect with backoff (5 s up to 5 min) and keep the PAPER session; data the
+  strategy rejects, such as a history gap, stops the agent with ERROR.
 
 ## Telegram
 
@@ -119,9 +130,17 @@ Telegram is not required for local browser use. For optional Telegram setup,
 create a bot using BotFather, set its token and point `WEBAPP_URL` to the HTTPS
 address of this same React WebApp. Set `VITE_BACKEND_URL` to a backend address
 reachable from that device and include the frontend origin in `ALLOWED_ORIGINS`.
-Configure authenticated access before making the control API public. Telegram
-`/start` launches the WebApp and `/status` reports runtime state. Existing
+Set `TELEGRAM_ALLOWED_USER_IDS` so only you can use the bot and the Mini App; the
+bot's `/start` reply shows your user ID. Telegram `/start` launches the WebApp
+and `/status` reports runtime state. Existing
 `/dashboard` links redirect to `WEBAPP_URL`; update old links to the frontend.
+
+## Deploy to a VPS
+
+`compose.yaml` runs the backend and a Caddy web server with automatic HTTPS:
+`docker compose up -d --build` after setting `DOMAIN` and an access setting in
+`.env`. Step-by-step guide (Turkish): [docs/deploy-vps.md](docs/deploy-vps.md).
+The deployment files have not yet been exercised on a real VPS.
 
 ## Verification and technical history
 

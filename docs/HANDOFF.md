@@ -1,4 +1,19 @@
-# Current handoff - branch consolidation, 2026-09-19
+# Current handoff - VPS hardening, 2026-09-19
+
+Claude; branch `main`. The owner asked to make the system robust before moving
+it to a VPS, then to continue together. Read "VPS hardening" in
+[PROJECT_STATE](PROJECT_STATE.md) and [NEXT_TASK](NEXT_TASK.md).
+
+Commits: reconnect with backoff, owner-only API access, test isolation from the
+developer's `.env`, durable PAPER session, restart-after-restart marker, plus
+this documentation and the draft deployment files. Each feature was built test
+first; 620 Python tests, 15 frontend tests and the build pass. No push, no
+remote change, no LIVE path. The deployment files are unverified until the first
+real VPS run.
+
+---
+
+# Previous handoff - branch consolidation, 2026-09-19
 
 Claude; canonical root `C:/Users/Serdar Arif/Desktop/Agent Trading`, branch
 `main`. The Git layout changed; read "Git and local data" in

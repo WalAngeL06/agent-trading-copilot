@@ -1,0 +1,42 @@
+# VPS deployment: docker compose up -d --build
+# Needs DOMAIN (a DNS name pointing at this server) plus API_ACCESS_TOKEN or
+# TELEGRAM_ALLOWED_USER_IDS in .env. Guide: docs/deploy-vps.md
+services:
+  app:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      target: app
+    env_file: .env
+    environment:
+      WEBAPP_URL: https://${DOMAIN:?Set DOMAIN in .env}
+      ALLOWED_ORIGINS: https://${DOMAIN:?Set DOMAIN in .env}
+    volumes:
+      - agent-config:/app/config
+      - agent-runs:/app/runs
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      target: web
+      args:
+        PUBLIC_URL: https://${DOMAIN:?Set DOMAIN in .env}
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - app
+    restart: unless-stopped
+
+volumes:
+  agent-config:
+  agent-runs:
+  caddy-data:
+  caddy-config:

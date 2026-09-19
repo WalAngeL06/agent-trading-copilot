@@ -1,20 +1,23 @@
-# Next task - finish external verification
+# Next task - first VPS deployment
 
 Updated 2026-09-19. Do not create new worktrees or sibling Agent Trading folders.
 Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
 
-1. Public product-runtime verification is complete: fresh REST, Python HTTPS,
-   MCP lifecycle/discovery, ATK ticker/candles, normalization, BotService polling
-   and Dashboard CONNECTED all pass without runtime changes. Do not carry forward
-   the old "network blocked" conclusion. Evidence:
-   [fresh diagnosis](fresh-atk-runtime-diagnosis.md).
-2. If account status is wanted, the owner supplies read-only OKX credentials
-   directly in the ignored canonical .env. Restart and verify real account reads.
-   Do not copy old credential stores. Generic auto-lend is not Lira Auto Earn.
-3. Optional Telegram setup requires its token and reachable HTTPS WebApp/API.
-   The local browser workflow does not require Telegram.
-4. Consider durable PAPER session/position recovery as a separately specified
-   feature. Current Start creates a fresh historical bootstrap session.
+1. Network: on 2026-09-19 the owner's home WiFi reset TLS connections to
+   tr.okx.com and www.okx.com while other HTTPS worked; the owner confirmed the
+   WiFi cause. Locally the agent shows RECONNECTING. The 2026-09-16
+   [diagnosis](fresh-atk-runtime-diagnosis.md) passed on a working network.
+2. VPS, together with the owner: the owner provides an Ubuntu VPS and a domain
+   pointing at it and confirms tr.okx.com is reachable there. Then run the draft
+   deployment from [deploy-vps.md](deploy-vps.md) and fix what the first real run
+   reveals.
+3. Before that, the owner decides whether to publish `main` (and `archive/*`
+   tags) to GitHub and make `main` the default branch; GitHub still shows the
+   old `work/final-demo`.
+4. The canonical `.env` already holds OKX read-only keys and a Telegram token
+   (values not displayed); account reads could not be verified locally because
+   of the network. On the VPS prefer a new read-only key restricted to its IP,
+   and set `API_ACCESS_TOKEN` and `TELEGRAM_ALLOWED_USER_IDS`.
 5. Owner: review `_archive/` (it holds `.env` files with filled keys and local
    run data) and delete it when satisfied. Decide separately whether to push
    `main` and the `archive/*` tags to GitHub and make `main` the default branch.

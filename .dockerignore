@@ -1,0 +1,13 @@
+# Allowlist: only what the images need. Keeps .env, runtime data, local
+# archives and personal folders out of the build context.
+*
+!agent_trading
+!pyproject.toml
+!src
+!index.html
+!package.json
+!package-lock.json
+!tsconfig.json
+!vite.config.ts
+!deploy
+**/__pycache__
