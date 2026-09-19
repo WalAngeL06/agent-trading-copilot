@@ -35,8 +35,10 @@ class SettingsApiTests(unittest.TestCase):
         self.root = Path(self.tmp.name)
         self.config = AnalysisConfig(db_path=self.root / 'history.db', audit_dir=self.root / 'audit')
 
-    def app(self):
-        return create_app(config=self.config, strategy_path=self.root / 'strategy.json')
+    def app(self, **overrides):
+        return create_app(config=self.config, strategy_path=self.root / 'strategy.json',
+                          preferences_path=self.root / 'preferences.json',
+                          session_path=self.root / 'paper_session.pickle', **overrides)
 
     def test_save_survives_new_app_and_reaches_engine_profile(self):
         app = self.app()
@@ -118,9 +120,7 @@ class SettingsApiTests(unittest.TestCase):
         class PendingAdapter:
             async def candles(self, *args, **kwargs):
                 await asyncio.Event().wait()
-        app = create_app(config=self.config,
-                         strategy_path=self.root / 'strategy.json',
-                         mcp_factory=_PublicFactory(PendingAdapter()))
+        app = self.app(mcp_factory=_PublicFactory(PendingAdapter()))
         with TestClient(app) as client:
             config = client.get('/api/v1/strategy/config').json()
             for _ in range(3):

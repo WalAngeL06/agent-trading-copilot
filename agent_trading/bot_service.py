@@ -13,6 +13,10 @@ from .strategy_v1 import StrategyV1, StrategyProfile
 from .market import bar_duration
 
 
+class MarketHistoryGap(ValueError):
+    """Closed candles are missing between the processed history and the new read."""
+
+
 def _iso(value):
     if value is None:
         return None
@@ -30,8 +34,10 @@ class BotService:
                  private_config_loader=load_private_config,
                  telegram_token="", webapp_url="http://127.0.0.1:5173",
                  telegram=None, retry_delays=(5, 15, 30, 60, 120, 300),
-                 telegram_allowed_user_ids=()):
+                 telegram_allowed_user_ids=(), session_store=None):
         self.config = config
+        self.session_store = session_store
+        self._resumed = False
         self.retry_delays = tuple(retry_delays)
         if not self.retry_delays or any(
                 type(delay) not in (int, float) or not math.isfinite(delay) or delay < 0
@@ -98,14 +104,37 @@ class BotService:
         if self.is_running or (self.task and not self.task.done()):
             return False
         self.is_running = True
-        self.brain = StrategyV1(self.config.symbol, self.strategy_profile)
-        self.stream_as_of = {}
+        restored = (self.session_store.load(self.config.symbol, self.strategy_profile)
+                    if self.session_store else None)
+        self._resumed = restored is not None
+        if restored:
+            self.brain, self.stream_as_of = restored
+            # Events of the resumed session were already announced before the restart.
+            self.seen_event_ids = {event.id for event in self.brain.report().get("events", ())}
+            self._add_ui_event("Agent", "Resumed saved PAPER session")
+        else:
+            self._new_session()
+            self._add_ui_event("Agent", "Started in PAPER mode; historical bootstrap")
         self.latest_state = {}
         self.market_status = "WAITING"
-        self._add_ui_event("Agent", "Started in PAPER mode; historical bootstrap")
-        self.seen_event_ids = set()
         self.task = asyncio.create_task(self._run_loop())
         return True
+
+    def _new_session(self):
+        self.brain = StrategyV1(self.config.symbol, self.strategy_profile)
+        self.stream_as_of = {}
+        self.seen_event_ids = set()
+        if self.session_store:
+            self.session_store.clear()
+
+    def _save_session(self):
+        if not self.session_store:
+            return
+        try:
+            self.session_store.save(self.config.symbol, self.strategy_profile,
+                                    self.brain, self.stream_as_of)
+        except Exception as exc:
+            logging.warning("PAPER session could not be saved (%s)", type(exc).__name__)
 
     def stop(self):
         if not self.is_running and self.task is None:
@@ -251,13 +280,15 @@ class BotService:
                    and (previous is None or c.close_time > previous)]
             for candle in new:
                 if previous is not None and candle.close_time != previous + bar_duration(timeframe):
-                    raise ValueError("Market history gap; restart to bootstrap")
+                    raise MarketHistoryGap("Market history gap; restart to bootstrap")
                 previous = candle.close_time
             incoming.extend(new)
         incoming.sort(key=lambda c: (c.close_time, roles.rank(c.timeframe)))
         for candle in incoming:
             self.brain.process(candle)
             self.stream_as_of[candle.timeframe] = candle.close_time
+        if incoming:
+            self._save_session()
         self.market_connected = True
         self.market_status = "WAITING" if deferred else "CONNECTED"
         self.last_market_update = observed_at
@@ -283,12 +314,20 @@ class BotService:
                             processing = True
                             self._apply_market_read(histories, observed_at)
                             processing = False
+                            self._resumed = False
                             if failures:
                                 failures = 0
                                 self._add_ui_event("OKX ATK", "market reconnected")
                             await asyncio.sleep(self.config.poll_interval_seconds)
                 except Exception as exc:
                     self.market_connected = False
+                    if processing and self._resumed and isinstance(exc, MarketHistoryGap):
+                        # The saved session ends before the history OKX still serves.
+                        self._resumed = False
+                        self._new_session()
+                        self._add_ui_event("Agent", "Saved PAPER session is too old to resume; "
+                                           "started a fresh session", "warning")
+                        continue
                     if processing:
                         self.market_status = "ERROR"
                         self._add_ui_event("OKX ATK", "market data rejected; agent stopped", "warning")

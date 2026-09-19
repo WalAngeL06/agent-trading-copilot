@@ -20,6 +20,7 @@ from .demo_config import DemoConfig
 from .account_preferences import AccountPreferences, AccountPreferenceStore
 from .okx_mcp_runtime import open_atk_mcp
 from .access import AccessPolicy, is_public_deployment
+from .paper_session import PaperSessionStore
 
 
 _ERROR_MESSAGES = {
@@ -46,7 +47,8 @@ def _iso(value):
 
 def create_app(config=None, service=None, bot_config=None, bot_service=None,
                mcp_factory=None, demo_config=None, strategy_path="config/strategy.json",
-               preferences_path="config/preferences.json"):
+               preferences_path="config/preferences.json",
+               session_path="runs/product/paper_session.pickle"):
     analysis_service = service or AnalysisService(config or AnalysisConfig.from_env())
     demo = demo_config or DemoConfig.from_env()
     access = AccessPolicy(demo.api_access_token, demo.telegram_bot_token,
@@ -65,6 +67,7 @@ def create_app(config=None, service=None, bot_config=None, bot_service=None,
             telegram_token=demo.telegram_bot_token,
             webapp_url=demo.webapp_url,
             telegram_allowed_user_ids=demo.telegram_allowed_user_ids,
+            session_store=PaperSessionStore(session_path),
         )
 
     strategy_store = StrategyStore(strategy_path)
