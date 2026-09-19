@@ -7,9 +7,9 @@ it to a VPS, then to continue together. Read "VPS hardening" in
 Commits: reconnect with backoff, owner-only API access, test isolation from the
 developer's `.env`, durable PAPER session, restart-after-restart marker, plus
 this documentation and the draft deployment files. Each feature was built test
-first; 620 Python tests, 15 frontend tests and the build pass. No push, no
-remote change, no LIVE path. The deployment files are unverified until the first
-real VPS run.
+first; 620 Python tests, 15 frontend tests and the build passed then. No LIVE
+path. GitHub publishing follows the fast-forward rule in NEXT_TASK. The
+deployment files are unverified until the first real VPS run.
 
 ---
 

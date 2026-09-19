@@ -119,9 +119,12 @@ keys in `-final` and `-auth`, `runs/`, `data/` and virtual environments. The
 owner reviews and deletes it. User folders (Yeni klasör, odin-videolar,
 öğrenme-dd finance ve odin) are untouched and untracked.
 
-Remote `origin` (public GitHub) is unchanged: its `main` is still 6671358 and
-its default branch is `work/final-demo`. Publishing `main` and the tags is a
-separate owner decision. The session worktree
+Remote `origin` is the **private** GitHub repository
+`WalAngeL06/agent-trading-copilot` (verified 2026-09-19; earlier records that call
+it public are outdated). `main` is published by fast-forward only and is the
+default branch. PR #1 (`work/final-demo` -> `main`) is stale and must never be
+merged. `work/final-demo` and the local `archive/*` tags are kept. The session
+worktree
 `.claude/worktrees/gracious-meninsky-11af1e` (branch
 `claude/worktree-question-1778f7`, no unique commits) remains until the desktop
 app removes it.

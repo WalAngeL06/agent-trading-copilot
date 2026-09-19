@@ -34,8 +34,26 @@ ayarları), `agent-runs` (PAPER oturumu, analiz geçmişi), `caddy-data`
 
 1. Docker Engine ve Compose eklentisini resmi talimatla kur:
    <https://docs.docker.com/engine/install/ubuntu/>
-2. Kodu VPS'e al. GitHub'daki repo şu an eski `work/final-demo` dalını gösteriyor;
-   önce güncel `main` yayımlanmalı (ya da klasör `scp` ile kopyalanmalı).
+2. Kodu VPS'e al. Repo **private** olduğu için VPS'e sadece okuma yetkili bir
+   deploy key gerekir:
+
+   ```bash
+   ssh-keygen -t ed25519 -C "agent-trading-vps" -f ~/.ssh/agent_trading_deploy -N ""
+   cat ~/.ssh/agent_trading_deploy.pub
+   ```
+
+   Çıkan satırı GitHub'da repo → **Settings → Deploy keys → Add deploy key**
+   bölümüne yapıştır; **Allow write access** kutusunu işaretleme. Sonra:
+
+   ```bash
+   GIT_SSH_COMMAND="ssh -i ~/.ssh/agent_trading_deploy -o IdentitiesOnly=yes" \
+     git clone git@github.com:WalAngeL06/agent-trading-copilot.git agent-trading
+   cd agent-trading
+   git config core.sshCommand "ssh -i ~/.ssh/agent_trading_deploy -o IdentitiesOnly=yes"
+   ```
+
+   Son satır, güncellemelerde `git pull` komutunun aynı anahtarı kullanmasını
+   sağlar. Varsayılan dal `main`.
 3. `.env` oluştur: `cp .env.example .env` ve doldur:
    - `DOMAIN=bot.ornek.com`
    - `API_ACCESS_TOKEN=` en az 24 karakterlik rastgele anahtar:

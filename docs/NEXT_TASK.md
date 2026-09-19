@@ -15,9 +15,10 @@ Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
    pointing at it and confirms tr.okx.com is reachable there. Then run the draft
    deployment from [deploy-vps.md](deploy-vps.md) and fix what the first real run
    reveals.
-3. Before that, the owner decides whether to publish `main` (and `archive/*`
-   tags) to GitHub and make `main` the default branch; GitHub still shows the
-   old `work/final-demo`.
+3. GitHub: `WalAngeL06/agent-trading-copilot` is private. Publish `main` by
+   fast-forward only and keep it the default branch. Never merge stale PR #1
+   (`work/final-demo` -> `main`). Keep `work/final-demo` and the local
+   `archive/*` tags until the owner decides otherwise.
 4. The canonical `.env` already holds OKX read-only keys and a Telegram token
    (values not displayed); account reads could not be verified locally because
    of the network. On the VPS prefer a new read-only key restricted to its IP,
@@ -25,8 +26,8 @@ Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
    empty today, so the bot answers anyone who messages it; do not guess the ID,
    the owner reads it from the bot's `/start` reply.
 5. Owner: review `_archive/` (it holds `.env` files with filled keys and local
-   run data) and delete it when satisfied. Decide separately whether to push
-   `main` and the `archive/*` tags to GitHub and make `main` the default branch.
+   run data) and delete it when satisfied. Pushing the local `archive/*` tags
+   to GitHub is optional.
 6. Archived, unreviewed candidates: the BacktestPage UI in `archive/final-ui`.
    The LIVE_SMOKE path in `archive/final-demo` stays out of scope unless the
    owner explicitly authorizes live execution work.
