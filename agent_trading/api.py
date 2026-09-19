@@ -2,6 +2,7 @@
 
 import asyncio
 from contextlib import asynccontextmanager
+import logging
 from typing import Annotated
 from uuid import UUID
 
@@ -79,6 +80,8 @@ def create_app(config=None, service=None, bot_config=None, bot_service=None,
     async def lifespan(app):
         await analysis_service.startup()
         bot_service.startup()
+        if bot_service.session_store and bot_service.session_store.was_active():
+            bot_service.start()  # The owner left the agent running before this restart.
         try:
             yield
         finally:
@@ -249,6 +252,7 @@ def create_app(config=None, service=None, bot_config=None, bot_service=None,
     async def bot_start():
         async with control_lock:
             started = bot_service.start()
+            remember_running(True)
             return {"status": "started" if started else "already running"}
 
     @app.post("/api/v1/bot/stop")
@@ -256,9 +260,18 @@ def create_app(config=None, service=None, bot_config=None, bot_service=None,
         async with control_lock:
             task = bot_service.task
             stopped = bot_service.stop()
+            remember_running(False)
             if task:
                 await asyncio.gather(task, return_exceptions=True)
             return {"status": "stopped" if stopped else "not running"}
+
+    def remember_running(active):
+        if bot_service.session_store is None:
+            return
+        try:
+            bot_service.session_store.mark_active(active)
+        except OSError:
+            logging.warning("Agent run state could not be saved")
 
     @app.get("/dashboard", include_in_schema=False)
     async def dashboard():

@@ -1,3 +1,4 @@
+import asyncio
 from dataclasses import replace
 from datetime import timedelta
 from decimal import Decimal
@@ -9,6 +10,7 @@ from unittest.mock import patch
 
 from agent_trading.analysis_config import AnalysisConfig
 from agent_trading.api import create_app
+from fastapi.testclient import TestClient
 from env_isolation import BLANK_LOCAL_SETTINGS, isolated_environment
 from agent_trading.backtest.dataset import load_stream
 from agent_trading.bot_service import BotService
@@ -187,3 +189,40 @@ class BotSessionResumeTests(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class _PendingAdapter:
+    """Connected market that never publishes a candle: the agent stays running."""
+
+    async def candles(self, *args, **kwargs):
+        await asyncio.Event().wait()
+
+
+class AgentAutoResumeTests(unittest.TestCase):
+    def _app(self, root):
+        return create_app(config=AnalysisConfig(db_path=root / "history.sqlite3", audit_dir=root / "audit"),
+                          mcp_factory=_CountingFactory(_PendingAdapter()),
+                          strategy_path=root / "strategy.json", preferences_path=root / "preferences.json",
+                          session_path=root / "paper_session.pickle")
+
+    def _status(self, client):
+        return client.get("/api/v1/bot/status").json()["bot_status"]
+
+    def test_agent_started_by_the_owner_is_running_again_after_a_backend_restart(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            with TestClient(self._app(root)) as client:
+                self.assertEqual(client.post("/api/v1/bot/start").status_code, 200)
+            with TestClient(self._app(root)) as client:
+                self.assertEqual(self._status(client), "running")
+
+    def test_agent_stopped_by_the_owner_stays_stopped_after_a_backend_restart(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            with TestClient(self._app(root)) as client:
+                client.post("/api/v1/bot/start")
+                self.assertEqual(client.post("/api/v1/bot/stop").status_code, 200)
+            with TestClient(self._app(root)) as client:
+                self.assertEqual(self._status(client), "stopped")
+            with TestClient(self._app(root)) as client:
+                self.assertEqual(self._status(client), "stopped")

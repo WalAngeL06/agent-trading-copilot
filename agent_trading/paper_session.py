@@ -53,3 +53,18 @@ class PaperSessionStore:
 
     def clear(self):
         self.path.unlink(missing_ok=True)
+
+    @property
+    def _active_path(self):
+        return self.path.with_name(self.path.name + ".active")
+
+    def mark_active(self, active):
+        """Remember whether the owner left the agent running, across backend restarts."""
+        if active:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            self._active_path.touch()
+        else:
+            self._active_path.unlink(missing_ok=True)
+
+    def was_active(self):
+        return self._active_path.exists()
