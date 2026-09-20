@@ -3,7 +3,13 @@
 Updated 2026-09-19. Do not create new worktrees or sibling Agent Trading folders.
 Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
 
-1. Network: the application connects to OKX through ATK/MCP whenever network
+1. Strategy (owner decision, highest value): the range layer now follows the
+   guide, but the engine is still LONG_ONLY while 27 of 30 measured
+   manipulations are SHORT, and the 4H long permission is not a guide rule.
+   Decide whether to implement the guide's two-directional deviation model and
+   replace the permission gate with its HTF context (4.3) and premium/discount
+   (4.4) rules. Only then does multi-pair data become informative.
+2. Network: the application connects to OKX through ATK/MCP whenever network
    access is available; the 2026-09-16
    [diagnosis](fresh-atk-runtime-diagnosis.md) verified every public layer. This
    is environment-specific, not a product defect: on

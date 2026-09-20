@@ -138,15 +138,23 @@ class RangeTests(ScenarioMixin, unittest.TestCase):
         self.assertEqual(state.range_high, D('140'))
         self.assertEqual(state.eq, D('129'))
 
-    def test_a_pre_confirmation_wick_below_range_low_invalidates_the_candidate(self):
+    def test_a_pre_confirmation_sweep_survives_and_only_a_breakout_body_invalidates(self):
+        # [U-RANGE-GUIDE-001] range 118/140: EQ 129, deviation limit 5.5.
         candidate_at = first_event(self.strategy, 'RANGE_CANDIDATE').observed_at
+        swept = replace_candle(range_candles(), candidate_at + timedelta(hours=1),
+                               low=D('117'), open=D('124'), high=D('124'), close=D('120'))
+        strategy = run_scenario(candles=bias_candles() + swept + entry_candles())
+        self.assertIsNone(first_event(strategy, 'RANGE_INVALIDATED'))
+        self.assertNotEqual(strategy.range.state.phase, 'RANGE_INVALIDATED')
+        self.assertEqual((strategy.range.state.range_low, strategy.range.state.range_high),
+                         (D('118'), D('140')))
         broken = replace_candle(range_candles(), candidate_at + timedelta(hours=1),
-                                low=D('117'), open=D('124'), high=D('124'), close=D('120'))
+                                low=D('110'), open=D('124'), high=D('124'), close=D('111'))
         strategy = run_scenario(candles=bias_candles() + broken + entry_candles())
         invalidated = first_event(strategy, 'RANGE_INVALIDATED')
         self.assertIsNotNone(invalidated)
-        self.assertIn('WICK_BELOW_RANGE_LOW', invalidated.payload.invalidation_reasons)
-        self.assertIsNone(first_event(strategy, 'RANGE_CONFIRMED'))
+        self.assertIn('BODY_CLOSE_BELOW_DEVIATION_LIMIT',
+                      invalidated.payload.invalidation_reasons)
 
     def test_manipulation_cannot_exist_before_range_confirmation(self):
         confirmed_at = first_event(self.strategy, 'RANGE_CONFIRMED').observed_at

@@ -1,4 +1,27 @@
-# Current project state - 2026-09-19
+# Current project state - 2026-09-20
+
+## Range rules aligned with the source guide - 2026-09-20 [U-RANGE-GUIDE-001]
+
+The missing strategy source turned up as the owner's
+`range_trade_learning_guide.md`, now kept in the repository as
+[the guide](specs/range-trade-learning-guide.md). Its section 4.1/4.2 defines a
+wick beyond a boundary as a liquidity sweep and reserves invalidation for a body
+closing past the boundary by more than half of (RangeHigh - EQ); section 3.2
+counts a touch only after price returns to EQ. The code did the opposite, so the
+owner replaced [U-RANGE-BOUNDARIES-001] with [U-RANGE-GUIDE-001].
+
+- `RangeEngine` now invalidates (and retires) on breakout bodies only, validates
+  touches through EQ visits, and exposes `range_deviation_ratio` /
+  `range_require_eq_visit` on the profile.
+- Measured on one year of BTC (`data/btc_deep`), old -> new: confirmed ranges
+  5 -> 7, manipulations 15 -> 30, invalidated candidates 112 (all wicks) -> 67
+  (all breakout bodies). Trades stay 0.
+- The binding constraint moved to direction: 27 of 30 manipulations are SHORT
+  while the strategy is LONG_ONLY, and the 4H long permission blocks more than
+  half of the remaining bars. Details and the rule-by-rule comparison:
+  [gap report](specs/range-model-gap-2026-09-20.md).
+- 630 Python tests pass. Charts of every confirmed and rejected range are
+  written next to each run (`runs/<label>/charts`).
 
 Owner: Codex. Branch: `main` (formerly `strategy-v0.1`). Canonical root:
 `C:/Users/Serdar Arif/Desktop/Agent Trading`.

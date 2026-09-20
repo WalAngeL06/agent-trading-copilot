@@ -98,8 +98,12 @@ class StrategyProfile:
     secondary_fvg_support_enabled: bool = True
     # [U-RANGE-RESEEK-001] look for a new range after a candidate invalidates.
     range_reseek_enabled: bool = True
-    # [U-RANGE-RETIRE-001] retire a confirmed range on a body close outside it.
+    # [U-RANGE-RETIRE-001] retire a confirmed range on a breakout body close.
     range_retire_enabled: bool = True
+    # [U-RANGE-GUIDE-001] guide 4.1: tolerated overshoot as a share of (RH - EQ).
+    range_deviation_ratio: Decimal = Decimal('0.5')
+    # [U-RANGE-GUIDE-001] guide 3.2: a boundary touch counts after an EQ visit.
+    range_require_eq_visit: bool = True
     # [U-MULTI-SETUP-001] allow a new setup once the previous trade has closed.
     multi_setup_enabled: bool = True
     # Structural trailing: only confirmed entry-timeframe higher lows, only
@@ -143,7 +147,8 @@ class StrategyProfile:
         if not isinstance(self.swing, SwingConfig):
             raise ValueError('swing must be SwingConfig')
         for name in ('entry_level_ratio', 'boundary_proximity', 'equity', 'stop_buffer',
-                     'risk_fraction', 'quantity_step', 'min_reward_risk', 'break_even_r'):
+                     'risk_fraction', 'quantity_step', 'min_reward_risk', 'break_even_r',
+                     'range_deviation_ratio'):
             value = getattr(self, name)
             if not isinstance(value, Decimal) or not value.is_finite():
                 raise ValueError(f'{name} must be a finite Decimal')
@@ -151,6 +156,8 @@ class StrategyProfile:
             raise ValueError('entry_level_ratio must be within [0, 1]')
         if self.boundary_proximity < 0:
             raise ValueError('boundary_proximity must not be negative')
+        if self.range_deviation_ratio < 0:
+            raise ValueError('range_deviation_ratio must not be negative')
         for name in ('equity', 'stop_buffer', 'risk_fraction', 'quantity_step',
                      'min_reward_risk', 'break_even_r'):
             if getattr(self, name) <= 0:

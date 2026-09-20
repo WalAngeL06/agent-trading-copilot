@@ -122,18 +122,21 @@ class ReplayTests(unittest.TestCase):
             records=tuple(e.payload.raw for e in brain.events if e.kind in ('SWING_LOW','SWING_HIGH'))
             self.assertEqual(records,independent.confirmed)
             if tf=='4H':
-                self.assertEqual(brain.range.state.invalidation_candle.low,D('62457.1'))
+                self.assertEqual(brain.range.state.invalidation_reasons,
+                                 ('BODY_CLOSE_BELOW_DEVIATION_LIMIT',))
+                self.assertEqual(brain.range.state.invalidation_candle.close,D('62530'))
                 self.assertEqual(brain.range.state.range_low,D('63261.6'))
                 self.assertTrue(any(raw.price==D('62983.5') for raw in records))
 
-    def test_synthetic_preconfirmation_breach_invalidates_only_range_and_keeps_future_raw(self):
+    def test_synthetic_preconfirmation_breakout_invalidates_only_range_and_keeps_future_raw(self):
+        # Range 80000/120000: EQ 100000, so only a body below 70000 is a breakout.
         candles=list(read_candles(FIXTURE))
-        candles[13]=replace(candles[13],low=D('79000'))
+        candles[13]=replace(candles[13],low=D('69000'),close=D('69500'))
         brain=replay(candles,CONFIG)
         state=brain.range.state
         self.assertEqual(state.phase,'RANGE_INVALIDATED')
         self.assertEqual(state.invalidated_at,candles[13].close_time)
-        self.assertEqual(state.invalidation_reasons,('WICK_BELOW_RANGE_LOW',))
+        self.assertEqual(state.invalidation_reasons,('BODY_CLOSE_BELOW_DEVIATION_LIMIT',))
         self.assertEqual(brain.broker.trades,())
         self.assertFalse(any(e.kind in ('RANGE_CONFIRMED','SWEEP','RECLAIM') for e in brain.events))
         independent=SwingEngine('BTC-USDT','15m',CONFIG.swing)

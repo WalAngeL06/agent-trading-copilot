@@ -1,4 +1,18 @@
-# Current handoff - VPS hardening, 2026-09-19
+# Current handoff - range rules aligned with the guide, 2026-09-20
+
+Claude; branch `main`. The owner supplied the original strategy source
+(`range_trade_learning_guide.md`); it is now `docs/specs/range-trade-learning-guide.md`.
+Work done: rule-by-rule gap report, guide range rules (deviation limit,
+body-close invalidation, EQ-validated touches) with tests, and a before/after
+measurement on one year of BTC data. Tests that encoded the superseded
+[U-RANGE-BOUNDARIES-001] were rewritten, not deleted; 630 Python tests pass.
+The strategy still opens no trades: the next blocker is direction, not the range
+layer. See [PROJECT_STATE](PROJECT_STATE.md) and
+[the gap report](specs/range-model-gap-2026-09-20.md). No push in this turn.
+
+---
+
+# Previous handoff - VPS hardening, 2026-09-19
 
 Claude; branch `main`. The owner asked to make the system robust before moving
 it to a VPS, then to continue together. Read "VPS hardening" in

@@ -99,9 +99,10 @@ class RangeReseekUnitTests(unittest.TestCase):
 class RangeRetireTests(unittest.TestCase):
     """[U-RANGE-RETIRE-001] a confirmed range retires when a body truly leaves it.
 
-    The tolerance is `boundary_proximity`, the distance the profile already uses
-    for "at the boundary". That is what separates a manipulation sweep, which
-    pokes just past the edge and reclaims, from price leaving the band.
+    [U-RANGE-GUIDE-001] sets the tolerance: half of (RangeHigh - EQ). That is
+    what separates a manipulation sweep, which pokes past the edge and reclaims,
+    from a breakout where price leaves the band for good. Range 100 .. 120 here,
+    so EQ is 110 and bodies may close between 95 and 125.
     """
 
     def _confirmed(self, proximity=5, allow_retire=True):
@@ -118,13 +119,13 @@ class RangeRetireTests(unittest.TestCase):
         engine = self._confirmed()
         states = engine.process(bar(START + 3 * STEP, low=90, price=92))   # 8 below 100
         self.assertEqual(engine.state.phase, 'RANGE_RETIRED')
-        self.assertEqual(states[-1].invalidation_reasons, ('BODY_CLOSE_BELOW_RANGE_LOW',))
+        self.assertEqual(states[-1].invalidation_reasons, ('BODY_CLOSE_BELOW_DEVIATION_LIMIT',))
 
     def test_an_upside_departure_is_recorded_with_its_own_reason(self):
         engine = self._confirmed()
         engine.process(bar(START + 3 * STEP, low=125, price=130))          # 10 above 120
         self.assertEqual(engine.state.invalidation_reasons,
-                         ('BODY_CLOSE_ABOVE_RANGE_HIGH',))
+                         ('BODY_CLOSE_ABOVE_DEVIATION_LIMIT',))
 
     def test_a_sweep_that_closes_just_past_the_edge_does_not_retire(self):
         engine = self._confirmed()
@@ -162,7 +163,7 @@ class ReseekStrategyTests(unittest.TestCase):
     def _broken(self, profile=None):
         strategy = run_scenario()
         candidate_at = first_event(strategy, 'RANGE_CANDIDATE').observed_at
-        broken = [replace(c, low=D('117'), open=D('124'), high=D('124'), close=D('120'))
+        broken = [replace(c, low=D('110'), open=D('124'), high=D('124'), close=D('111'))
                   if c.close_time == candidate_at + timedelta(hours=1) else c
                   for c in range_candles()]
         return run_scenario(profile=profile,

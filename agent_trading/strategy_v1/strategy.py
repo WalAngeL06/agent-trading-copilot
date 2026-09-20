@@ -42,7 +42,9 @@ class StrategyV1:
         self.range_structure = StructureEngine(symbol, roles.range)
         self.range = RangeEngine(self.profile.boundary_proximity,
                                  allow_reseek=self.profile.range_reseek_enabled,
-                                 allow_retire=self.profile.range_retire_enabled)
+                                 allow_retire=self.profile.range_retire_enabled,
+                                 deviation_ratio=self.profile.range_deviation_ratio,
+                                 require_eq_visit=self.profile.range_require_eq_visit)
         self.manipulation = ManipulationEngine()
         self.entry_swing = SwingEngine(symbol, roles.entry, self.profile.swing)
         self.gaps = GapEngine()

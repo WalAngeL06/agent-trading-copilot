@@ -1,4 +1,9 @@
-"""User boundary correction: closed-prefix wick checks precede range confirmation."""
+"""Guide boundary rules [U-RANGE-GUIDE-001]: sweeps keep a candidate, breakout bodies end it.
+
+Supersedes the wick-breach invalidation of [U-RANGE-BOUNDARIES-001]. The frozen
+candidate is 80 .. 120, so EQ is 100 and the deviation limit is 10: bodies may
+close down to 70 and up to 130 while the structure survives.
+"""
 from decimal import Decimal as D
 import unittest
 from test_trading_brain import bar, raw, pair
@@ -16,11 +21,10 @@ def candidate(phase='WAIT_LOW_TOUCH'):
     return engine
 
 class FrozenBoundaryTests(unittest.TestCase):
-    def test_any_lower_upper_or_dual_wick_breach_invalidates_in_both_pending_phases(self):
+    def test_bodies_beyond_the_deviation_limit_invalidate_in_both_pending_phases(self):
         cases=(
-            (bar(10,'100','105','79.9','100'),('WICK_BELOW_RANGE_LOW',)),
-            (bar(10,'100','120.1','95','100'),('WICK_ABOVE_RANGE_HIGH',)),
-            (bar(10,'100','120.1','79.9','100'),('WICK_BELOW_RANGE_LOW','WICK_ABOVE_RANGE_HIGH')),
+            (bar(10,'100','105','69','69.9'),('BODY_CLOSE_BELOW_DEVIATION_LIMIT',)),
+            (bar(10,'100','131','95','130.1'),('BODY_CLOSE_ABOVE_DEVIATION_LIMIT',)),
         )
         for phase in ('WAIT_LOW_TOUCH','WAIT_HIGH_TOUCH'):
             for candle,reasons in cases:
@@ -36,9 +40,18 @@ class FrozenBoundaryTests(unittest.TestCase):
                     self.assertIsNone(invalidated.confirmed_at)
                     self.assertEqual(ManipulationEngine().process(candle,invalidated),())
 
-    def test_breach_wins_over_a_high_touch_confirmed_on_the_same_bar(self):
+    def test_sweeps_of_either_boundary_keep_the_candidate_alive(self):
+        for label,candle in (('wick below',bar(10,'100','105','70.1','100')),
+                             ('wick above',bar(10,'100','129.9','95','100')),
+                             ('body inside the band',bar(10,'100','131','69','129.9'))):
+            with self.subTest(case=label):
+                engine=candidate()
+                self.assertEqual(engine.process(candle),())
+                self.assertEqual(engine.state.phase,'WAIT_LOW_TOUCH')
+
+    def test_breakout_wins_over_a_high_touch_confirmed_on_the_same_bar(self):
         engine=candidate('WAIT_HIGH_TOUCH')
-        result=engine.process(bar(11,'100','119','79','100'),(),
+        result=engine.process(bar(11,'100','119','69','69.5'),(),
                               (raw(SwingSide.HIGH,'119',10,11),))
         self.assertEqual([s.phase for s in result],['RANGE_INVALIDATED'])
         self.assertIsNone(engine.state.high_touch)
@@ -47,7 +60,7 @@ class FrozenBoundaryTests(unittest.TestCase):
         engine=RangeEngine(D('2'))
         low,high=pair()
         engine.process(bar(4),(low,),())
-        result=engine.process(bar(7,'100','105','79','100'),(high,),())
+        result=engine.process(bar(7,'100','105','69','69.5'),(high,),())
         self.assertEqual([s.phase for s in result],['WAIT_LOW_TOUCH','RANGE_INVALIDATED'])
         invalidated=engine.state
         engine.process(bar(9),(),(raw(SwingSide.LOW,'81',8,9),))
@@ -80,19 +93,23 @@ class FrozenBoundaryTests(unittest.TestCase):
         result=engine.process(bar(11,'100','120','80','100'),(),(raw(SwingSide.HIGH,'120',10,11),))
         self.assertEqual(result[0].phase,'RANGE_CONFIRMED')
 
-    def test_same_wick_reclaim_is_invalidation_before_confirmation_manipulation_after(self):
+    def test_a_sweep_and_reclaim_bar_is_a_manipulation_only_after_confirmation(self):
         for prices,direction in ((('100','105','79','100'),'LONG'),
                                   (('100','121','95','100'),'SHORT')):
             with self.subTest(direction=direction):
                 before=candidate('WAIT_HIGH_TOUCH')
-                invalidated,=before.process(bar(10,*prices))
-                self.assertEqual(invalidated.phase,'RANGE_INVALIDATED')
-                self.assertEqual(ManipulationEngine().process(bar(12,*prices),invalidated),())
+                self.assertEqual(before.process(bar(10,*prices)),())
+                self.assertEqual(before.state.phase,'WAIT_HIGH_TOUCH')
+                self.assertEqual(ManipulationEngine().process(bar(12,*prices),before.state),())
                 after=candidate('WAIT_HIGH_TOUCH')
                 after.process(bar(11),(),(raw(SwingSide.HIGH,'119',10,11),))
                 confirmed=after.state
+                self.assertEqual(confirmed.phase,'RANGE_CONFIRMED')
                 self.assertEqual(after.process(bar(12,*prices)),())
                 self.assertEqual(after.state,confirmed)
                 sweep,reclaim=ManipulationEngine().process(bar(12,*prices),after.state)
                 self.assertEqual((sweep.phase,reclaim.phase,reclaim.direction),
                                  ('SWEPT','RECLAIMED',direction))
+
+if __name__=='__main__':
+    unittest.main()
