@@ -9,6 +9,7 @@ from .recorder import add
 SETUP_EVENTS = {'setups': 'TRADE_CANDIDATE', 'pending_entries': 'PENDING_ENTRY',
                 'cancelled_entries': 'PAPER_ORDER_CANCELLED', 'risk_blocked': 'BLOCKED',
                 'ranges_confirmed': 'RANGE_CONFIRMED', 'manipulations': 'MANIPULATION_CONFIRMED',
+                'htf_context_checks': 'HTF_CONTEXT',
                 'bias_breaks': 'BIAS_BREAK', 'fvgs_detected': 'FVG',
                 'partial_tp_fills': 'PARTIAL_TP_FILLED',
                 'range_high_exits': 'RANGE_HIGH_PARTIAL_EXIT',

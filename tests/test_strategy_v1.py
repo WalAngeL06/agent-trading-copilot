@@ -466,18 +466,20 @@ class TargetTests(ScenarioMixin, unittest.TestCase):
 
 # --------------------------------------------------------------- DIRECTION
 class DirectionTests(ScenarioMixin, unittest.TestCase):
-    def test_no_short_trade_candidate_is_ever_produced(self):
+    """The shared scenario pins LONG_ONLY, so only longs may appear in it."""
+
+    def test_a_long_only_profile_produces_no_short_candidate(self):
+        self.assertEqual(self.strategy.profile.direction, 'LONG_ONLY')
         for event in events_of(self.strategy, 'TRADE_CANDIDATE'):
             self.assertEqual(event.payload.direction, 'LONG')
 
-    def test_no_short_paper_trade_is_ever_opened(self):
+    def test_a_long_only_profile_opens_no_short_paper_trade(self):
         for trade in self.strategy.broker.trades:
             self.assertEqual(trade.direction, 'LONG')
         for event in events_of(self.strategy, 'PAPER_ORDER_OPENED'):
             self.assertEqual(event.payload.direction, 'LONG')
 
-    def test_the_broker_refuses_a_short_plan(self):
-        profile = scenario_profile()
+    def _short_plan(self, profile):
         risk = RiskEngine(profile.risk_config())
         broker = PendingLimitPaperBroker(risk, D('10000'), profile)
         moment = bias_candles()[0].close_time
@@ -485,14 +487,27 @@ class DirectionTests(ScenarioMixin, unittest.TestCase):
                                    sweep_extreme=D('141'))
         decision = risk.evaluate(candidate, D('10000'), (), symbol=SYMBOL, timeframe='15m')
         self.assertIsNotNone(decision.plan)
-        with self.assertRaises(ValueError):
-            broker.submit(decision.plan, None)
+        return broker, decision.plan
 
-    def test_only_long_direction_is_configurable(self):
+    def test_the_broker_refuses_a_plan_the_profile_disables(self):
+        broker, plan = self._short_plan(scenario_profile())
         with self.assertRaises(ValueError):
-            StrategyProfile(direction='SHORT_ONLY')
+            broker.submit(plan, None)
+
+    def test_a_two_directional_profile_accepts_a_short_plan(self):
+        broker, plan = self._short_plan(scenario_profile(direction='BOTH'))
+        broker.submit(plan, None)
+        self.assertIs(broker.pending_plan, plan)
+
+    def test_every_supported_direction_is_configurable(self):
+        for direction, allowed in (('LONG_ONLY', ('LONG',)), ('SHORT_ONLY', ('SHORT',)),
+                                   ('BOTH', ('LONG', 'SHORT'))):
+            with self.subTest(direction=direction):
+                profile = StrategyProfile(direction=direction)
+                self.assertEqual(tuple(d for d in ('LONG', 'SHORT') if profile.allows(d)),
+                                 allowed)
         with self.assertRaises(ValueError):
-            StrategyProfile(direction='BOTH')
+            StrategyProfile(direction='UP_ONLY')
 
 
 # ----------------------------------------------------------- CUSTOMIZATION
@@ -501,9 +516,28 @@ class CustomizationTests(unittest.TestCase):
         profile = StrategyProfile()
         self.assertEqual((profile.timeframes.bias, profile.timeframes.range,
                           profile.timeframes.entry), ('4H', '1H', '15m'))
-        self.assertEqual(profile.direction, 'LONG_ONLY')
-        self.assertEqual(profile.entry_zone, 'BULLISH_FVG')
+        self.assertEqual(profile.direction, 'BOTH')
+        self.assertEqual(profile.entry_zone, 'DIRECTIONAL_FVG')
         self.assertTrue(profile.secondary_fvg_support_enabled)
+
+    def test_the_default_direction_gate_is_the_guide_htf_context(self):
+        # [U-RANGE-GUIDE-002] guide 4.3/4.4 replace the 4H long permission.
+        profile = StrategyProfile()
+        self.assertEqual(profile.direction_gate, 'GUIDE_HTF_CONTEXT')
+        self.assertTrue(profile.htf_confluence_required)
+        self.assertIsNone(profile.htf_zone_tolerance)
+        self.assertEqual(profile.effective_htf_zone_tolerance, profile.boundary_proximity)
+        self.assertEqual(StrategyProfile(htf_zone_tolerance=D('250'))
+                         .effective_htf_zone_tolerance, D('250'))
+
+    def test_the_superseded_permission_gate_stays_selectable(self):
+        profile = StrategyProfile(direction='LONG_ONLY',
+                                  direction_gate='BIAS_LONG_PERMISSION')
+        self.assertEqual(profile.direction_gate, 'BIAS_LONG_PERMISSION')
+        # It can only grant a long permission, so any other direction would
+        # silently never trade.
+        with self.assertRaises(ValueError):
+            StrategyProfile(direction='BOTH', direction_gate='BIAS_LONG_PERMISSION')
 
     def test_an_alternate_timeframe_profile_needs_no_engine_change(self):
         profile = StrategyProfile(timeframes=TimeframeRoles('1H', '15m', '5m'))
@@ -534,7 +568,8 @@ class CustomizationTests(unittest.TestCase):
     def test_invalid_configuration_is_rejected(self):
         for kwargs in ({'entry_level_ratio': D('1.5')}, {'stop_buffer': D('0')},
                        {'risk_fraction': D('0')}, {'pending_expiry_bars': 0},
-                       {'primary_failure_mode': 'GUESS'}):
+                       {'primary_failure_mode': 'GUESS'}, {'direction_gate': 'GUESS'},
+                       {'htf_zone_tolerance': D('-1')}, {'entry_zone': 'GUESS'}):
             with self.assertRaises(ValueError):
                 StrategyProfile(**kwargs)
 

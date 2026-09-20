@@ -3,12 +3,14 @@
 Updated 2026-09-19. Do not create new worktrees or sibling Agent Trading folders.
 Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
 
-1. Strategy (owner decision, highest value): the range layer now follows the
-   guide, but the engine is still LONG_ONLY while 27 of 30 measured
-   manipulations are SHORT, and the 4H long permission is not a guide rule.
-   Decide whether to implement the guide's two-directional deviation model and
-   replace the permission gate with its HTF context (4.3) and premium/discount
-   (4.4) rules. Only then does multi-pair data become informative.
+1. Strategy, highest value now that the engine trades: the sample is two
+   trades on one symbol. Widen it before tuning anything. In order:
+   (a) fetch every liquid OKX TR pair (instrument listing + per-symbol history)
+   and replay the same profile over all of them; (b) implement the guide's CHoCH
+   body confirmation and breaker/order-block entries (section 5-6), which are
+   the last entry rules still missing; (c) revisit the symmetric range anchor,
+   which is measured and deferred in the gap report section 10. Do not tune
+   thresholds on two trades.
 2. Network: the application connects to OKX through ATK/MCP whenever network
    access is available; the 2026-09-16
    [diagnosis](fresh-atk-runtime-diagnosis.md) verified every public layer. This

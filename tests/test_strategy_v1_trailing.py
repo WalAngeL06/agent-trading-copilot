@@ -178,14 +178,13 @@ class TrailingTests(unittest.TestCase):
                        (confirmed_low(134, moment + STEP),))
         self.assertEqual(broker.trades[-1].stop, D('131'))        # 134 - 3
 
-    def test_trailing_introduces_no_short_behaviour(self):
+    def test_trailing_moves_a_long_stop_only_upward(self):
         broker, moment = self._protected()
         broker.process(candle('15m', moment + STEP, 138, 139, 137, 138.5),
                        (confirmed_low(131, moment + STEP),))
         self.assertEqual(broker.trades[-1].direction, 'LONG')
         for record in broker.trailing_updates:
             self.assertGreater(record.new_stop, record.old_stop)
-        self.assertEqual(StrategyProfile().direction, 'LONG_ONLY')
         self.assertEqual(StrategyProfile().trailing_mode, 'CONFIRMED_HIGHER_LOW')
 
     def test_an_unknown_trailing_mode_or_buffer_is_rejected(self):

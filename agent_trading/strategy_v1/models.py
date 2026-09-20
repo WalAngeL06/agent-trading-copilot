@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from ..models import Candle
-from ..trading_brain.models import FVG, ValidHigh, ValidLow, SwingLow
+from ..trading_brain.models import FVG, SwingHigh, SwingLow, ValidHigh, ValidLow
 
 BIAS_STATES = ('NEUTRAL', 'BULLISH_CONTINUATION', 'BULLISH_REVERSAL', 'LONG_DISABLED')
 FVG_STATES = ('FRESH', 'TOUCHED', 'INVALIDATED')
@@ -67,7 +67,7 @@ class EntryPlan:
     target: Decimal
     stop_source: str
     secondary: TrackedFvg | None
-    protecting_swing: SwingLow | None
+    protecting_swing: SwingLow | SwingHigh | None
     protecting_price: Decimal | None
     observed_at: datetime
     source_ids: tuple[str, ...] = ('[U-STRATEGY-V1-001]', '[H]-SV1-ENTRY-001')
@@ -76,7 +76,7 @@ class EntryPlan:
 @dataclass(frozen=True)
 class PositionExit:
     """One realised slice of a single logical trade."""
-    kind: str                       # PARTIAL_TP | RANGE_HIGH | RUNNER | STOP
+    kind: str                  # PARTIAL_TP | RANGE_HIGH | RANGE_LOW | RUNNER | STOP
     quantity: Decimal
     exit_price: Decimal
     realized_pnl: Decimal

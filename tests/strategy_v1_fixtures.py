@@ -180,11 +180,19 @@ def acceptance_candles():
 
 
 def scenario_profile(**overrides):
-    """Buffer/tolerance are scaled to the synthetic price grid, not to BTC."""
+    """Buffer/tolerance are scaled to the synthetic price grid, not to BTC.
+
+    This scenario predates [U-RANGE-GUIDE-002] and deliberately keeps the
+    superseded BIAS_LONG_PERMISSION gate, so that path stays covered end to
+    end. The guide gate has its own scenario in `guide_fixtures.py`.
+    """
     settings = dict(timeframes=TimeframeRoles('4H', '1H', '15m'),
                     boundary_proximity=D('5'), stop_buffer=D('1'),
-                    equity=D('10000'), entry_level='FVG_EQ')
+                    equity=D('10000'), entry_level='FVG_EQ',
+                    direction='LONG_ONLY', direction_gate='BIAS_LONG_PERMISSION')
     settings.update(overrides)
+    if settings['direction'] != 'LONG_ONLY' and 'direction_gate' not in overrides:
+        settings['direction_gate'] = 'GUIDE_HTF_CONTEXT'
     return StrategyProfile(**settings)
 
 

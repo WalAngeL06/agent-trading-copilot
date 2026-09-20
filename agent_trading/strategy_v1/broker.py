@@ -1,9 +1,12 @@
-"""Pending limit PAPER entry, partial take profits, RangeHigh exit and runner.
+"""Pending limit PAPER entry, partial take profits, boundary exit and runner.
 
 No exchange client exists here. Stops only ever tighten, and every tightening
-goes through the shipped RiskEngine so the LONG monotonic invariant is enforced
-in one place. One logical trade stays one trade record: partial exits are
+goes through the shipped RiskEngine so the monotonic invariant is enforced in
+one place. One logical trade stays one trade record: partial exits are
 accounted in its ledger, never as separate trades.
+
+[U-RANGE-GUIDE-002] Every rule below is written once and read from the trade's
+own direction: a short is the reflection of a long, never a second code path.
 """
 from dataclasses import replace
 from decimal import Decimal
@@ -14,6 +17,11 @@ from ..models import Candle
 from ..trading_brain.models import PaperTrade, BrokerEvent
 from ..trading_brain.risk import RiskEngine, exact_difference, exact_product
 from .models import PositionExit, PositionLedger, StopProtection
+
+# The structural exit is the opposite range boundary of the setup.
+BOUNDARY_EXIT = {'LONG': 'RANGE_HIGH', 'SHORT': 'RANGE_LOW'}
+# One trailing mode today; the record names the side it actually followed.
+TRAIL_REFERENCE = {'LONG': 'CONFIRMED_HIGHER_LOW', 'SHORT': 'CONFIRMED_LOWER_HIGH'}
 
 
 def floor_to_step(value, step):
@@ -52,16 +60,18 @@ class PendingLimitPaperBroker:
             raise ValueError('strategy broker already has a pending/open order')
         if not self.risk.is_approved(plan):
             raise ValueError('paper execution requires a RiskEngine-issued approved plan')
-        if plan.direction != 'LONG':
-            raise ValueError('Strategy V1 is LONG_ONLY')
+        if not self.profile.allows(plan.direction):
+            raise ValueError(f'profile direction {self.profile.direction} forbids a '
+                             f'{plan.direction} order')
         self.pending_plan, self.pending = plan, entry_plan
         self._pending_bars = 0
 
     def cancel_pending(self, reason, observed_at):
         """Drop a resting order whose setup died before it could fill.
 
-        Reachable without price ever returning to the entry: long permission can
-        be lost, or the frozen range can be invalidated, while the order rests.
+        Reachable without price ever returning to the entry: the high timeframe
+        context can turn against the setup, or the frozen range can be
+        invalidated, while the order rests.
         """
         if self.pending_plan is None:
             return None
@@ -69,8 +79,9 @@ class PendingLimitPaperBroker:
         self._pending_bars = 0
         return BrokerEvent('PAPER_ORDER_CANCELLED', observed_at, reason)
 
-    def process(self, candle, swing_lows=()):
-        """`swing_lows` are entry-timeframe swings confirmed on EARLIER candles.
+    def process(self, candle, swing_lows=(), swing_highs=()):
+        """`swing_lows`/`swing_highs` are entry-timeframe swings confirmed on
+        EARLIER candles.
 
         The caller appends this candle's own swings only after this returns, so
         a stop can never tighten on structure that the finished bar itself
@@ -86,31 +97,33 @@ class PendingLimitPaperBroker:
         self._last_candle = candle
         result = []
         result.extend(self._fill(candle))
-        result.extend(self._manage(candle, swing_lows))
+        result.extend(self._manage(candle, swing_lows, swing_highs))
         return tuple(result)
 
     def _fill(self, candle):
         plan = self.pending_plan
         if plan is None or candle.close_time <= plan.approved_at:
             return ()                       # never fill on the publishing candle
+        long_ = plan.direction == 'LONG'
         entry = plan.entry
+        reached = candle.low <= entry if long_ else candle.high >= entry
         self._pending_bars += 1
         cancel = None
-        if candle.low <= plan.stop:
-            # Defensive only. For a LONG the structural stop sits below the entry,
-            # so any candle reaching the stop also traded the limit: the fill wins
-            # and the position is stopped on the same bar. Inferring the opposite
+        if candle.low <= plan.stop if long_ else candle.high >= plan.stop:
+            # Defensive only. The structural stop sits beyond the entry, so any
+            # candle reaching the stop also traded the limit: the fill wins and
+            # the position is stopped on the same bar. Inferring the opposite
             # order would assume intrabar sequencing in the trade's favour.
             cancel = 'STOP_BREACHED_BEFORE_FILL'
         elif (self.profile.pending_expiry_bars is not None
               and self._pending_bars > self.profile.pending_expiry_bars):
             cancel = 'PENDING_ENTRY_EXPIRED'
-        if cancel is not None and not candle.low <= entry:
+        if cancel is not None and not reached:
             self.pending_plan = self.pending = None
             return (BrokerEvent('PAPER_ORDER_CANCELLED', candle.close_time, cancel),)
-        if not candle.low <= entry:
+        if not reached:
             return ()
-        fill_price = candle.open if candle.open <= entry else entry
+        fill_price = min(candle.open, entry) if long_ else max(candle.open, entry)
         self.pending_plan = None
         decision = self.risk.revalidate_fill(plan, fill_price, self.equity, candle.close_time)
         if decision.plan is None:
@@ -120,7 +133,7 @@ class PendingLimitPaperBroker:
         approved = decision.plan
         # Initial R is frozen here and never re-derived, so break-even, trailing
         # and realised partials can never move a partial target price.
-        initial_r = exact_difference(approved.entry, approved.stop)
+        initial_r = exact_difference(approved.entry, approved.stop).copy_abs()
         runner_target = floor_to_step(
             exact_product(approved.quantity, self.profile.runner_fraction),
             self.profile.quantity_step)
@@ -136,16 +149,19 @@ class PendingLimitPaperBroker:
 
     # ------------------------------------------------------------- management
     def partial_target(self, trade, r_multiple):
-        """entry + r_multiple * frozen initial R."""
-        return exact_difference(
-            trade.entry, exact_product(trade.ledger.initial_r, r_multiple).copy_negate())
+        """entry plus r_multiple frozen initial R, on the trade's own side."""
+        step = exact_product(trade.ledger.initial_r, r_multiple)
+        return exact_difference(trade.entry,
+                                step.copy_negate() if trade.direction == 'LONG' else step)
 
     def _realise(self, trade, kind, quantity, price, observed_at, *, trigger_r=None,
                  target_price=None):
         """Book one slice against the single logical trade."""
         ledger = trade.ledger
         quantity = min(quantity, ledger.remaining_quantity)
-        pnl = exact_product(quantity, exact_difference(price, trade.entry))
+        move = (exact_difference(price, trade.entry) if trade.direction == 'LONG'
+                else exact_difference(trade.entry, price))
+        pnl = exact_product(quantity, move)
         remaining = exact_difference(ledger.remaining_quantity, quantity)
         record = PositionExit(kind, quantity, price, pnl, remaining, observed_at,
                               trigger_r, target_price)
@@ -164,7 +180,7 @@ class PendingLimitPaperBroker:
                          closed_at=observed_at, pnl=ledger.total_realized_pnl)
         return self._store(closed)
 
-    def _manage(self, candle, swing_lows=()):
+    def _manage(self, candle, swing_lows=(), swing_highs=()):
         if not self.trades or self.trades[-1].status != 'OPEN':
             return ()
         trade = self.trades[-1]
@@ -173,7 +189,7 @@ class PendingLimitPaperBroker:
         stopped = self._stop_out(trade, candle)
         if stopped is not None:
             return stopped
-        result.extend(self._upside(trade, candle))
+        result.extend(self._favorable(trade, candle))
         # Every step below re-reads the stored trade: a stale copy here would
         # silently roll back the ledger written by the exits above.
         trade = self.trades[-1]
@@ -188,14 +204,15 @@ class PendingLimitPaperBroker:
             trade = self._store(recovered)
             result.append(BrokerEvent('PAPER_STOP_UPDATED', candle.close_time, recovered))
         result.extend(self._protection(trade, candle, before))
-        result.extend(self._trail(self.trades[-1], candle, swing_lows))
+        result.extend(self._trail(self.trades[-1], candle, swing_lows, swing_highs))
         return tuple(result)
 
     def _stop_out(self, trade, candle):
         """Conservative stop-first: a bar touching the stop awards no upside."""
-        if candle.open <= trade.stop:
+        long_ = trade.direction == 'LONG'
+        if candle.open <= trade.stop if long_ else candle.open >= trade.stop:
             price = candle.open
-        elif candle.low <= trade.stop:
+        elif candle.low <= trade.stop if long_ else candle.high >= trade.stop:
             price = trade.stop
         else:
             return None
@@ -211,20 +228,21 @@ class PendingLimitPaperBroker:
         events.append(BrokerEvent('PAPER_ORDER_CLOSED', candle.close_time, closed))
         return tuple(events)
 
-    def _upside(self, trade, candle):
-        """Configured R partials in ascending order, then the RangeHigh exit."""
+    def _favorable(self, trade, candle):
+        """Configured R partials in order, then the range boundary exit."""
         ledger = trade.ledger
         if not ledger.has_upside_target:
             return ()                              # a runner keeps no fixed target
+        long_ = trade.direction == 'LONG'
         events = []
         for level in self.profile.partial_take_profits:
             if level.r_multiple in ledger.filled_r:
                 continue
             target = self.partial_target(trade, level.r_multiple)
-            if target >= trade.tp:
+            if target >= trade.tp if long_ else target <= trade.tp:
                 break              # the structural exit owns this level instead
-            if candle.high < target:
-                break              # ascending targets: nothing above can fill
+            if candle.high < target if long_ else candle.low > target:
+                break              # ordered targets: nothing beyond can fill
             quantity = floor_to_step(exact_product(ledger.original_quantity,
                                                    level.close_fraction),
                                      self.profile.quantity_step)
@@ -232,31 +250,34 @@ class PendingLimitPaperBroker:
             trade = self._store(replace(trade, ledger=ledger))
             if quantity <= 0:
                 continue           # the grid cannot express this slice
-            price = candle.open if candle.open > target else target
+            price = (candle.open if (candle.open > target if long_ else candle.open < target)
+                     else target)
             trade, record = self._realise(trade, 'PARTIAL_TP', quantity, price,
                                           candle.close_time, trigger_r=level.r_multiple,
                                           target_price=target)
             trade = self._store(trade)
             ledger = trade.ledger
             events.append(BrokerEvent('PARTIAL_TP_FILLED', candle.close_time, record))
-        if candle.high < trade.tp:
+        if candle.high < trade.tp if long_ else candle.low > trade.tp:
             return tuple(events)
-        return tuple(events) + self._range_high(self.trades[-1], candle)
+        return tuple(events) + self._boundary(self.trades[-1], candle)
 
-    def _range_high(self, trade, candle):
+    def _boundary(self, trade, candle):
         """Close down to exactly the configured runner, then cancel the rest."""
+        long_ = trade.direction == 'LONG'
         ledger = trade.ledger
-        price = candle.open if candle.open > trade.tp else trade.tp
+        price = (candle.open if (candle.open > trade.tp if long_ else candle.open < trade.tp)
+                 else trade.tp)
         quantity = exact_difference(ledger.remaining_quantity, ledger.runner_target_quantity)
         events = []
         if quantity > 0:
-            trade, record = self._realise(trade, 'RANGE_HIGH', quantity, price,
-                                          candle.close_time, target_price=trade.tp)
+            trade, record = self._realise(trade, BOUNDARY_EXIT[trade.direction], quantity,
+                                          price, candle.close_time, target_price=trade.tp)
             trade = self._store(trade)
             ledger = trade.ledger
             events.append(BrokerEvent('RANGE_HIGH_PARTIAL_EXIT', candle.close_time, record))
         # Unfilled R levels die here: the runner is never partially closed by a
-        # stale 2R/3R instruction, and it keeps no fixed upside target.
+        # stale 2R/3R instruction, and it keeps no fixed target.
         ledger = replace(ledger, range_high_done=True,
                          partials_cancelled_at=candle.close_time)
         trade = self._store(replace(trade, ledger=ledger))
@@ -269,8 +290,10 @@ class PendingLimitPaperBroker:
 
     # ------------------------------------------------------------------ stops
     def _protection(self, trade, candle, before):
-        """Announce the first move that puts the stop at or above entry."""
-        if self.break_even_at is not None or trade.stop < trade.entry:
+        """Announce the first move that puts the stop at or beyond entry."""
+        long_ = trade.direction == 'LONG'
+        if self.break_even_at is not None or (trade.stop < trade.entry if long_
+                                              else trade.stop > trade.entry):
             return ()
         self.break_even_at = candle.close_time
         reason = trade.stop_updates[-1].reason if trade.stop_updates else 'BREAK_EVEN'
@@ -279,26 +302,35 @@ class PendingLimitPaperBroker:
                                            reason, trade.entry, candle.close_time,
                                            candle.close_time)),)
 
-    def _trail(self, trade, candle, swing_lows):
-        """Tighten to `confirmed higher low - trailing_buffer` after break-even.
+    def _trail(self, trade, candle, swing_lows, swing_highs):
+        """Tighten to `confirmed structure -/+ trailing_buffer` after break-even.
 
-        Only confirmed structure is eligible, never below break-even once
+        A long follows confirmed higher lows, a short confirmed lower highs.
+        Only confirmed structure is eligible, never past break-even once
         break-even is reached, and `tighten_stop` still enforces monotonicity.
-        A runner keeps receiving these updates after the RangeHigh exit.
+        A runner keeps receiving these updates after the boundary exit.
         """
         if (not self.profile.trailing_enabled or self.break_even_at is None
                 or trade.status != 'OPEN'):
             return ()
+        long_ = trade.direction == 'LONG'
         buffer = self.profile.effective_trailing_buffer
-        best = best_low = None
-        for low in swing_lows:
-            if low.confirmed_at > candle.close_time:
+        best = best_swing = None
+        for swing in (swing_lows if long_ else swing_highs):
+            if swing.confirmed_at > candle.close_time:
                 continue                      # never act on unconfirmed structure
-            proposed = exact_difference(low.price, buffer)
-            if proposed <= trade.stop or proposed < trade.entry:
-                continue                      # only tighten, never below break-even
-            if best is None or proposed > best:
-                best, best_low = proposed, low
+            proposed = exact_difference(swing.price,
+                                        buffer if long_ else buffer.copy_negate())
+            if long_:
+                if proposed <= trade.stop or proposed < trade.entry:
+                    continue                  # only tighten, never past break-even
+                closer = best is None or proposed > best
+            else:
+                if proposed >= trade.stop or proposed > trade.entry:
+                    continue
+                closer = best is None or proposed < best
+            if closer:
+                best, best_swing = proposed, swing
         if best is None:
             return ()
         before = trade.stop
@@ -307,8 +339,8 @@ class PendingLimitPaperBroker:
             return ()
         self._store(trailed)
         record = StopProtection('TRAILING_STOP_UPDATED', before, trailed.stop,
-                                self.profile.trailing_mode, best_low.price,
-                                best_low.confirmed_at, candle.close_time)
+                                TRAIL_REFERENCE[trade.direction], best_swing.price,
+                                best_swing.confirmed_at, candle.close_time)
         self.trailing_updates += (record,)
         return (BrokerEvent('TRAILING_STOP_UPDATED', candle.close_time, record),)
 
@@ -321,20 +353,25 @@ class PendingLimitPaperBroker:
         plan = self.pending
         if plan is None or plan.secondary is None:
             return None
+        long_ = trade.direction == 'LONG'
         if self.primary_failed_at is None:
-            if candle.close < plan.primary.lower:      # [H] body close below PRIMARY
+            failed = (candle.close < plan.primary.lower if long_     # [H] body close
+                      else candle.close > plan.primary.upper)        # beyond PRIMARY
+            if failed:
                 self.primary_failed_at = candle.close_time
             return None
         if self.secondary_reacted_at is None:
-            reached = candle.low <= plan.secondary.upper
-            held = candle.close >= plan.secondary.lower
+            reached = (candle.low <= plan.secondary.upper if long_
+                       else candle.high >= plan.secondary.lower)
+            held = (candle.close >= plan.secondary.lower if long_
+                    else candle.close <= plan.secondary.upper)
             if reached and held:
                 self.secondary_reacted_at = candle.close_time
             return None
         if self.recovery_at is not None:
             return None
-        if candle.high >= trade.entry:                 # recovered to original entry
-            self.recovery_at = candle.close_time
+        if candle.high >= trade.entry if long_ else candle.low <= trade.entry:
+            self.recovery_at = candle.close_time      # recovered to original entry
             return self.risk.tighten_stop(trade, trade.entry, candle.close_time,
                                           'RECOVERY_BREAK_EVEN')
         return None

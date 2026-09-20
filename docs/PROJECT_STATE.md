@@ -1,5 +1,34 @@
 # Current project state - 2026-09-20
 
+## Direction follows the guide's HTF context - 2026-09-20 [U-RANGE-GUIDE-002]
+
+The range layer was fixed first (below) and the binding constraint moved to
+direction. The guide never defines the 4H "long permission" the engine used; it
+defines section 4.3 (a deviation must coincide with a high timeframe zone) and
+section 4.4 (no long in premium, no short in discount unless market structure is
+broken). Those two rules now decide direction, and the deviation model works on
+both sides.
+
+- New `HtfContext` ([context.py](../agent_trading/strategy_v1/context.py)) reads
+  the bias timeframe: the current Valid pair is the dealing range, its midpoint
+  is the equilibrium, and its boundaries plus unfilled bias-timeframe FVGs are
+  the zones a sweep has to touch. Every verdict is emitted as an `HTF_CONTEXT`
+  event, so a refusal is auditable.
+- Strategy V1 is no longer long-only: `direction` defaults to `BOTH`, targets,
+  stops, entries, partials, break-even, trailing and the boundary exit are
+  written once and read from the trade's direction. The superseded gate stays
+  selectable as `direction_gate='BIAS_LONG_PERMISSION'` (long-only by
+  construction) and the shipped acceptance scenario still covers it.
+- Measured on the same frozen BTC data (`runs/eval-direction`), old gate -> new
+  gate with both directions: trades 0 -> 2, ending equity 10000 -> 10096.40,
+  HTF verdicts 30 with 17 allowed (8 refused for no zone, 5 for no frame).
+  Premium/discount refused nothing: sweeps already happen on the right side.
+  Two trades prove the chain runs end to end; they prove nothing about profit.
+- 677 Python tests and 15 frontend tests pass. What the guide still asks for,
+  and what was deliberately deferred (symmetric range anchor, CHoCH body
+  confirmation, breaker/order block entries, acceptance layer), is listed in the
+  [gap report](specs/range-model-gap-2026-09-20.md) sections 8-10.
+
 ## Range rules aligned with the source guide - 2026-09-20 [U-RANGE-GUIDE-001]
 
 The missing strategy source turned up as the owner's

@@ -23,6 +23,7 @@ from agent_trading.backtest.recorder import (EquityPoint, SliceRecord, TradeReco
 from agent_trading.market import bar_duration
 from agent_trading.strategy_v1 import StrategyProfile
 
+from guide_fixtures import guide_acceptance_profile, short_acceptance_candles
 from strategy_v1_fixtures import (D, SYMBOL, acceptance_candles, acceptance_profile,
                                   all_candles, bias_candles)
 
@@ -503,20 +504,77 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(config.start.tzinfo.utcoffset(config.start), timedelta(0))
 
 
+class ShortAccountingTests(unittest.TestCase):
+    """[U-RANGE-GUIDE-002] A reflected short run is recorded like its long twin."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = tempfile.TemporaryDirectory()
+        cls.dir = dump(short_acceptance_candles(), Path(cls._tmp.name))
+        cls.result = run(BacktestConfig(SYMBOL, cls.dir, D('10000'),
+                                        profile=guide_acceptance_profile()))
+        cls.record = cls.result.trades[0]
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._tmp.cleanup()
+
+    def test_one_short_logical_trade_is_recorded(self):
+        self.assertEqual(len(self.result.trades), 1)
+        self.assertEqual(self.record.direction, 'SHORT')
+        self.assertEqual(self.result.summary['filled_logical_trades'], 1)
+
+    def test_the_boundary_slice_is_the_range_low(self):
+        found = [s for s in self.record.slices if s.kind == 'RANGE_LOW']
+        self.assertEqual(len(found), 1)
+        self.assertEqual(found[0].exit_price, D('118'))
+        self.assertTrue(self.record.range_high_reached)
+
+    def test_the_funnel_counts_the_htf_context_verdicts(self):
+        funnel = self.result.summary_document()['funnel']
+        self.assertEqual(funnel['htf_context_checks'], 1)
+
+    def test_the_short_risk_and_result_are_measured_on_the_right_side(self):
+        self.assertGreater(self.record.initial_r, 0)
+        self.assertGreater(self.record.initial_stop, self.record.entry_price)
+        self.assertGreater(self.record.r_multiple, 0)
+        self.assertEqual(self.record.partial_count, 2)
+
 class CliTests(unittest.TestCase):
     def test_the_cli_runs_a_whole_backtest_and_writes_artifacts(self):
         from agent_trading.backtest.__main__ import main
         with tempfile.TemporaryDirectory() as data, tempfile.TemporaryDirectory() as out:
             dump(acceptance_candles(), Path(data))
+            # The shipped acceptance scenario predates [U-RANGE-GUIDE-002] and
+            # replays under the superseded gate it was designed for.
             code = main(['--symbol', SYMBOL, '--data', data, '--output', out,
                          '--starting-equity', '10000', '--stop-buffer', '1',
                          '--boundary-proximity', '5',
+                         '--direction', 'LONG_ONLY',
+                         '--direction-gate', 'BIAS_LONG_PERMISSION',
                          '--partial-tp', '1.0:0.20,2.0:0.20',
                          '--runner-fraction', '0.10'])
             self.assertEqual(code, 0)
             payload = json.loads((Path(out) / 'backtest_summary.json').read_text('utf-8'))
             self.assertEqual(payload['metrics']['filled_logical_trades'], 1)
             self.assertEqual(payload['metrics']['ending_equity'], '10302')
+
+    def test_the_direction_rules_are_selectable(self):
+        from agent_trading.backtest.__main__ import build_config, build_parser
+
+        def profile(extra):
+            return build_config(build_parser().parse_args(
+                ['--data', '.', '--output', '.'] + extra)).profile
+
+        default = profile([])
+        self.assertEqual((default.direction, default.direction_gate),
+                         ('BOTH', 'GUIDE_HTF_CONTEXT'))
+        self.assertTrue(default.htf_confluence_required)
+        tuned = profile(['--direction', 'SHORT_ONLY', '--htf-zone-tolerance', '250',
+                         '--no-htf-confluence'])
+        self.assertEqual(tuned.direction, 'SHORT_ONLY')
+        self.assertEqual(tuned.effective_htf_zone_tolerance, D('250'))
+        self.assertFalse(tuned.htf_confluence_required)
 
 
 if __name__ == '__main__':

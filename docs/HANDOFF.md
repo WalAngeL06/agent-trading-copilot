@@ -1,4 +1,22 @@
-# Current handoff - range rules aligned with the guide, 2026-09-20
+# Current handoff - direction rules, 2026-09-20
+
+Claude; branch `main`. Second turn on the owner's strategy guide: the direction
+gate. The 4H long permission was replaced by the guide's HTF context (4.3
+confluence, 4.4 premium/discount) and the deviation model now works in both
+directions, down to execution. The superseded gate remains selectable, and the
+shipped acceptance scenario keeps covering it.
+
+On the frozen BTC data the engine now opens trades for the first time: 2 short
+trades, ending equity 10096.40, both closed by a trailed stop in profit. That is
+a wiring result, not a profitability result. Charts and artifacts:
+`runs/eval-direction/`. 677 Python tests, 15 frontend tests and the production
+build pass. Deferred work with its evidence is in
+[the gap report](specs/range-model-gap-2026-09-20.md) sections 8-10; the next
+step is more data, not tuning. No push in this turn.
+
+---
+
+# Previous handoff - range rules aligned with the guide, 2026-09-20
 
 Claude; branch `main`. The owner supplied the original strategy source
 (`range_trade_learning_guide.md`); it is now `docs/specs/range-trade-learning-guide.md`.

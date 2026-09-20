@@ -11,8 +11,18 @@ from ..swing import SwingConfig
 from ..trading_brain.risk_models import RiskConfig
 
 ENTRY_LEVELS = ('FVG_LOW', 'FVG_EQ', 'FVG_HIGH')
-DIRECTIONS = ('LONG_ONLY',)
-ENTRY_ZONES = ('BULLISH_FVG',)
+# [U-RANGE-GUIDE-002] The guide trades both sides of a range: the deviation
+# model is symmetric and direction is decided by the HTF context, not by a
+# one-sided permission. LONG_ONLY / SHORT_ONLY stay available as restrictions.
+DIRECTIONS = ('LONG_ONLY', 'SHORT_ONLY', 'BOTH')
+DIRECTION_SETS = {'LONG_ONLY': ('LONG',), 'SHORT_ONLY': ('SHORT',), 'BOTH': ('LONG', 'SHORT')}
+# GUIDE_HTF_CONTEXT applies guide 4.3 (HTF zone confluence) and 4.4
+# (premium/discount). BIAS_LONG_PERMISSION is the superseded rule that required
+# a bullish body-close break on the bias timeframe; it can only ever open longs.
+DIRECTION_GATES = ('GUIDE_HTF_CONTEXT', 'BIAS_LONG_PERMISSION')
+ENTRY_ZONES = ('DIRECTIONAL_FVG', 'BULLISH_FVG')
+# CLOSE_BELOW_PRIMARY_LOW is the long-only spelling of the same rule.
+PRIMARY_FAILURE_MODES = ('CLOSE_BEYOND_PRIMARY_EDGE', 'CLOSE_BELOW_PRIMARY_LOW')
 TRAILING_MODES = ('CONFIRMED_HIGHER_LOW',)
 
 
@@ -79,8 +89,14 @@ class TimeframeRoles:
 class StrategyProfile:
     """User-facing Strategy V1 configuration."""
     timeframes: TimeframeRoles = field(default_factory=TimeframeRoles)
-    direction: str = 'LONG_ONLY'
-    entry_zone: str = 'BULLISH_FVG'
+    direction: str = 'BOTH'
+    # [U-RANGE-GUIDE-002] guide 4.3 + 4.4 decide the direction; see context.py.
+    direction_gate: str = 'GUIDE_HTF_CONTEXT'
+    # Guide 4.3 makes the HTF zone mandatory. Off keeps premium/discount alone.
+    htf_confluence_required: bool = True
+    # None reuses boundary_proximity as the "touches a major level" tolerance.
+    htf_zone_tolerance: Decimal | None = None
+    entry_zone: str = 'DIRECTIONAL_FVG'
     entry_level: str = 'FVG_EQ'
     # [H]-SV1-ENTRY-LEVEL-001: FVG_EQ is the midpoint. Kept as an explicit ratio
     # so 0.5 is never hardcoded in the engine and can be retuned later.
@@ -122,19 +138,29 @@ class StrategyProfile:
     fvg_freshness_enabled: bool = True
     # [H]-SV1-PRIMARY-FAIL-001: PRIMARY_FVG "failed" == closed entry candle
     # whose body closes below PRIMARY_FVG.lower. The user has not defined this.
-    primary_failure_mode: str = 'CLOSE_BELOW_PRIMARY_LOW'
+    primary_failure_mode: str = 'CLOSE_BEYOND_PRIMARY_EDGE'
     # [H]-SV1-PENDING-EXPIRY-001: None disables expiry.
     pending_expiry_bars: int | None = None
 
     def __post_init__(self):
         if self.direction not in DIRECTIONS:
-            raise ValueError('Strategy V1 is LONG_ONLY')
+            raise ValueError('unknown direction')
+        if self.direction_gate not in DIRECTION_GATES:
+            raise ValueError('unknown direction gate')
+        if self.direction_gate == 'BIAS_LONG_PERMISSION' and self.direction != 'LONG_ONLY':
+            # The superseded gate can only ever grant a long permission, so any
+            # other direction would silently never trade.
+            raise ValueError('BIAS_LONG_PERMISSION requires direction LONG_ONLY')
         if self.entry_zone not in ENTRY_ZONES:
             raise ValueError('unknown entry zone')
         if self.entry_level not in ENTRY_LEVELS:
             raise ValueError('unknown entry level')
-        if self.primary_failure_mode != 'CLOSE_BELOW_PRIMARY_LOW':
+        if self.primary_failure_mode not in PRIMARY_FAILURE_MODES:
             raise ValueError('unknown primary failure mode')
+        if self.htf_zone_tolerance is not None and (
+                not isinstance(self.htf_zone_tolerance, Decimal)
+                or not self.htf_zone_tolerance.is_finite() or self.htf_zone_tolerance < 0):
+            raise ValueError('htf_zone_tolerance must be a nonnegative finite Decimal or None')
         if self.trailing_mode not in TRAILING_MODES:
             raise ValueError('unknown trailing mode')
         if self.trailing_buffer is not None and (
@@ -193,6 +219,9 @@ class StrategyProfile:
                 'entry_level': self.entry_level,
                 'entry_level_ratio': str(self.entry_level_ratio),
                 'direction': self.direction,
+                'direction_gate': self.direction_gate,
+                'htf_confluence_required': self.htf_confluence_required,
+                'htf_zone_tolerance': str(self.effective_htf_zone_tolerance),
                 'timeframes': {'bias': self.timeframes.bias, 'range': self.timeframes.range,
                                'entry': self.timeframes.entry},
                 'range_reseek_enabled': self.range_reseek_enabled,
@@ -207,6 +236,20 @@ class StrategyProfile:
     def effective_trailing_buffer(self):
         """Trailing buffer, defaulting to the structural stop buffer."""
         return self.stop_buffer if self.trailing_buffer is None else self.trailing_buffer
+
+    @property
+    def effective_htf_zone_tolerance(self):
+        """HTF level tolerance, defaulting to the range boundary proximity."""
+        return (self.boundary_proximity if self.htf_zone_tolerance is None
+                else self.htf_zone_tolerance)
+
+    @property
+    def directions(self):
+        return DIRECTION_SETS[self.direction]
+
+    def allows(self, direction):
+        """Is this trade direction enabled by the profile?"""
+        return direction in DIRECTION_SETS[self.direction]
 
     def risk_config(self):
         """Strategy V1 always manages stops through the shipped RiskEngine."""

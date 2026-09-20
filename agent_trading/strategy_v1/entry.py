@@ -70,12 +70,12 @@ class FvgBook:
     def _kinds(self, profile):
         return ('FVG', 'iFVG') if profile.allow_ifvg_entry else ('FVG',)
 
-    def eligible_long(self, profile, manipulation, now):
-        """Fresh bullish gaps belonging to the current post-sweep setup only."""
+    def eligible(self, direction, profile, manipulation, now):
+        """Fresh gaps on the setup's own side, from the current post-sweep setup."""
         kinds = self._kinds(profile)
         result = []
         for item in self.tracked:
-            if (item.direction != 'LONG' or item.gap.kind not in kinds
+            if (item.direction != direction or item.gap.kind not in kinds
                     or item.observed_at > now):
                 continue
             if profile.fvg_freshness_enabled and not item.fresh:
@@ -89,38 +89,52 @@ class FvgBook:
             result.append(item)
         return tuple(result)
 
-    def secondary_below(self, profile, primary, manipulation, now):
-        """Closest eligible fresh bullish gap strictly below PRIMARY_FVG."""
+    def eligible_long(self, profile, manipulation, now):
+        return self.eligible('LONG', profile, manipulation, now)
+
+    def secondary_beyond(self, direction, profile, primary, manipulation, now):
+        """Closest eligible fresh gap on the protective side of PRIMARY_FVG.
+
+        That is the next gap below the primary for a long and the next gap
+        above it for a short: the one price would have to break through first.
+        """
         if not profile.secondary_fvg_support_enabled:
             return None
+        long_ = direction == 'LONG'
         kinds = self._kinds(profile)
         candidates = []
         for item in self.tracked:
-            if (item.direction != 'LONG' or item.gap.kind not in kinds
+            if (item.direction != direction or item.gap.kind not in kinds
                     or item.gap_id == primary.gap_id or item.observed_at > now):
                 continue
             if profile.fvg_freshness_enabled and not item.fresh:
                 continue
-            if item.upper >= primary.lower:
+            if item.upper >= primary.lower if long_ else item.lower <= primary.upper:
                 continue
             if item.formed_at < manipulation.swept_at:
                 continue
             candidates.append(item)
         if not candidates:
             return None
-        # Closest below primary, then newest, then stable id order.
+        # Closest beyond primary, then newest, then stable id order.
         candidates.sort(key=lambda z: z.gap_id)
         candidates.sort(key=lambda z: z.observed_at, reverse=True)
-        candidates.sort(key=lambda z: z.upper, reverse=True)
+        candidates.sort(key=lambda z: z.upper if long_ else z.lower, reverse=long_)
         return candidates[0]
+
+
+def protecting_swing(direction, swings, level, now):
+    """Most recent confirmed swing beyond `level` on the protective side."""
+    eligible = [s for s in swings
+                if s.confirmed_at <= now
+                and (s.price <= level if direction == 'LONG' else s.price >= level)]
+    if not eligible:
+        return None
+    eligible.sort(key=lambda s: s.price, reverse=direction != 'LONG')
+    eligible.sort(key=lambda s: s.swing_time, reverse=True)
+    return eligible[0]
 
 
 def protecting_swing_low(swing_lows, level, now):
     """Most recent confirmed swing low at or below `level`, known by `now`."""
-    eligible = [s for s in swing_lows
-                if s.confirmed_at <= now and s.price <= level]
-    if not eligible:
-        return None
-    eligible.sort(key=lambda s: s.price)
-    eligible.sort(key=lambda s: s.swing_time, reverse=True)
-    return eligible[0]
+    return protecting_swing('LONG', swing_lows, level, now)

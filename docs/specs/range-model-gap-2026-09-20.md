@@ -116,3 +116,92 @@ Sıradaki iki karar, önem sırasıyla:
 2. **4H yön izni.** Giriş bakılan barların yarısından fazlasında LONG izni yok.
    Rehberin HTF bağlamı (§4.3) ve premium/discount (§4.4) kuralları bu kapının
    yerine geçmeli; mevcut izin kuralı rehberde tanımlı değil.
+
+## 8. İkinci tur: yön kuralları [U-RANGE-GUIDE-002]
+
+Yukarıdaki iki karar da uygulandı. Kapsam:
+
+- **§4.4 Premium / Discount.** 4H'deki geçerli tepe/dip çifti bir "dealing range"
+  verir; ortası EQ'dur. Fiyat EQ'nun üstündeyse premium, altındaysa discount.
+  LONG premium'da aranmaz. SHORT discount'ta yalnızca piyasa yapısı bozulmuşsa
+  (4H'de geçerli dibin gövdeyle kırılması) aranır.
+- **§4.3 HTF teyidi.** Sapma hareketinin (süpürülen sınırdan uç fitile kadar
+  olan bant) bir HTF bölgesine denk gelmesi zorunlu: doldurulmamış bir 4H FVG
+  ya da o anki 4H geçerli tepe/dip seviyesi (tolerans = `boundary_proximity`).
+- **Çift yön.** Aynı sapma modeli iki tarafta da çalışır: RH süpürülüp geri
+  dönülürse SHORT, RL için LONG. Hedef karşı sınır (SHORT için RangeLow),
+  stop süpürme ucunun ötesi, giriş aynı yöndeki FVG.
+- **Kapı değişimi.** 4H "long izni" kuralı rehberde yok; yerine yukarıdaki iki
+  kural geçti. Eski kural `direction_gate='BIAS_LONG_PERMISSION'` olarak
+  seçilebilir durumda kalıyor ve yapı gereği yalnızca LONG açabiliyor.
+
+Kod: [context.py](../../agent_trading/strategy_v1/context.py) (bağlam motoru),
+`strategy_v1/strategy.py` (`setup_ready`, `_htf_context`, `HTF_CONTEXT` olayı),
+`strategy_v1/broker.py` ve `strategy_v1/entry.py` (her kural tek yerde yazılıp
+işlem yönünden okunuyor). Yeni ayarlar: `direction` (`BOTH` varsayılan),
+`direction_gate`, `htf_confluence_required`, `htf_zone_tolerance`.
+
+Testler: `tests/test_htf_context.py` (13), `tests/test_guide_direction.py` (26),
+`tests/test_backtest.py` içindeki SHORT muhasebesi. Short senaryosu, long
+senaryosunun range ekseni (`RangeLow + RangeHigh`) etrafında yansımasıdır:
+aynı yapı, aynı R, aynı sonuç, ters yön.
+
+## 9. Ölçülen sonuç: yön kuralları
+
+Aynı veri (`data/btc_deep`: 36.000 adet 15m, 10.000 adet 1H, 10.000 adet 4H
+mum; 15m akışı 2025-09-02 → 2026-09-12). Koşu: `runs/eval-direction`.
+
+| Metrik | Eski kapı (LONG_ONLY) | Rehber kapısı (LONG_ONLY) | Rehber kapısı (BOTH) | BOTH, §4.3 kapalı |
+|---|---|---|---|---|
+| Onaylanan range | 7 | 7 | 7 | 7 |
+| Manipülasyon | 30 | 30 | 30 | 30 |
+| HTF kararı | - | 3 | 30 | 30 |
+| Kurala uyan | - | 2 | 17 | 25 |
+| Aday (TRADE_CANDIDATE) | 0 | 0 | 12 | 21 |
+| Riskte elenen | 0 | 0 | 10 | 15 |
+| **İşlem** | **0** | **0** | **2** | **6** |
+| Bitiş sermayesi | 10.000 | 10.000 | **10.096,40** | 10.103,09 |
+
+Reddetme sebepleri (BOTH): 17 `HTF_CONTEXT_OK`, 8 `NO_HTF_ZONE`, 5
+`NO_HTF_FRAME`. Premium/discount tek bir manipülasyonu bile reddetmedi: 23
+SHORT premium'da, 2 LONG discount'ta gerçekleşti — yani süpürmeler doğal olarak
+doğru bölgede oluyor. Asıl seçici kural §4.3 teyidi.
+
+Açılan iki işlem (ikisi de SHORT, ikisi de kârda kapandı):
+
+| # | Giriş | Stop | Hedef | Çıkış | Sonuç |
+|---|---|---|---|---|---|
+| 1 | 13 Tem 2026 02:30, 63.492,2 | 64.524,9 | 61.129 | 13 Tem 13:45, 62.523,3 | +93,82 USDT (+0,94R) |
+| 2 | 14 Tem 2026 00:15, 62.458,7 | 63.086,5 | 61.129 | 14 Tem 00:30, 62.442,6 | +2,58 USDT (+0,03R) |
+
+Her ikisi de hedefe ulaşmadan, kâra çekilmiş stopla kapandı; `trades.csv`
+bunları `STOP_LOSS` diye etiketliyor, bu etiket yanıltıcı (sebep alanı
+iyileştirilmeli). Grafikler: `runs/eval-direction/charts/`.
+
+**Bu ölçüm ne kanıtlar:** zincir baştan sona çalışıyor ve gerçek veride işlem
+üretiyor. **Ne kanıtlamaz:** iki işlem, maliyetsiz ve tek paritede bir örnek —
+kârlılık hakkında hiçbir şey söylemez.
+
+## 10. Hâlâ rehberde olup kodda olmayanlar
+
+Ölçülüp bilinçli olarak ertelenenler:
+
+- **Simetrik range çapası.** Rehber hangi sınırın önce bulunacağını söylemiyor;
+  kod hâlâ önce geçerli dibi arıyor ([H]-RANGE-001). Simetrik hâli denendi ve
+  ölçüldü: mevcut veride seçilen range'lerin kendisi değişiyor, yerleşik kabul
+  senaryosu dahil 84 test kırılıyor. Kendi turunu hak ediyor; bu turda geri
+  alındı. Sonucu: yansıtılmış 1H akışı range onaylamıyor, bu yüzden short
+  senaryosunun 1H kuyruğu elle yazıldı.
+- **Dealing range'in yeniden çapalanması.** Fiyat geçerli çiftin dışına
+  taştığında rehber ne yapılacağını söylemiyor; kod EQ'yu son onaylı çiftten
+  okumayı sürdürüyor. Bu veride iki yaklaşım da aynı 25 manipülasyonu kabul
+  ediyor (13 SHORT çerçevenin üstünde, 2 LONG altında).
+- **CHoCH gövde teyidi (§5 Adım 2)**, **breaker / order block girişleri (§6)**,
+  **LTF ikincil teyit**, **impulse ön koşulu (§3 Adım 1)**, **likidite filtresi**,
+  **Pazartesi ve haftalık/aylık açılış seviyeleri (§8)**, **trend takip modu
+  (§9)**, **kabul katmanı (§10)**.
+- **Arz/talep (RBR/DBD) bölgeleri** HTF teyidinde kullanılmıyor; teyit bugün
+  yalnızca doldurulmamış FVG ve geçerli tepe/dip seviyeleriyle yapılıyor.
+- Ürün yüzeyi: ayarlar API'si yeni yön bilgilerini (`direction`,
+  `direction_gate`, HTF eşikleri) henüz dışarı vermiyor; arayüzden
+  değiştirilemiyorlar, varsayılanlarla çalışıyorlar.

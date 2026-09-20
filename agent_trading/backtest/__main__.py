@@ -45,6 +45,15 @@ def build_parser():
     parser.add_argument('--entry-level', default='FVG_EQ',
                         choices=('FVG_LOW', 'FVG_EQ', 'FVG_HIGH'))
     parser.add_argument('--entry-level-ratio', default='0.5')
+    parser.add_argument('--direction', default='BOTH',
+                        choices=('BOTH', 'LONG_ONLY', 'SHORT_ONLY'))
+    parser.add_argument('--direction-gate', default='GUIDE_HTF_CONTEXT',
+                        choices=('GUIDE_HTF_CONTEXT', 'BIAS_LONG_PERMISSION'),
+                        help='guide 4.3/4.4 context, or the superseded 4H permission')
+    parser.add_argument('--htf-zone-tolerance',
+                        help='defaults to the boundary proximity')
+    parser.add_argument('--no-htf-confluence', action='store_true',
+                        help='keep premium/discount but drop the guide 4.3 zone rule')
     parser.add_argument('--risk-per-trade', default='.01')
     parser.add_argument('--min-reward-risk', default='1')
     parser.add_argument('--stop-buffer', default='100')
@@ -67,6 +76,11 @@ def build_config(args):
                                   args.entry_timeframe),
         entry_level=args.entry_level,
         entry_level_ratio=Decimal(args.entry_level_ratio),
+        direction=args.direction,
+        direction_gate=args.direction_gate,
+        htf_confluence_required=not args.no_htf_confluence,
+        htf_zone_tolerance=(None if args.htf_zone_tolerance is None
+                            else Decimal(args.htf_zone_tolerance)),
         boundary_proximity=Decimal(args.boundary_proximity),
         equity=Decimal(args.starting_equity),
         stop_buffer=Decimal(args.stop_buffer),
