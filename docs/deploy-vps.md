@@ -97,6 +97,57 @@ ayarları), `agent-runs` (PAPER oturumu, analiz geçmişi), `caddy-data`
 - Strateji ayarları değişirse ya da kayıt OKX'in hâlâ sunduğu geçmişten eskiyse
   temiz bir oturum başlar ve etkinlik listesinde uyarı görünür.
 
+## Çoklu parite verisi ve tarama
+
+Strateji araştırması için OKX TR'nin 24 saatlik hacme göre en likit 30 USDT
+paritesinin geçmişi VPS'te indirilir [U-MULTI-PAIR-001]; geliştirme
+bilgisayarından OKX'e erişilemediği için bu adım burada yapılır. Yalnızca genel
+piyasa okuması kullanılır, API anahtarı gerekmez.
+
+- `.env` içinde `DOMAIN` tanımlı olmalı: `docker compose run` bütün
+  `compose.yaml`'ı okur.
+- Komutlar konteynerin kendi Python'uyla çalışır: `/opt/venv/bin/python`
+  (sistem Python'unda `mcp` paketi yok).
+- Çıktı `agent-runs` birimine, `/app/runs/...` altına yazılır; konteynerde
+  yazılabilir tek veri yeri orası.
+
+1. Kısa gerçek deneme (birkaç saniye):
+
+   ```bash
+   docker compose run --rm app /opt/venv/bin/python -m agent_trading.backtest.fetch --symbols BTC-USDT --limits 4H=600,1H=600,15m=600 --out /app/runs/research/smoke
+   ```
+
+2. Parite listesini seç ve durup gözden geçir; listeyi birlikte kontrol ederiz:
+
+   ```bash
+   docker compose run --rm app /opt/venv/bin/python -m agent_trading.backtest.fetch --universe --quote USDT --top 30 --universe-only --out /app/runs/research/okx_tr_usdt_top30
+   ```
+
+3. Tam indirme, aynı klasöre. Tahminen 1–2,5 saat sürer; bağlantı kopsa da
+   devam etsin diye `tmux` içinde çalıştır:
+
+   ```bash
+   docker compose run --rm app /opt/venv/bin/python -m agent_trading.backtest.fetch --universe --quote USDT --top 30 --limits 4H=10000,1H=10000,15m=36000 --pace 0.2 --timeout 60 --out /app/runs/research/okx_tr_usdt_top30
+   ```
+
+   Çıkış kodu 1: bazı pariteler indirilemedi. Aynı komutu sonuna `--resume`
+   ekleyerek yeniden çalıştır; tamamlananlar atlanır, liste ve bitiş anı aynı
+   kalır. Çıkış kodu 2: koşu durdu (örneğin art arda üç parite başarısız oldu,
+   yani OKX'e ulaşılamıyor); sebep ekranda ve `fetch_manifest.json`'da yazar.
+
+4. Veriyi bilgisayara al (~330 MB), `app` konteyneri çalışırken:
+
+   ```bash
+   docker compose cp app:/app/runs/research ./research
+   ```
+
+   Klasör geliştirme bilgisayarında gitignored `data/` altına konur ve tarama
+   orada çalışır (10–20 dk):
+
+   ```bash
+   python -m agent_trading.backtest.sweep --data data/okx_tr_usdt_top30 --output runs/sweep-okx-tr
+   ```
+
 ## Güncelleme
 
 ```bash

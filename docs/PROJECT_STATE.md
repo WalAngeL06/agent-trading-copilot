@@ -1,4 +1,28 @@
-# Current project state - 2026-09-20
+# Current project state - 2026-09-21
+
+## Multi-pair research set, built and waiting for the VPS - 2026-09-21 [U-MULTI-PAIR-001]
+
+Two trades on one symbol say nothing, so the next step is the same profile on
+many pairs. Owner decisions: USDT-quoted pairs only, the top 30 by 24h quote
+volume, downloaded on the VPS because OKX is not reachable from this PC (curl
+resets, the ATK server reports NetworkError, re-checked 2026-09-21).
+
+- The MCP adapter can read the OKX TR spot instrument and ticker listings
+  (public, `instType=SPOT` only, optional at discovery; both gate docs carry a
+  dated amendment). An empty candle page after a paging cursor now means the
+  end of history.
+- `python -m agent_trading.backtest.fetch --universe ...` selects the pairs,
+  writes one folder per pair plus `universe.json` and `fetch_manifest.json`,
+  paces and retries calls, isolates failing pairs and resumes with `--resume`.
+- `python -m agent_trading.backtest.sweep --data ...` runs the unchanged engine
+  on every folder, scales the two price-unit knobs per pair
+  ([H]-SWEEP-SCALE-001) and writes pooled R statistics, funnels and reasons.
+- Verified on the local BTC data: with `--scale none` the sweep reproduces the
+  direction result exactly (2 trades, 10096.402343948); it also shows that 7 of
+  the 10 risk-blocked setups were `INSUFFICIENT_EQUITY`.
+- 751 Python tests, 15 frontend tests and the production build pass. The
+  runbook is in [deploy-vps.md](deploy-vps.md), "Çoklu parite verisi ve tarama";
+  the design and caveats in [the backtest spec](specs/backtest-v0.1.md), section D.
 
 ## Direction follows the guide's HTF context - 2026-09-20 [U-RANGE-GUIDE-002]
 

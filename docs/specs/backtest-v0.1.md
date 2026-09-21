@@ -47,8 +47,9 @@ Datasets are directories holding `*_4H`, `*_1H` and `*_15m` files (`.jsonl`,
 
 `python -m agent_trading.backtest.fetch --symbol BTC-USDT --out data/btc` is a
 separate utility that freezes public candles through the shipped read-only
-market adapter (allowlist: ticker, candles, orderbook). It is never imported by
-the replay path.
+market adapter (public market reads only: ticker, candles, orderbook and, since
+2026-09-21, the spot instrument and ticker listings). It is never imported by
+the replay path. Its multi-pair form and the sweep are described in section D.
 
 ## Costs
 
@@ -128,3 +129,38 @@ strategy is still holding the same frozen range, so no LONG setup can form.
 More data makes this worse, not better: a deeper 1H history means an earlier
 first confirmation and a staler range. This needs an explicit decision on when a
 confirmed range should retire, and was NOT invented here.
+
+## D - multi-pair replay [U-MULTI-PAIR-001] (2026-09-21)
+
+**Fetch.** `python -m agent_trading.backtest.fetch --universe --quote USDT --top 30
+--limits 4H=10000,1H=10000,15m=36000 --out DIR` selects live OKX TR spot pairs
+in the quote currency, drops stablecoin and fiat bases
+([H]-UNIVERSE-EXCLUDE-001), ranks them by 24h quote volume and writes
+`DIR/universe.json`, one folder per pair (`DIR/<instId>/<slug>_<tf>.jsonl`)
+and `DIR/fetch_manifest.json`. Every pair ends at the same moment (`as_of`).
+Paging stops at the real end of history; when bars are missing only the newest
+unbroken segment is kept and the dropped count is recorded. Calls are paced,
+page faults retried with backoff, and a failing pair restarts once on a fresh
+session before it is marked FAILED while the run continues. Three failures in a
+row, or a contract fault, stop the run. `--resume` continues with the same
+choices; `--symbols A,B` skips the listing; `--symbol` keeps the flat layout.
+
+**Sweep.** `python -m agent_trading.backtest.sweep --data DIR --output OUT` runs
+the unchanged engine on every dataset folder, writes the usual artifacts per
+dataset, and adds `sweep_summary.json`, `sweep_symbols.csv` and
+`sweep_trades.csv`. A folder that cannot load is SKIPPED with its reason; one
+that loads but cannot run is FAILED. Reruns are byte-identical.
+
+**Scaling [H]-SWEEP-SCALE-001.** `boundary_proximity` and `stop_buffer` are price
+units. Under the default `--scale price` they become 0.005 and 0.001 of the
+first entry-timeframe close in the window (500 and 100 at a BTC price of
+100,000); the HTF tolerance and the trailing buffer follow them. Explicit
+price-unit flags are refused in that mode; `--scale none` keeps them absolute.
+On the local BTC data `--scale none` reproduces the single-run result exactly
+(2 trades, 10096.402343948), and price scaling gives 2 trades, 10095.3721872805.
+
+**Caveats.** The list is chosen by today's volume, so the past is seen through
+survivors and delisted pairs are absent. Pooled trades are not independent
+(pairs move together) and windows differ per pair (young listings have less
+history). The scaling reference is fixed at the window start, so a pair that
+moved a lot drifts from it; `price_drift` in each row shows by how much.

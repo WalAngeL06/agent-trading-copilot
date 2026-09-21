@@ -1,4 +1,17 @@
-# Current handoff - direction rules, 2026-09-20
+# Current handoff - multi-pair fetch and sweep, 2026-09-21
+
+Claude; branch `main`. The owner chose USDT pairs, the top 30 by 24h volume, and
+a download on the VPS. Built with TDD in four local commits: listing reads in
+the MCP adapter, a multi-pair fetcher with resume, the sweep runner with
+per-pair scaling and shared CLI flags, and these docs. No real multi-pair data
+exists yet: OKX is blocked from this PC. The local BTC smoke reproduces the
+direction result exactly. Next: the first VPS session runs the steps in
+[deploy-vps.md](deploy-vps.md), the data comes back, and the 30-pair sweep is
+analysed before any tuning. 751 Python tests pass. No push in this turn.
+
+---
+
+# Previous handoff - direction rules, 2026-09-20
 
 Claude; branch `main`. Second turn on the owner's strategy guide: the direction
 gate. The 4H long permission was replaced by the guide's HTF context (4.3

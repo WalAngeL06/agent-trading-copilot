@@ -1,17 +1,24 @@
-# Next task - first VPS deployment
+# Next task - first VPS deployment and the multi-pair run
 
-Updated 2026-09-19. Do not create new worktrees or sibling Agent Trading folders.
+Updated 2026-09-21. Do not create new worktrees or sibling Agent Trading folders.
 Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
 
-1. Strategy, highest value now that the engine trades: the sample is two
-   trades on one symbol. Widen it before tuning anything. In order:
-   (a) fetch every liquid OKX TR pair (instrument listing + per-symbol history)
-   and replay the same profile over all of them; (b) implement the guide's CHoCH
-   body confirmation and breaker/order-block entries (section 5-6), which are
-   the last entry rules still missing; (c) revisit the symmetric range anchor,
-   which is measured and deferred in the gap report section 10. Do not tune
-   thresholds on two trades.
-2. Network: the application connects to OKX through ATK/MCP whenever network
+1. Strategy, highest value: the sample is still two trades on one symbol.
+   Widen it before tuning anything. In order:
+   (a) run the multi-pair research set, now built in code [U-MULTI-PAIR-001]:
+   the top 30 OKX TR USDT pairs by 24h volume, downloaded on the VPS with the
+   steps in [deploy-vps.md](deploy-vps.md) ("Çoklu parite verisi ve tarama"),
+   then swept locally with `python -m agent_trading.backtest.sweep`; analyse the
+   per-pair and pooled results before changing any threshold;
+   (b) implement the guide's CHoCH body confirmation and breaker/order-block
+   entries (sections 5-6), the last entry rules still missing;
+   (c) revisit the symmetric range anchor, measured and deferred in the gap
+   report section 10.
+2. VPS, together with the owner: the owner provides an Ubuntu VPS and a domain
+   pointing at it and confirms tr.okx.com is reachable there. Then run the draft
+   deployment from [deploy-vps.md](deploy-vps.md), fix what the first real run
+   reveals, and start the multi-pair download of item 1(a) in the same session.
+3. Network: the application connects to OKX through ATK/MCP whenever network
    access is available; the 2026-09-16
    [diagnosis](fresh-atk-runtime-diagnosis.md) verified every public layer. This
    is environment-specific, not a product defect: on
@@ -19,24 +26,20 @@ Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
    while other HTTPS worked. Before concluding either way run
    `curl -sS -o /dev/null -w "%{http_code}\n" "https://tr.okx.com/api/v5/market/ticker?instId=BTC-USDT"`.
    While it fails the agent shows RECONNECTING and recovers on its own.
-2. VPS, together with the owner: the owner provides an Ubuntu VPS and a domain
-   pointing at it and confirms tr.okx.com is reachable there. Then run the draft
-   deployment from [deploy-vps.md](deploy-vps.md) and fix what the first real run
-   reveals.
-3. GitHub: `WalAngeL06/agent-trading-copilot` is private. Publish `main` by
+4. GitHub: `WalAngeL06/agent-trading-copilot` is private. Publish `main` by
    fast-forward only and keep it the default branch. Never merge stale PR #1
    (`work/final-demo` -> `main`). Keep `work/final-demo` and the local
    `archive/*` tags until the owner decides otherwise.
-4. The canonical `.env` already holds OKX read-only keys and a Telegram token
+5. The canonical `.env` already holds OKX read-only keys and a Telegram token
    (values not displayed); account reads could not be verified locally because
    of the network. On the VPS prefer a new read-only key restricted to its IP,
    and set `API_ACCESS_TOKEN` and `TELEGRAM_ALLOWED_USER_IDS`. The allowlist is
    empty today, so the bot answers anyone who messages it; do not guess the ID,
    the owner reads it from the bot's `/start` reply.
-5. Owner: review `_archive/` (it holds `.env` files with filled keys and local
+6. Owner: review `_archive/` (it holds `.env` files with filled keys and local
    run data) and delete it when satisfied. Pushing the local `archive/*` tags
    to GitHub is optional.
-6. Archived, unreviewed candidates: the BacktestPage UI in `archive/final-ui`.
+7. Archived, unreviewed candidates: the BacktestPage UI in `archive/final-ui`.
    The LIVE_SMOKE path in `archive/final-demo` stays out of scope unless the
    owner explicitly authorizes live execution work.
 
