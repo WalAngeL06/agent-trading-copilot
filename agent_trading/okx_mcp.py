@@ -13,16 +13,22 @@ from typing import Generic, TypeVar
 
 from .market import bar_duration
 from .market_observations import (
-    normalize_orderbook, normalize_ticker, observation_time, okx_milliseconds,
+    normalize_orderbook, normalize_spot_instruments, normalize_spot_tickers, normalize_ticker,
+    observation_time, okx_milliseconds,
 )
 from .okx import _symbol, normalize_candles
 
 
 REQUIRED_TOOLS = ("market_get_ticker", "market_get_candles", "market_get_orderbook")
+# [U-MULTI-PAIR-001] Public spot listings for the offline universe selection.
+# Callable once discovered but never required, so the live contract is unchanged.
+LISTING_TOOLS = ("market_get_instruments", "market_get_tickers")
 _REQUEST_FIELDS = {
     REQUIRED_TOOLS[0]: {"instId": "string"},
     REQUIRED_TOOLS[1]: {"instId": "string", "bar": "string", "limit": "number"},
     REQUIRED_TOOLS[2]: {"instId": "string", "sz": "number"},
+    LISTING_TOOLS[0]: {"instType": "string"},
+    LISTING_TOOLS[1]: {"instType": "string"},
 }
 T = TypeVar("T")
 
@@ -124,14 +130,14 @@ def _payload(response, tool_name: str) -> list:
     return rows
 
 
-def _schema(tool, fields):
+def _schema(tool, fields, key="instId"):
     schema = tool.input_schema
     if not isinstance(schema, dict) or schema.get("type") != "object":
         raise McpMarketError("TOOL_SCHEMA_DRIFT")
     properties, required = schema.get("properties"), schema.get("required", [])
     if not isinstance(properties, dict) or not isinstance(required, list):
         raise McpMarketError("TOOL_SCHEMA_DRIFT")
-    if "instId" not in required or any(name not in fields for name in required):
+    if key not in required or any(name not in fields for name in required):
         raise McpMarketError("TOOL_SCHEMA_DRIFT")
     for name, expected in fields.items():
         field = properties.get(name)
@@ -196,8 +202,8 @@ class OkxMcpMarketAdapter:
             missing = tuple(name for name in REQUIRED_TOOLS if name not in tools)
             if missing:
                 raise McpMarketError("REQUIRED_TOOLS_MISSING", missing_tools=missing)
-            for name, fields in _REQUEST_FIELDS.items():
-                _schema(tools[name], fields)
+            for name in REQUIRED_TOOLS:
+                _schema(tools[name], _REQUEST_FIELDS[name])
             self._tools = tools
             self.discovered_tools = tuple(sorted(tools))
         except Exception as exc:
@@ -208,7 +214,7 @@ class OkxMcpMarketAdapter:
         return self.discovered_tools
 
     async def _read(self, name, symbol, arguments, normalize, *, timeframe=None, as_of=None):
-        if name not in REQUIRED_TOOLS or name not in self._tools:
+        if name not in REQUIRED_TOOLS + LISTING_TOOLS or name not in self._tools:
             raise McpMarketError("TOOLS_NOT_DISCOVERED")
         start, started_ns = observation_time(self.clock()), monotonic_ns()
         observed_at = None
@@ -218,7 +224,8 @@ class OkxMcpMarketAdapter:
             fields = dict(_REQUEST_FIELDS[name])
             if "after" in arguments:
                 fields["after"] = "string"
-            _schema(self._tools[name], fields)
+            _schema(self._tools[name], fields,
+                    "instType" if name in LISTING_TOOLS else "instId")
             for field, value in arguments.items():
                 enum = self._tools[name].input_schema["properties"][field].get("enum")
                 if enum is not None and value not in enum:
@@ -262,7 +269,9 @@ class OkxMcpMarketAdapter:
             arguments["after"] = str(after)
 
         def normalize(rows, observed):
-            if not rows or len(rows) > limit:
+            # [U-MULTI-PAIR-001] An empty page that answers a paging cursor is
+            # the end of the venue's history; without a cursor it is malformed.
+            if len(rows) > limit or (not rows and after is None):
                 raise ValueError("unexpected candle response count")
             candles = normalize_candles(rows, symbol, timeframe, boundary)
             open_rows = sum(str(row[8]) == "0" for row in rows)
@@ -281,3 +290,13 @@ class OkxMcpMarketAdapter:
             raise ValueError("order book depth must be between 1 and 400")
         return await self._read(REQUIRED_TOOLS[2], symbol, {"instId": symbol, "sz": depth},
                                 lambda rows, observed: (normalize_orderbook(rows, symbol, observed, depth), None))
+
+    async def spot_instruments(self) -> McpMarketRead:
+        """Every OKX TR spot listing. Only `instType=SPOT` is ever sent."""
+        return await self._read(LISTING_TOOLS[0], None, {"instType": "SPOT"},
+                                lambda rows, observed: (normalize_spot_instruments(rows), None))
+
+    async def spot_tickers(self) -> McpMarketRead:
+        """24h activity of every OKX TR spot pair, for volume ranking."""
+        return await self._read(LISTING_TOOLS[1], None, {"instType": "SPOT"},
+                                lambda rows, observed: (normalize_spot_tickers(rows), None))

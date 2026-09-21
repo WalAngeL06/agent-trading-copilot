@@ -4,6 +4,12 @@ Date: 2026-09-12. Owner: Codex. Source: [U-MCP-GATE-001].
 Result: **VERIFIED NARROW PRODUCT-RUNTIME MCP GATE** [E-MCP-GATE-001].
 **Ch.1 is not complete.** No strategy or profitability validation is claimed.
 
+> **Amendment 2026-09-21 [U-MULTI-PAIR-001].** The adapter can now also call
+> `market_get_instruments` and `market_get_tickers` (public, `instType=SPOT`
+> only, optional at discovery), so five public read tools are callable. The
+> "exactly three public read tool names" statement below records the 2026-09-12
+> state. Contract: [the gate spec](specs/runtime-atk-mcp-gate.md).
+
 ## Verified context and path
 
 Only `C:/Users/Serdar Arif/Desktop/Agent Trading-backend`, branch

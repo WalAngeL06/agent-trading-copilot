@@ -16,7 +16,16 @@ OBSERVED = AS_OF + timedelta(minutes=1)
 MS = "1767262500000"
 
 
+LISTING = ("market_get_instruments", "market_get_tickers")
+INST_TYPES = ["SPOT", "SWAP", "FUTURES", "OPTION", "MARGIN", "EVENTS"]
+
+
 def tool(name):
+    if name in LISTING:
+        properties = {"instType": {"type": "string", "enum": list(INST_TYPES)},
+                      "instFamily": {"type": "string"}, "demo": {"type": "boolean"}}
+        return SimpleNamespace(name=name, input_schema={"type": "object",
+                               "properties": properties, "required": ["instType"]})
     properties = {"instId": {"type": "string"}}
     if name == "market_get_candles":
         properties.update(bar={"type": "string", "enum": ["15m", "1H", "4H"]},
@@ -30,7 +39,9 @@ def tool(name):
 def reply(name, data):
     endpoint = {"market_get_ticker": "/api/v5/market/ticker",
                 "market_get_candles": "/api/v5/market/candles",
-                "market_get_orderbook": "/api/v5/market/books"}[name]
+                "market_get_orderbook": "/api/v5/market/books",
+                "market_get_instruments": "/api/v5/public/instruments",
+                "market_get_tickers": "/api/v5/market/tickers"}[name]
     payload = {"tool": name, "ok": True,
                "data": {"endpoint": endpoint, "requestTime": AS_OF.isoformat(), "data": data},
                "capabilities": {"readOnly": True, "hasAuth": False, "demo": False}}
@@ -303,6 +314,31 @@ class McpAdapterTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(McpMarketError):
             await self.adapter.candles("BTC-USDT", "15m", 10, as_of=AS_OF)
 
+    async def test_an_empty_candle_page_without_a_cursor_stays_malformed(self):
+        # Live callers never page, so for them an empty answer is a broken one.
+        self.session.responses["market_get_candles"] = reply("market_get_candles", [])
+        with self.assertRaises(McpMarketError) as error:
+            await self.adapter.candles("BTC-USDT", "15m", 10, as_of=AS_OF)
+        self.assertEqual(error.exception.code, "MALFORMED_RESPONSE")
+
+    async def test_an_empty_page_after_a_cursor_means_no_older_history(self):
+        # [U-MULTI-PAIR-001] Paging past a pair's listing date returns nothing.
+        self.session.responses["market_get_candles"] = reply("market_get_candles", [])
+        read = await self.adapter.candles("BTC-USDT", "15m", 10, as_of=AS_OF,
+                                          after=1767262500000)
+        self.assertEqual(read.value, ())
+        self.assertEqual(to_jsonable(read.provenance.filtering), {
+            "received_rows": 0, "open_rows": 0, "future_rows": 0,
+            "duplicate_rows": 0, "retained_rows": 0})
+        self.assertEqual(self.session.calls[-1][1]["after"], "1767262500000")
+
+    async def test_too_many_rows_still_fail_with_a_cursor(self):
+        rows = [candle("2026-01-01T09:00:00Z"), candle("2026-01-01T09:15:00Z")]
+        self.session.responses["market_get_candles"] = reply("market_get_candles", rows)
+        with self.assertRaises(McpMarketError) as error:
+            await self.adapter.candles("BTC-USDT", "15m", 1, as_of=AS_OF, after=1767262500000)
+        self.assertEqual(error.exception.code, "MALFORMED_RESPONSE")
+
     async def test_bad_book_sort_crossing_empty_or_future_time_fails(self):
         variants = []
         for change in ["reversed", "crossed", "empty", "future"]:
@@ -349,3 +385,93 @@ class McpAdapterTests(unittest.IsolatedAsyncioTestCase):
         for _ in range(105):
             await self.adapter.ticker("BTC-USDT")
         self.assertLessEqual(len(self.adapter.provenance), 100)
+
+
+def spot_instrument(inst_id="ETH-USDT"):
+    base, quote = inst_id.split("-")
+    return {"instType": "SPOT", "instId": inst_id, "baseCcy": base, "quoteCcy": quote,
+            "state": "live", "listTime": "1548133413000"}
+
+
+def spot_ticker(inst_id="ETH-USDT", volume="1000.5"):
+    return {"instType": "SPOT", "instId": inst_id, "last": "2500", "volCcy24h": volume,
+            "ts": MS}
+
+
+class SpotListingAdapterTests(unittest.IsolatedAsyncioTestCase):
+    """[U-MULTI-PAIR-001] Two public listing reads; still no private or write tool."""
+
+    async def asyncSetUp(self):
+        self.session = FakeSession()
+        self.session.tools += [tool(name) for name in LISTING]
+        self.session.responses["market_get_instruments"] = reply(
+            "market_get_instruments", [spot_instrument(), spot_instrument("BTC-USDT")])
+        self.session.responses["market_get_tickers"] = reply(
+            "market_get_tickers", [spot_ticker(), spot_ticker("BTC-USDT", "9000")])
+        self.adapter = OkxMcpMarketAdapter(self.session, clock=lambda: OBSERVED)
+        await self.adapter.discover()
+
+    async def test_the_callable_tools_are_the_three_required_plus_two_listings(self):
+        from agent_trading import okx_mcp
+        self.assertEqual(okx_mcp.REQUIRED_TOOLS,
+                         ("market_get_ticker", "market_get_candles", "market_get_orderbook"))
+        self.assertEqual(okx_mcp.LISTING_TOOLS, LISTING)
+
+    async def test_spot_instruments_are_read_with_inst_type_spot_only(self):
+        read = await self.adapter.spot_instruments()
+        self.assertEqual([record.symbol for record in read.value], ["ETH-USDT", "BTC-USDT"])
+        self.assertEqual(self.session.calls[-1], ("market_get_instruments", {"instType": "SPOT"}))
+        self.assertEqual((read.provenance.tool, read.provenance.symbol, read.provenance.timeframe),
+                         ("market_get_instruments", None, None))
+        self.assertTrue(read.provenance.success)
+
+    async def test_spot_tickers_carry_the_quote_volume(self):
+        read = await self.adapter.spot_tickers()
+        self.assertEqual({record.symbol: record.quote_volume_24h for record in read.value},
+                         {"ETH-USDT": Decimal("1000.5"), "BTC-USDT": Decimal("9000")})
+        self.assertEqual(self.session.calls[-1], ("market_get_tickers", {"instType": "SPOT"}))
+
+    async def test_discovery_does_not_require_the_listing_tools(self):
+        session = FakeSession()                       # only the three required tools
+        adapter = OkxMcpMarketAdapter(session, clock=lambda: OBSERVED)
+        await adapter.discover()
+        for operation in (adapter.spot_instruments(), adapter.spot_tickers()):
+            with self.assertRaises(McpMarketError) as error:
+                await operation
+            self.assertEqual(error.exception.code, "TOOLS_NOT_DISCOVERED")
+        self.assertEqual(session.calls, [])
+
+    async def test_listing_schema_drift_is_caught_when_called_not_at_discovery(self):
+        drifted = tool("market_get_instruments")
+        drifted.input_schema["required"] = ["instId"]
+        self.session.tools[-2] = drifted
+        await self.adapter.discover()                 # the live contract stays intact
+        with self.assertRaises(McpMarketError) as error:
+            await self.adapter.spot_instruments()
+        self.assertEqual(error.exception.code, "TOOL_SCHEMA_DRIFT")
+        self.assertEqual(self.session.calls, [])
+
+    async def test_an_inst_type_enum_without_spot_is_drift(self):
+        self.session.tools[-1].input_schema["properties"]["instType"]["enum"] = ["SWAP"]
+        await self.adapter.discover()
+        with self.assertRaises(McpMarketError) as error:
+            await self.adapter.spot_tickers()
+        self.assertEqual(error.exception.code, "TOOL_SCHEMA_DRIFT")
+        self.assertEqual(self.session.calls, [])
+
+    async def test_other_market_tools_stay_uncallable_even_when_discovered(self):
+        self.session.tools.append(tool("market_get_trades"))
+        await self.adapter.discover()
+        with self.assertRaises(McpMarketError) as error:
+            await self.adapter._read("market_get_trades", "BTC-USDT", {"instId": "BTC-USDT"},
+                                     lambda rows, observed: (rows, None))
+        self.assertEqual(error.exception.code, "TOOLS_NOT_DISCOVERED")
+        self.assertEqual(self.session.calls, [])
+
+    async def test_a_malformed_listing_fails_without_leaking_the_payload(self):
+        self.session.responses["market_get_tickers"] = reply(
+            "market_get_tickers", [spot_ticker(volume="secret")])
+        with self.assertRaises(McpMarketError) as error:
+            await self.adapter.spot_tickers()
+        self.assertEqual(error.exception.code, "MALFORMED_RESPONSE")
+        self.assertNotIn("secret", json.dumps(to_jsonable(self.adapter.provenance)))

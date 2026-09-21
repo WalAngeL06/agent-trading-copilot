@@ -5,6 +5,14 @@ Source: [U-MCP-GATE-001], the user's Ch.1 Backend Target #1 instruction.
 This instruction explicitly starts Ch.1 in the backend worktree and prioritizes
 the runtime MCP gate before the shared API contract. Ch.1 is not complete.
 
+> **Amendment 2026-09-21 [U-MULTI-PAIR-001].** Two more public read tools are
+> callable: `market_get_instruments` and `market_get_tickers`, always with
+> `instType=SPOT` and nothing else. They serve the offline universe selection
+> for multi-pair backtests. They are optional: discovery still requires exactly
+> the three tools named below, and a listing tool's schema is checked when it is
+> called, so the live contract is unchanged. Account, trade and write tools stay
+> out of scope and the market-only discovery fence is unchanged.
+
 ## Scope and contracts
 
 Python product code uses the official `mcp==2.2.0` v2 `Client` and stdio

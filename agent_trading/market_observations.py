@@ -111,3 +111,75 @@ def normalize_orderbook(rows: list, symbol: str, observed_at: datetime,
             raise ValueError("order book level must have four fields")
         sides.append(tuple(BookLevel(_decimal(level[0]), _decimal(level[1])) for level in levels))
     return OrderBookObservation(symbol, *sides, okx_milliseconds(row["ts"]), observed_at)
+
+
+# [U-MULTI-PAIR-001] Spot listings for the offline universe selection. Only the
+# fields a selection needs survive; everything else in the OKX row is dropped.
+@dataclass(frozen=True)
+class SpotInstrument:
+    symbol: str
+    base: str
+    quote: str
+    state: str
+    list_time: datetime | None = None
+
+    def __post_init__(self):
+        _symbol(self.symbol)
+        for value in (self.base, self.quote, self.state):
+            if not isinstance(value, str) or not value:
+                raise ValueError("spot instrument fields must be nonempty text")
+        if self.symbol != f"{self.base}-{self.quote}":
+            raise ValueError("a spot instrument id must read BASE-QUOTE")
+
+
+@dataclass(frozen=True)
+class SpotVolume:
+    """24h activity of one spot pair; `quote_volume_24h` is in the quote currency.
+
+    The ticker timestamp is deliberately not kept: ranking does not need it, and
+    a venue clock slightly ahead of ours must not fail the whole listing.
+    """
+    symbol: str
+    last: Decimal | None
+    quote_volume_24h: Decimal
+
+    def __post_init__(self):
+        _symbol(self.symbol)
+        if self.last is not None:
+            _exact(self.last)
+        _exact(self.quote_volume_24h, quantity=True)
+
+
+def _spot_rows(rows):
+    if not isinstance(rows, list) or not rows:
+        raise ValueError("a spot listing must be a nonempty row list")
+    for row in rows:
+        if not isinstance(row, dict) or row.get("instType") != "SPOT":
+            raise ValueError("expected SPOT rows")
+    return rows
+
+
+def _unique(records):
+    symbols = [record.symbol for record in records]
+    if len(set(symbols)) != len(symbols):
+        raise ValueError("duplicate instrument rows")
+    return tuple(records)
+
+
+def normalize_spot_instruments(rows: list) -> tuple[SpotInstrument, ...]:
+    records = []
+    for row in _spot_rows(rows):
+        listed = row.get("listTime")
+        records.append(SpotInstrument(row["instId"], row["baseCcy"], row["quoteCcy"],
+                                      row["state"],
+                                      None if listed in (None, "") else okx_milliseconds(listed)))
+    return _unique(records)
+
+
+def normalize_spot_tickers(rows: list) -> tuple[SpotVolume, ...]:
+    records = []
+    for row in _spot_rows(rows):
+        last = row.get("last")
+        records.append(SpotVolume(row["instId"], None if last in (None, "") else _decimal(last),
+                                  _decimal(row["volCcy24h"])))
+    return _unique(records)
