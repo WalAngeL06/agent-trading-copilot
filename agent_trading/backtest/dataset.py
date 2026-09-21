@@ -137,6 +137,16 @@ def load_stream(path, symbol, timeframe, start=None, end=None):
     return StreamLoad(timeframe, Path(path), tuple(candles), excluded_open, excluded_window)
 
 
+def peek_symbol(path):
+    """The pair a candle file belongs to, read from its first row."""
+    for number, row in _rows(Path(path)):
+        symbol = row.get('symbol') if isinstance(row, dict) else None
+        if not isinstance(symbol, str) or not symbol.strip():
+            raise ValueError(f'{path}: row {number} names no symbol')
+        return symbol
+    raise ValueError(f'{path}: no candle rows')
+
+
 def load_dataset(config):
     """Load every role timeframe named by the strategy profile."""
     streams = {}
