@@ -102,47 +102,69 @@ ayarları), `agent-runs` (PAPER oturumu, analiz geçmişi), `caddy-data`
 Strateji araştırması için OKX TR'nin 24 saatlik hacme göre en likit 30 USDT
 paritesinin geçmişi VPS'te indirilir [U-MULTI-PAIR-001]; geliştirme
 bilgisayarından OKX'e erişilemediği için bu adım burada yapılır. Yalnızca genel
-piyasa okuması kullanılır, API anahtarı gerekmez.
+piyasa okuması kullanılır, API anahtarı gerekmez. İlk gerçek koşu 21 Eylül
+2026'da bu adımlarla yapıldı: 30 paritenin 30'u tamamlandı, boşluk çıkmadı,
+indirme 18 dakika sürdü.
 
 - `.env` içinde `DOMAIN` tanımlı olmalı: `docker compose run` bütün
-  `compose.yaml`'ı okur.
+  `compose.yaml`'ı okur. Uygulama henüz yayına alınmadıysa geçici bir değer
+  yeterli: `printf 'DOMAIN=pending.invalid\n' > .env`.
 - Komutlar konteynerin kendi Python'uyla çalışır: `/opt/venv/bin/python`
   (sistem Python'unda `mcp` paketi yok).
-- Çıktı `agent-runs` birimine, `/app/runs/...` altına yazılır; konteynerde
-  yazılabilir tek veri yeri orası.
+- Veri, proje klasörünün içindeki `data/`'ya yazılır; git bu klasörü yok sayar.
+  Konteyner 10001 numaralı kullanıcıyla çalıştığı için klasör bir kez ona
+  verilir. Aşağıdaki komutlar proje klasörünün içinden çalıştırılır:
 
-1. Kısa gerçek deneme (birkaç saniye):
+  ```bash
+  mkdir -p data && chown 10001:10001 data
+  ```
+
+1. Kısa gerçek deneme (ilk seferde imaj derlendiği için ~2 dakika):
 
    ```bash
-   docker compose run --rm app /opt/venv/bin/python -m agent_trading.backtest.fetch --symbols BTC-USDT --limits 4H=600,1H=600,15m=600 --out /app/runs/research/smoke
+   docker compose run --rm -v "$PWD/data:/app/data" app /opt/venv/bin/python -m agent_trading.backtest.fetch --symbols BTC-USDT --limits 4H=600,1H=600,15m=600 --out /app/data/smoke
    ```
+
+   Beklenen: `BTC-USDT: COMPLETE 4H=600 1H=600 15m=600`.
 
 2. Parite listesini seç ve durup gözden geçir; listeyi birlikte kontrol ederiz:
 
    ```bash
-   docker compose run --rm app /opt/venv/bin/python -m agent_trading.backtest.fetch --universe --quote USDT --top 30 --universe-only --out /app/runs/research/okx_tr_usdt_top30
+   docker compose run --rm -v "$PWD/data:/app/data" app /opt/venv/bin/python -m agent_trading.backtest.fetch --universe --quote USDT --top 30 --universe-only --out /app/data/okx_tr_usdt_top30
    ```
 
-3. Tam indirme, aynı klasöre. Tahminen 1–2,5 saat sürer; bağlantı kopsa da
+3. Tam indirme, aynı klasöre. 21 Eylül'de 18 dakika sürdü; bağlantı kopsa da
    devam etsin diye `tmux` içinde çalıştır:
 
    ```bash
-   docker compose run --rm app /opt/venv/bin/python -m agent_trading.backtest.fetch --universe --quote USDT --top 30 --limits 4H=10000,1H=10000,15m=36000 --pace 0.2 --timeout 60 --out /app/runs/research/okx_tr_usdt_top30
+   docker compose run --rm -v "$PWD/data:/app/data" app /opt/venv/bin/python -m agent_trading.backtest.fetch --universe --quote USDT --top 30 --limits 4H=10000,1H=10000,15m=36000 --pace 0.2 --timeout 60 --out /app/data/okx_tr_usdt_top30
    ```
 
    Çıkış kodu 1: bazı pariteler indirilemedi. Aynı komutu sonuna `--resume`
    ekleyerek yeniden çalıştır; tamamlananlar atlanır, liste ve bitiş anı aynı
    kalır. Çıkış kodu 2: koşu durdu (örneğin art arda üç parite başarısız oldu,
    yani OKX'e ulaşılamıyor); sebep ekranda ve `fetch_manifest.json`'da yazar.
+   Kısa geçmişli pariteler (manifestte `exhausted`) OKX TR'deki listelenme
+   tarihinde başlar; bu bir hata değildir.
 
-4. Veriyi bilgisayara al (~330 MB), `app` konteyneri çalışırken:
+4. Veriyi arşivle (278 MB veri, ~33 MB arşiv) ve bilgisayara al:
 
    ```bash
-   docker compose cp app:/app/runs/research ./research
+   tar czf /root/okx_tr_usdt_top30.tgz -C data okx_tr_usdt_top30
    ```
 
-   Klasör geliştirme bilgisayarında gitignored `data/` altına konur ve tarama
-   orada çalışır (10–20 dk):
+   Geliştirme bilgisayarında (PowerShell):
+
+   ```bash
+   scp root@<sunucu-ip>:/root/okx_tr_usdt_top30.tgz "C:\Users\Serdar Arif\Desktop\Agent Trading\data\okx_tr_usdt_top30.tgz"
+   ```
+
+   Arşiv gitignored `data/` altında açılır ve tarama orada çalışır
+   (30 paritede ~10 dk):
+
+   ```bash
+   tar xzf data/okx_tr_usdt_top30.tgz -C data
+   ```
 
    ```bash
    python -m agent_trading.backtest.sweep --data data/okx_tr_usdt_top30 --output runs/sweep-okx-tr
