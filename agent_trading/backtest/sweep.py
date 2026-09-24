@@ -19,6 +19,7 @@ import io
 import json
 from pathlib import Path
 
+from ..strategy_v1.config import ENTRY_MODELS
 from ..trading_brain.risk import exact_product
 from . import engine, report
 from .cli import (add_cost_arguments, add_profile_arguments, costs_from_args,
@@ -147,6 +148,14 @@ def pooled(records):
             'wins': sum(1 for record in mine if record.net_pnl > 0),
             'total_r': plain(_total(record.r_multiple for record in mine
                                     if record.r_multiple is not None))}
+    by_entry_model = {}
+    for model in ENTRY_MODELS:
+        mine = [record for record in closed if record.entry_model == model]
+        by_entry_model[model] = {
+            'trades': sum(1 for record in records if record.entry_model == model),
+            'wins': sum(1 for record in mine if record.net_pnl > 0),
+            'total_r': plain(_total(record.r_multiple for record in mine
+                                    if record.r_multiple is not None))}
     return {'trades': len(records), 'closed': len(closed), 'open': len(records) - len(closed),
             'wins': len(wins), 'losses': len(losses),
             'win_rate': _text(Decimal(len(wins)) / Decimal(len(closed)) if closed else None),
@@ -154,7 +163,7 @@ def pooled(records):
             'total_r': plain(_total(r_values)),
             'profit_factor_r': _text(gained / lost if lost > 0 else None),
             'net_pnl': plain(_total(record.net_pnl for record in records)),
-            'by_direction': by_direction}
+            'by_direction': by_direction, 'by_entry_model': by_entry_model}
 
 
 def _limitations(root, scale):

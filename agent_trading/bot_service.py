@@ -175,6 +175,7 @@ class BotService:
                 "PAPER_ORDER_OPENED", "PAPER_ORDER_CLOSED",
                 "PARTIAL_TP_FILLED", "BREAK_EVEN_PROTECTED", "TRAILING_STOP_UPDATED",
                 "RANGE_HIGH_PARTIAL_EXIT", "RUNNER_OPEN", "RUNNER_STOPPED",
+                "CHOCH_CONFIRMED", "RANGE_EQ_PARTIAL_EXIT",
             ):
                 self._add_ui_event(event.kind, f"PAPER · {event.timeframe} · {_iso(event.observed_at)}")
                 try:

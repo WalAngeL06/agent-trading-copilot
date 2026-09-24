@@ -8,7 +8,8 @@ from pathlib import Path
 
 from .format import plain
 
-TRADE_COLUMNS = ('trade_id', 'symbol', 'direction', 'setup_at', 'entry_at', 'entry_price',
+TRADE_COLUMNS = ('trade_id', 'symbol', 'direction', 'entry_model', 'setup_at', 'entry_at',
+                 'entry_price',
                  'initial_stop', 'initial_r', 'original_quantity', 'initial_risk_amount',
                  'final_exit_at', 'exit_reason', 'status', 'gross_pnl', 'cost', 'net_pnl',
                  'r_multiple', 'duration_seconds', 'partial_count', 'range_high_reached',

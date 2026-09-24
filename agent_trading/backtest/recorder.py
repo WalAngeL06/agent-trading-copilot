@@ -9,9 +9,9 @@ from decimal import Decimal
 from ..trading_brain.risk import exact_difference, exact_product
 from .format import plain
 
-BREAK_EVEN_REASONS = ('BREAK_EVEN', 'RECOVERY_BREAK_EVEN')
+BREAK_EVEN_REASONS = ('BREAK_EVEN', 'RECOVERY_BREAK_EVEN', 'RANGE_EQ_BREAK_EVEN')
 EXIT_REASONS = {'RUNNER': 'RUNNER_STOP', 'STOP': 'STOP_LOSS', 'RANGE_HIGH': 'RANGE_HIGH',
-                'PARTIAL_TP': 'PARTIAL_TP'}
+                'PARTIAL_TP': 'PARTIAL_TP', 'RANGE_EQ': 'RANGE_EQ', 'RANGE_LOW': 'RANGE_LOW'}
 
 
 def add(left, right):
@@ -70,10 +70,11 @@ class TradeRecord:
     runner_stopped: bool
     break_even_reached: bool
     trailing_updates: int
+    entry_model: str | None = None
 
     def as_dict(self):
         return {'trade_id': self.trade_id, 'symbol': self.symbol,
-                'direction': self.direction,
+                'direction': self.direction, 'entry_model': self.entry_model,
                 'setup_at': self.setup_at.isoformat(),
                 'entry_at': self.entry_at.isoformat(),
                 'entry_price': plain(self.entry_price),
@@ -127,6 +128,10 @@ def slice_cost(costs, entry_price, exit_price, quantity):
 def record_trades(strategy, costs, symbol):
     """One record per logical trade, partial exits folded into it."""
     records = []
+    # [U-DD-DEVIATION-001] One order rests at a time, so the plan that became a
+    # trade is the PENDING_ENTRY emitted on its candidate's own bar.
+    plans = {event.observed_at: event.payload for event in strategy.events
+             if event.kind == 'PENDING_ENTRY'}
     for index, trade in enumerate(strategy.broker.trades, 1):
         ledger = trade.ledger
         if ledger is None:
@@ -163,7 +168,8 @@ def record_trades(strategy, costs, symbol):
             final_exit_at=last.observed_at if closed and last is not None else None,
             exit_reason=reason, status=trade.status, gross_pnl=gross, cost=cost,
             net_pnl=net_pnl, r_multiple=r_multiple, duration_seconds=duration,
-            partial_count=len(ledger.partial_exits),
+            partial_count=len(ledger.partial_exits) + len(ledger.of_kind('RANGE_EQ')),
+            entry_model=getattr(plans.get(trade.candidate.observed_at), 'entry_model', None),
             range_high_reached=ledger.range_high_done,
             runner_opened=runner_opened, runner_stopped=runner_stopped,
             break_even_reached=any(u.reason in BREAK_EVEN_REASONS
