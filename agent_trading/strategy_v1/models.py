@@ -70,13 +70,17 @@ class EntryPlan:
     protecting_swing: SwingLow | SwingHigh | None
     protecting_price: Decimal | None
     observed_at: datetime
+    # [U-DD-DEVIATION-001] the range EQ frozen with the plan, and the DD model
+    # (CHOCH_FVG / HTF_FVG_REVERSAL) that produced it.
+    range_eq: Decimal | None = None
+    entry_model: str | None = None
     source_ids: tuple[str, ...] = ('[U-STRATEGY-V1-001]', '[H]-SV1-ENTRY-001')
 
 
 @dataclass(frozen=True)
 class PositionExit:
     """One realised slice of a single logical trade."""
-    kind: str                  # PARTIAL_TP | RANGE_HIGH | RANGE_LOW | RUNNER | STOP
+    kind: str                  # PARTIAL_TP | RANGE_EQ | RANGE_HIGH | RANGE_LOW | RUNNER | STOP
     quantity: Decimal
     exit_price: Decimal
     realized_pnl: Decimal
@@ -103,6 +107,7 @@ class PositionLedger:
     filled_r: tuple[Decimal, ...] = ()
     partials_cancelled_at: datetime | None = None
     range_high_done: bool = False
+    range_eq_done: bool = False
     source_ids: tuple[str, ...] = ('[U-STRATEGY-V1-001]', '[H]-SV1-PARTIAL-001')
 
     def of_kind(self, kind):

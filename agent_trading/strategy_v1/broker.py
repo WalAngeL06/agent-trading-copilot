@@ -204,7 +204,9 @@ class PendingLimitPaperBroker:
         trade = self.trades[-1]
         if trade.status != 'OPEN':
             return tuple(result)
-        managed = self.risk.manage(trade, candle)          # inherited 1R break-even
+        managed = (self.risk.manage(trade, candle)        # inherited 1R break-even
+                   if self.profile.break_even_trigger == 'R_MULTIPLE'
+                   else self._range_break_even(trade, candle))
         if managed != trade:
             trade = self._store(managed)
             result.append(BrokerEvent('PAPER_STOP_UPDATED', candle.close_time, managed))
@@ -238,12 +240,14 @@ class PendingLimitPaperBroker:
         return tuple(events)
 
     def _favorable(self, trade, candle):
-        """Configured R partials in order, then the range boundary exit."""
+        """Range EQ scale-out, configured R partials in order, then the boundary exit."""
         ledger = trade.ledger
         if not ledger.has_upside_target:
             return ()                              # a runner keeps no fixed target
         long_ = trade.direction == 'LONG'
-        events = []
+        trade, first = self._range_eq(trade, candle)
+        events = list(first)
+        ledger = trade.ledger
         for level in self.profile.partial_take_profits:
             if level.r_multiple in ledger.filled_r:
                 continue
@@ -270,6 +274,35 @@ class PendingLimitPaperBroker:
         if candle.high < trade.tp if long_ else candle.low > trade.tp:
             return tuple(events)
         return tuple(events) + self._boundary(self.trades[-1], candle)
+
+    def _range_eq(self, trade, candle):
+        """[U-DD-DEVIATION-001] Close `eq_scale_out_fraction` at the range EQ.
+
+        Reaching EQ also arms the RANGE_EQ break-even, with or without a slice.
+        [H]-DD-EQ-SKIP-001 An EQ that is not strictly between the entry and the
+        boundary target is skipped; break-even then waits for the boundary.
+        """
+        plan, ledger = self.pending, trade.ledger
+        eq = None if plan is None else plan.range_eq
+        if eq is None or ledger.range_eq_done:
+            return trade, ()
+        long_ = trade.direction == 'LONG'
+        if not (trade.entry < eq < trade.tp if long_ else trade.tp < eq < trade.entry):
+            return trade, ()
+        if candle.high < eq if long_ else candle.low > eq:
+            return trade, ()
+        trade = self._store(replace(trade, ledger=replace(ledger, range_eq_done=True)))
+        fraction = self.profile.eq_scale_out_fraction
+        quantity = (Decimal(0) if fraction is None
+                    else floor_to_step(exact_product(ledger.original_quantity, fraction),
+                                       self.profile.quantity_step))
+        if quantity <= 0:
+            return trade, ()
+        price = candle.open if (candle.open > eq if long_ else candle.open < eq) else eq
+        trade, record = self._realise(trade, 'RANGE_EQ', quantity, price, candle.close_time,
+                                      target_price=eq)
+        trade = self._store(trade)
+        return trade, (BrokerEvent('RANGE_EQ_PARTIAL_EXIT', candle.close_time, record),)
 
     def _boundary(self, trade, candle):
         """Close down to exactly the configured runner, then cancel the rest."""
@@ -310,6 +343,15 @@ class PendingLimitPaperBroker:
                             StopProtection('BREAK_EVEN_PROTECTED', before, trade.stop,
                                            reason, trade.entry, candle.close_time,
                                            candle.close_time)),)
+
+    def _range_break_even(self, trade, candle):
+        """[U-DD-DEVIATION-001] Entry protection once EQ, or the boundary when EQ
+        was skipped, has traded. It replaces the inherited 1R rule."""
+        ledger = trade.ledger
+        if not (ledger.range_eq_done or ledger.range_high_done):
+            return trade
+        return self.risk.tighten_stop(trade, trade.entry, candle.close_time,
+                                      'RANGE_EQ_BREAK_EVEN')
 
     def _trail(self, trade, candle, swing_lows, swing_highs):
         """Tighten to `confirmed structure -/+ trailing_buffer` after break-even.
