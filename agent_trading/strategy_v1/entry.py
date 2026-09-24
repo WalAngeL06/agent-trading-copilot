@@ -92,6 +92,23 @@ class FvgBook:
     def eligible_long(self, profile, manipulation, now):
         return self.eligible('LONG', profile, manipulation, now)
 
+    def choch_gap(self, direction, profile, confirmation, now):
+        """[H]-DD-CHOCH-001 The gap the break left: its three candles include the
+        CHoCH bar. The first one published wins; it must still be fresh."""
+        kinds = self._kinds(profile)
+        found = None
+        for item in reversed(self.tracked):          # publication order, newest first
+            if item.observed_at < confirmation.confirmed_at:
+                break
+            if (item.direction != direction or item.gap.kind not in kinds
+                    or item.observed_at > now):
+                continue
+            if profile.fvg_freshness_enabled and not item.fresh:
+                continue
+            if item.formed_at <= confirmation.confirmed_at:
+                found = item
+        return found
+
     def secondary_beyond(self, direction, profile, primary, manipulation, now):
         """Closest eligible fresh gap on the protective side of PRIMARY_FVG.
 
