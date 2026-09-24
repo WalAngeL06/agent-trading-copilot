@@ -23,11 +23,16 @@ from agent_trading.backtest.universe import select_universe, write_universe
 from agent_trading.market_observations import SpotInstrument, SpotVolume
 from agent_trading.strategy_v1 import StrategyProfile
 from guide_fixtures import long_candles, short_candles
-from strategy_v1_fixtures import entry_candles
+from strategy_v1_fixtures import LEGACY, entry_candles
 from test_backtest import dump
 
 # The guide scenarios are drawn on a grid where 5 and 1 are the right tolerances.
-GRID = ('--scale', 'none', '--boundary-proximity', '5', '--stop-buffer', '1')
+# [U-DD-DEVIATION-001] The sweep scenarios are pre-DD; they pin the legacy entry
+# and exits so they keep measuring the sweep, not the strategy.
+LEGACY_FLAGS = ('--entry-models', 'HTF_FVG_REVERSAL', '--model2-htf-fvg', 'false',
+                '--eq-scale-out', 'none', '--break-even-trigger', 'R_MULTIPLE',
+                '--secondary-fvg', '--runner-fraction', '0.10')
+GRID = ('--scale', 'none', '--boundary-proximity', '5', '--stop-buffer', '1') + LEGACY_FLAGS
 
 
 def relabel(candles, symbol):
@@ -135,7 +140,7 @@ class SweepTests(unittest.TestCase):
         self.assertEqual(self.run_sweep(*GRID), 0)
         direct = run(BacktestConfig('AAA-USDT', self.root / 'AAA', D('10000'),
                                     profile=StrategyProfile(boundary_proximity=D('5'),
-                                                            stop_buffer=D('1'))))
+                                                            stop_buffer=D('1'), **LEGACY)))
         written = json.loads((self.output / 'AAA' / 'backtest_summary.json').read_text('utf-8'))
         self.assertEqual(written['metrics'], json.loads(json.dumps(direct.summary)))
         self.assertEqual(self.rows()['AAA']['ending_equity'], direct.summary['ending_equity'])
@@ -159,7 +164,7 @@ class SweepTests(unittest.TestCase):
         self.add('LOW', long_candles(), 'LOW-USDT')
         self.add('HIGH', rescaled(long_candles(), 1000), 'HIGH-USDT')
         self.assertEqual(self.run_sweep('--proximity-ratio', '0.04',
-                                        '--stop-buffer-ratio', '0.008'), 0)
+                                        '--stop-buffer-ratio', '0.008', *LEGACY_FLAGS), 0)
         trades = {row['symbol']: row for row in self.trades()}
         self.assertEqual(set(trades), {'LOW-USDT', 'HIGH-USDT'})
         low, high = trades['LOW-USDT'], trades['HIGH-USDT']

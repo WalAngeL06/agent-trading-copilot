@@ -115,9 +115,12 @@ class StrategyProfile:
     quantity_step: Decimal = Decimal('.00000001')
     min_reward_risk: Decimal = Decimal('1')
     max_stop_distance: Decimal | None = None
-    # [H]-SV1-BE-001: inherited 1R favorable-excursion break-even.
+    # [H]-SV1-BE-001: inherited 1R favorable-excursion break-even, used under
+    # break_even_trigger R_MULTIPLE.
     break_even_r: Decimal = Decimal('1')
-    secondary_fvg_support_enabled: bool = True
+    # [U-DD-DEVIATION-001] Off: DD puts the stop behind the deviation wick. On
+    # restores the tighter protecting-swing stop and the recovery chain.
+    secondary_fvg_support_enabled: bool = False
     # [U-RANGE-RESEEK-001] look for a new range after a candidate invalidates.
     range_reseek_enabled: bool = True
     # [U-RANGE-RETIRE-001] retire a confirmed range on a breakout body close.
@@ -136,8 +139,9 @@ class StrategyProfile:
     trailing_buffer: Decimal | None = None
     # Optional R-multiple partial exits. Empty is the Strategy V1 default.
     partial_take_profits: tuple = ()
-    # Fraction of the ORIGINAL position left running past the RangeHigh exit.
-    runner_fraction: Decimal = Decimal('0.10')
+    # Fraction of the ORIGINAL position left running past the boundary exit.
+    # [U-DD-DEVIATION-001] 20%: 30% at EQ, 50% at the boundary, 20% trailed.
+    runner_fraction: Decimal = Decimal('0.20')
     # [H]-SV1-ALLOW-IFVG-001: iFVG stays available but is not required.
     allow_ifvg_entry: bool = False
     # [H]-SV1-FRESH-001: freshness reuses the shipped zone rule.
@@ -148,13 +152,13 @@ class StrategyProfile:
     # [H]-SV1-PENDING-EXPIRY-001: None disables expiry.
     pending_expiry_bars: int | None = None
     # [U-DD-DEVIATION-001] Entry models; the first one ready takes the trade.
-    entry_models: tuple = ('HTF_FVG_REVERSAL',)
+    entry_models: tuple = ENTRY_MODELS
     # Model 2 needs the deviation to touch an HTF FVG. None follows the gate:
     # true under GUIDE_HTF_CONTEXT, false under BIAS_LONG_PERMISSION (no zones).
-    model2_requires_htf_fvg: bool | None = False
+    model2_requires_htf_fvg: bool | None = None
     # Share of the ORIGINAL quantity closed at the range EQ; None disables.
-    eq_scale_out_fraction: Decimal | None = None
-    break_even_trigger: str = 'R_MULTIPLE'
+    eq_scale_out_fraction: Decimal | None = Decimal('0.30')
+    break_even_trigger: str = 'RANGE_EQ'
 
     def __post_init__(self):
         if self.direction not in DIRECTIONS:

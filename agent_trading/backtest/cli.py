@@ -65,18 +65,18 @@ def add_profile_arguments(parser):
     parser.add_argument('--trailing-buffer', help='price units; defaults to the stop buffer')
     parser.add_argument('--no-trailing', action='store_true')
     parser.add_argument('--secondary-fvg', action=argparse.BooleanOptionalAction,
-                        default=True, help='tighter stop behind a secondary FVG')
-    parser.add_argument('--entry-models', default='HTF_FVG_REVERSAL',
+                        default=False, help='tighter stop behind a secondary FVG')
+    parser.add_argument('--entry-models', default=','.join(ENTRY_MODELS),
                         help=f"comma list of {', '.join(ENTRY_MODELS)} [U-DD-DEVIATION-001]")
-    parser.add_argument('--model2-htf-fvg', default='false', choices=('auto', 'true', 'false'),
+    parser.add_argument('--model2-htf-fvg', default='auto', choices=('auto', 'true', 'false'),
                         help='model 2 needs a touched HTF FVG; auto follows the gate')
-    parser.add_argument('--eq-scale-out', default='none',
+    parser.add_argument('--eq-scale-out', default='0.30',
                         help="share of the original quantity closed at range EQ, or 'none'")
-    parser.add_argument('--break-even-trigger', default='R_MULTIPLE',
+    parser.add_argument('--break-even-trigger', default='RANGE_EQ',
                         choices=BREAK_EVEN_TRIGGERS)
     parser.add_argument('--partial-tp', default='',
                         help="R:FRACTION pairs, e.g. '1.0:0.20,2.0:0.20'")
-    parser.add_argument('--runner-fraction', default='0.10')
+    parser.add_argument('--runner-fraction', default='0.20')
 
 
 def add_cost_arguments(parser):

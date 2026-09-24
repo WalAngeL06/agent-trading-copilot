@@ -518,7 +518,8 @@ class CustomizationTests(unittest.TestCase):
                           profile.timeframes.entry), ('4H', '1H', '15m'))
         self.assertEqual(profile.direction, 'BOTH')
         self.assertEqual(profile.entry_zone, 'DIRECTIONAL_FVG')
-        self.assertTrue(profile.secondary_fvg_support_enabled)
+        # [U-DD-DEVIATION-001] DD puts the stop behind the deviation wick.
+        self.assertFalse(profile.secondary_fvg_support_enabled)
 
     def test_the_default_direction_gate_is_the_guide_htf_context(self):
         # [U-RANGE-GUIDE-002] guide 4.3/4.4 replace the 4H long permission.

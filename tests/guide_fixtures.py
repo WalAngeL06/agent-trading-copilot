@@ -17,7 +17,7 @@ from dataclasses import replace
 from decimal import Decimal
 
 from agent_trading.strategy_v1 import StrategyV1, StrategyProfile, TimeframeRoles
-from strategy_v1_fixtures import (D, SYMBOL, BIAS_START, _flat, _leg,
+from strategy_v1_fixtures import (D, LEGACY, SYMBOL, BIAS_START, _flat, _leg,
                                   acceptance_entry_candles, acceptance_range_candles,
                                   bars, entry_candles, range_candles)
 
@@ -90,7 +90,7 @@ def guide_profile(**overrides):
     """Same grid as the shipped scenario, on the guide's direction rules."""
     settings = dict(timeframes=TimeframeRoles('4H', '1H', '15m'),
                     boundary_proximity=D('5'), stop_buffer=D('1'),
-                    equity=D('10000'), entry_level='FVG_EQ', direction='BOTH')
+                    equity=D('10000'), entry_level='FVG_EQ', direction='BOTH', **LEGACY)
     settings.update(overrides)
     return StrategyProfile(**settings)
 

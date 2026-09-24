@@ -61,6 +61,18 @@ class DdProfileTests(unittest.TestCase):
         self.assertEqual(data['break_even_trigger'], 'RANGE_EQ')
 
 
+class DdDefaultTests(unittest.TestCase):
+    def test_the_dd_models_are_the_default(self):
+        profile = StrategyProfile()
+        self.assertEqual(profile.entry_models, ENTRY_MODELS)
+        self.assertIsNone(profile.model2_requires_htf_fvg)
+        self.assertTrue(profile.effective_model2_requires_htf_fvg)
+        self.assertEqual(profile.eq_scale_out_fraction, D('0.30'))
+        self.assertEqual(profile.break_even_trigger, 'RANGE_EQ')
+        self.assertFalse(profile.secondary_fvg_support_enabled)
+        self.assertEqual(profile.runner_fraction, D('0.20'))
+
+
 class DdFlagTests(unittest.TestCase):
     def profile(self, *flags):
         from agent_trading.backtest.cli import add_profile_arguments, profile_from_args

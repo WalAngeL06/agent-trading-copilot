@@ -553,7 +553,11 @@ class CliTests(unittest.TestCase):
                          '--direction', 'LONG_ONLY',
                          '--direction-gate', 'BIAS_LONG_PERMISSION',
                          '--partial-tp', '1.0:0.20,2.0:0.20',
-                         '--runner-fraction', '0.10'])
+                         '--runner-fraction', '0.10',
+                         # [U-DD-DEVIATION-001] this scenario is pre-DD.
+                         '--entry-models', 'HTF_FVG_REVERSAL', '--model2-htf-fvg', 'false',
+                         '--eq-scale-out', 'none', '--break-even-trigger', 'R_MULTIPLE',
+                         '--secondary-fvg'])
             self.assertEqual(code, 0)
             payload = json.loads((Path(out) / 'backtest_summary.json').read_text('utf-8'))
             self.assertEqual(payload['metrics']['filled_logical_trades'], 1)

@@ -179,6 +179,13 @@ def acceptance_candles():
     return bias_candles() + acceptance_range_candles() + acceptance_entry_candles()
 
 
+# [U-DD-DEVIATION-001] The shipped scenarios were built for the pre-DD entry and
+# exits and keep covering them; DD scenarios live in dd_fixtures.py.
+LEGACY = dict(entry_models=('HTF_FVG_REVERSAL',), model2_requires_htf_fvg=False,
+              secondary_fvg_support_enabled=True, eq_scale_out_fraction=None,
+              break_even_trigger='R_MULTIPLE', runner_fraction=D('0.10'))
+
+
 def scenario_profile(**overrides):
     """Buffer/tolerance are scaled to the synthetic price grid, not to BTC.
 
@@ -189,7 +196,7 @@ def scenario_profile(**overrides):
     settings = dict(timeframes=TimeframeRoles('4H', '1H', '15m'),
                     boundary_proximity=D('5'), stop_buffer=D('1'),
                     equity=D('10000'), entry_level='FVG_EQ',
-                    direction='LONG_ONLY', direction_gate='BIAS_LONG_PERMISSION')
+                    direction='LONG_ONLY', direction_gate='BIAS_LONG_PERMISSION', **LEGACY)
     settings.update(overrides)
     if settings['direction'] != 'LONG_ONLY' and 'direction_gate' not in overrides:
         settings['direction_gate'] = 'GUIDE_HTF_CONTEXT'

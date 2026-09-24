@@ -63,22 +63,29 @@ def partials(*pairs):
 
 
 # ------------------------------------------------------------------- CONFIG
+# [U-DD-DEVIATION-001] The DD range-EQ slice also draws on the non-runner
+# allocation (tested in test_dd_config); the R-partial rules below are measured
+# with it switched off.
+NO_EQ = dict(eq_scale_out_fraction=None)
+
+
 class PartialConfigTests(unittest.TestCase):
     def test_an_empty_partial_list_is_the_default_and_is_valid(self):
         profile = StrategyProfile()
         self.assertEqual(profile.partial_take_profits, ())
-        self.assertEqual(profile.runner_fraction, D('0.10'))
+        # [U-DD-DEVIATION-001] 30% at EQ, 50% at the boundary, a 20% runner.
+        self.assertEqual(profile.runner_fraction, D('0.20'))
 
     def test_one_and_many_partials_are_accepted(self):
         self.assertEqual(len(StrategyProfile(
-            partial_take_profits=partials((1, '0.25'))).partial_take_profits), 1)
+            partial_take_profits=partials((1, '0.25')), **NO_EQ).partial_take_profits), 1)
         self.assertEqual(len(StrategyProfile(
             partial_take_profits=partials((1, '0.2'), (2, '0.2'),
-                                          (3, '0.2'))).partial_take_profits), 3)
+                                          (3, '0.2')), **NO_EQ).partial_take_profits), 3)
 
     def test_unsorted_input_is_normalised_to_ascending_r(self):
         profile = StrategyProfile(partial_take_profits=partials((3, '0.2'), (1, '0.2'),
-                                                                (2, '0.2')))
+                                                                (2, '0.2')), **NO_EQ)
         self.assertEqual([level.r_multiple for level in profile.partial_take_profits],
                          [D('1'), D('2'), D('3')])
 
@@ -99,17 +106,17 @@ class PartialConfigTests(unittest.TestCase):
     def test_fractions_exceeding_the_non_runner_allocation_are_rejected(self):
         with self.assertRaises(ValueError):
             StrategyProfile(partial_take_profits=partials((1, '0.5'), (2, '0.45')),
-                            runner_fraction=D('0.10'))
+                            runner_fraction=D('0.10'), **NO_EQ)
         # Exactly 1 - runner is allowed.
         StrategyProfile(partial_take_profits=partials((1, '0.5'), (2, '0.4')),
-                        runner_fraction=D('0.10'))
+                        runner_fraction=D('0.10'), **NO_EQ)
 
     def test_runner_fraction_bounds_are_enforced(self):
         for value in (D('-0.1'), D('1.1')):
             with self.assertRaises(ValueError):
-                StrategyProfile(runner_fraction=value)
-        StrategyProfile(runner_fraction=D('0'))
-        StrategyProfile(runner_fraction=D('1'))
+                StrategyProfile(runner_fraction=value, **NO_EQ)
+        StrategyProfile(runner_fraction=D('0'), **NO_EQ)
+        StrategyProfile(runner_fraction=D('1'), **NO_EQ)
 
     def test_a_full_runner_forbids_any_partial(self):
         with self.assertRaises(ValueError):
