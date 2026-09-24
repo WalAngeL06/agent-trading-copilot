@@ -32,11 +32,17 @@ def confirmed_low(price, now, bars_ago=2):
     return swing_low(price, now - bars_ago * STEP)
 
 
-def _submit(profile, secondary=True):
-    """Submit a real RiskEngine-approved LONG plan and leave it resting."""
-    risk = RiskEngine(profile.risk_config())
-    broker = PendingLimitPaperBroker(risk, D('10000'), profile)
-    start = bias_candles()[0].close_time
+def _submit(profile, secondary=True, *, broker=None, at=None):
+    """Submit a real RiskEngine-approved LONG plan and leave it resting.
+
+    With `broker` and `at` the plan goes to an existing broker, the way the
+    next trade of the same run does [U-MULTI-SETUP-001].
+    """
+    if broker is None:
+        broker = PendingLimitPaperBroker(RiskEngine(profile.risk_config()), D('10000'),
+                                         profile)
+    risk = broker.risk
+    start = at if at is not None else bias_candles()[0].close_time
     primary = TrackedFvg('p1', FVG('LONG', D('126'), D('130'), (start, start, start), start))
     second = TrackedFvg('s1', FVG('LONG', D('120'), D('122'), (start, start, start), start))
     zone = SupportingZone('s1', 'FVG', 'LONG', D('120'), D('122'), D('119'),
@@ -59,13 +65,19 @@ def open_long(profile=None):
     return broker, start + STEP
 
 
+def protect(broker, moment):
+    """One bar reaching 1R: the inherited break-even moves the stop to 128."""
+    moment = moment + STEP
+    return broker.process(candle('15m', moment, 128, 138.5, 127.5, 138)), moment
+
+
 class TrailingTests(unittest.TestCase):
     def _protected(self, profile=None):
         broker, moment = open_long(profile)
-        events = broker.process(candle('15m', moment + STEP, 128, 138.5, 127.5, 138))
+        events, moment = protect(broker, moment)
         self.assertIn('BREAK_EVEN_PROTECTED', [e.kind for e in events])
         self.assertEqual(broker.trades[-1].stop, D('128'))
-        return broker, moment + STEP
+        return broker, moment
 
     def test_break_even_protection_is_announced_with_old_and_new_stop(self):
         broker, moment = open_long()
@@ -203,6 +215,61 @@ class TrailingTests(unittest.TestCase):
         self.assertEqual(closed.status, 'CLOSED')
         self.assertEqual(closed.exit_price, D('130'))
         self.assertGreater(closed.pnl, 0)                 # exited above entry
+
+
+class PerTradeStateTests(unittest.TestCase):
+    """[U-MULTI-SETUP-001] The next trade on the same broker starts clean.
+
+    Break-even and the recovery chain belong to one trade; a later trade that
+    inherited them would trail from its first bar.
+    """
+
+    def _second_trade(self):
+        """Trade 1 reaches break-even and is stopped there; trade 2 fills at 128."""
+        broker, moment = open_long()
+        _events, moment = protect(broker, moment)
+        self.assertIsNotNone(broker.break_even_at)
+        moment = moment + STEP
+        broker.process(candle('15m', moment, 137, 137, 127, 127.5))     # stopped at 128
+        self.assertEqual(broker.trades[-1].status, 'CLOSED')
+        _submit(scenario_profile(), broker=broker, at=moment)
+        moment = moment + STEP
+        broker.process(candle('15m', moment, 129, 129.5, 128, 128.5))
+        self.assertEqual(len(broker.trades), 2)
+        self.assertEqual(broker.trades[-1].status, 'OPEN')
+        return broker, moment
+
+    def test_a_second_trade_does_not_inherit_break_even(self):
+        broker, moment = self._second_trade()
+        self.assertIsNone(broker.break_even_at)
+        # Trade 2's own higher low, confirmed on the next bar; it may only be
+        # trailed to once trade 2 itself reaches break-even.
+        broker.process(candle('15m', moment + STEP, 131.2, 132, 131, 131.5))
+        low = swing_low(131, moment + STEP)
+        events = broker.process(candle('15m', moment + 2 * STEP, 131.5, 133, 131.2, 132.5),
+                                (low,))
+        self.assertEqual([e.kind for e in events], [])
+        self.assertEqual(broker.trades[-1].stop, D('118'))
+
+    def test_the_second_trade_announces_its_own_break_even(self):
+        broker, moment = self._second_trade()
+        events, _moment = protect(broker, moment)
+        record = next((e.payload for e in events if e.kind == 'BREAK_EVEN_PROTECTED'), None)
+        self.assertIsNotNone(record)
+        self.assertEqual((record.old_stop, record.new_stop), (D('118'), D('128')))
+        self.assertIsNotNone(broker.break_even_at)
+
+    def test_a_new_submission_clears_the_recovery_chain(self):
+        broker, moment = open_long()
+        moment = moment + STEP
+        broker.process(candle('15m', moment, 128, 128.5, 124, 125))   # closes below PRIMARY
+        self.assertIsNotNone(broker.primary_failed_at)
+        moment = moment + STEP
+        broker.process(candle('15m', moment, 125, 125, 117, 117.5))   # stopped at 118
+        self.assertEqual(broker.trades[-1].status, 'CLOSED')
+        _submit(scenario_profile(), broker=broker, at=moment)
+        self.assertEqual((broker.primary_failed_at, broker.secondary_reacted_at,
+                          broker.recovery_at), (None, None, None))
 
 
 class PendingCancellationTests(unittest.TestCase):

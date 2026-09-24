@@ -232,7 +232,7 @@ class MultiSetupTests(unittest.TestCase):
         self.assertIsNone(first_event(strategy, 'SETUP_SLOT_RELEASED'))
         self.assertTrue(strategy._setup_consumed)
 
-    def test_a_second_submission_resets_per_trade_protection_state(self):
+    def test_the_trade_carries_its_own_break_even_and_trailing_history(self):
         broker = self.strategy.broker
         self.assertIsNotNone(broker.break_even_at)       # first trade reached BE
         trade = broker.trades[-1]

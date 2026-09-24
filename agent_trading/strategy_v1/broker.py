@@ -48,11 +48,19 @@ class PendingLimitPaperBroker:
         self.trades = ()
         self._last_candle = None
         self._pending_bars = 0
+        self._reset_trade_state()
+        self.trailing_updates = ()
+
+    def _reset_trade_state(self):
+        """Break-even and the recovery chain belong to one trade.
+
+        [U-MULTI-SETUP-001] lets one broker carry many trades in sequence; a
+        later trade that inherited these would trail from its first bar.
+        """
         self.primary_failed_at = None
         self.secondary_reacted_at = None
         self.recovery_at = None
         self.break_even_at = None
-        self.trailing_updates = ()
 
     # ------------------------------------------------------------------ entry
     def submit(self, plan, entry_plan):
@@ -65,6 +73,7 @@ class PendingLimitPaperBroker:
                              f'{plan.direction} order')
         self.pending_plan, self.pending = plan, entry_plan
         self._pending_bars = 0
+        self._reset_trade_state()
 
     def cancel_pending(self, reason, observed_at):
         """Drop a resting order whose setup died before it could fill.
