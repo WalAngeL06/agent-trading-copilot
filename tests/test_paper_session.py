@@ -3,6 +3,7 @@ from dataclasses import replace
 from datetime import timedelta
 from decimal import Decimal
 from pathlib import Path
+import pickle
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
@@ -77,6 +78,16 @@ class PaperSessionStoreTests(unittest.TestCase):
                 self.assertIsNone(store.load("BTC-USDT", profile))
             store.clear()
             self.assertFalse(path.exists())
+
+    def test_a_session_from_before_the_dd_entry_models_is_not_resumed(self):
+        # SESSION_FORMAT 2 [U-DD-DEVIATION-001]: format-1 brains lack the CHoCH state.
+        profile = StrategyProfile()
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "paper_session.pickle"
+            with path.open("wb") as handle:
+                pickle.dump({"format": 1, "symbol": "BTC-USDT", "profile": profile,
+                             "brain": object(), "stream_as_of": {}}, handle)
+            self.assertIsNone(PaperSessionStore(path).load("BTC-USDT", profile))
 
 
 class _AnnouncedOrderBrain:

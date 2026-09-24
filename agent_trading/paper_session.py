@@ -12,7 +12,8 @@ import pickle
 from tempfile import NamedTemporaryFile
 
 
-SESSION_FORMAT = 1
+# 2: StrategyV1 gained DD entry state [U-DD-DEVIATION-001]
+SESSION_FORMAT = 2
 
 
 class PaperSessionStore:

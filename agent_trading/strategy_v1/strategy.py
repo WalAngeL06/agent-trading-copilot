@@ -23,7 +23,8 @@ from ..trading_brain.risk_models import SupportingZone
 from ..trading_brain.structure import StructureEngine
 from .bias import BiasEngine
 from .broker import PendingLimitPaperBroker
-from .config import StrategyProfile
+from .choch import ChochTracker
+from .config import ENTRY_MODELS, StrategyProfile
 from .context import HtfContext
 from .entry import FvgBook, entry_price, protecting_swing
 from .models import CapitalPolicy, EntryPlan, StrategyEvent
@@ -59,6 +60,10 @@ class StrategyV1:
         self.entry_swing = SwingEngine(symbol, roles.entry, self.profile.swing)
         self.gaps = GapEngine()
         self.book = FvgBook(self.profile.fvg_freshness_enabled)
+        # [U-DD-DEVIATION-001] DD model 1 watches the entry timeframe for a CHoCH.
+        self.choch = ChochTracker(bar_duration(roles.range) // bar_duration(roles.entry))
+        self._choch_id = None
+        self._tried_gaps = set()          # one entry attempt per gap, whatever the model
         self.risk = RiskEngine(self.profile.risk_config())
         self.broker = PendingLimitPaperBroker(self.risk, self.profile.equity, self.profile)
         self.entry_swing_lows = self.entry_swing_highs = ()
@@ -214,10 +219,18 @@ class StrategyV1:
                     high = SwingHigh(raw)
                     self.entry_swing_highs += (high,)
                     self._emit('ENTRY_SWING_HIGH', candle.timeframe, high)
+        if 'CHOCH_FVG' in self.profile.entry_models:
+            confirmation = self.choch.process(candle, self.manipulation.active,
+                                              self.entry_swing_highs, self.entry_swing_lows,
+                                              bar_duration(self.roles.range))
+            if confirmation is not None:
+                self._choch_id = self._emit('CHOCH_CONFIRMED', candle.timeframe, confirmation,
+                                            (self._sweep_id,), sources=confirmation.source_ids)
         for gap in self.gaps.process(candle):
             gap_id = self._emit(gap.kind, candle.timeframe, gap)
             self.book.publish(gap, gap_id)
-            self._consider(candle, gap_id)
+            self._consider(candle, (gap_id,))
+        self._consider(candle)            # model 1 can be ready on a bar with no new gap
 
     def _cancel_pending(self, reason, timeframe):
         change = self.broker.cancel_pending(reason, self.as_of)
@@ -271,19 +284,60 @@ class StrategyV1:
                 return direction
         return None
 
-    def _consider(self, candle, gap_id):
+    def _consider(self, candle, published=()):
+        """[U-DD-DEVIATION-001] Try each enabled entry model, DD model 1 first.
+
+        The first model whose plan the RiskEngine approves takes the trade.
+        """
         direction = self.active_setup()
         if self._setup_consumed or direction is None:
             return
         if (self.broker.pending_plan is not None
                 or any(t.status == 'OPEN' for t in self.broker.trades)):
             return
+        for model in ENTRY_MODELS:
+            if model not in self.profile.entry_models:
+                continue
+            primary = (self._choch_gap(direction, candle) if model == 'CHOCH_FVG'
+                       else self._reversal_gap(direction, candle, published))
+            if primary is not None and self._enter(model, direction, primary, candle):
+                return
+
+    def _choch_gap(self, direction, candle):
+        """DD model 1: the fresh gap the CHoCH left [H]-DD-CHOCH-001."""
+        confirmation = self.choch.confirmed
+        if confirmation is None or confirmation.direction != direction:
+            return None
+        gap = self.book.choch_gap(direction, self.profile, confirmation, candle.close_time)
+        return None if gap is None or gap.gap_id in self._tried_gaps else gap
+
+    def _reversal_gap(self, direction, candle, published):
+        """DD model 2: the first reversal gap after the reclaim [H]-DD-MODEL2-001.
+
+        Under the guide gate the deviation must have touched an HTF FVG; the
+        superseded gate has no HTF zones and keeps the pre-DD entry.
+        """
+        if not published:
+            return None
+        if (self.profile.effective_model2_requires_htf_fvg
+                and not any(zone.kind == 'HTF_FVG' for zone in self.htf_verdict.zones)):
+            return None
+        eligible = self.book.eligible(direction, self.profile, self.manipulation.active,
+                                      candle.close_time)
+        for gap_id in published:
+            if gap_id in self._tried_gaps:
+                continue
+            primary = next((g for g in eligible if g.gap_id == gap_id), None)
+            if primary is not None:
+                return primary
+        return None
+
+    def _enter(self, model, direction, primary, candle):
+        """Plan, risk-check and submit one entry; True once an order rests."""
+        self._tried_gaps.add(primary.gap_id)
         long_ = direction == 'LONG'
         manipulation, state = self.manipulation.active, self.range.state
-        eligible = self.book.eligible(direction, self.profile, manipulation, candle.close_time)
-        primary = next((g for g in eligible if g.gap_id == gap_id), None)
-        if primary is None:
-            return
+        gap_id = primary.gap_id
         price = entry_price(primary.gap, self.profile.entry_level, self.profile.entry_level_ratio)
         # The terminal target is the opposite boundary, never EQ.
         target = state.range_high if long_ else state.range_low
@@ -308,9 +362,11 @@ class StrategyV1:
         plan = EntryPlan(primary, self.profile.entry_level, price, target, stop_source,
                          secondary if stop_source != sweep_source else None,
                          protecting, protecting.price if protecting is not None else None,
-                         candle.close_time)
+                         candle.close_time, range_eq=state.eq, entry_model=model)
         structural = protecting.price if protecting is not None else manipulation.extreme
         refs = (self._range_id, self._reclaim_id, gap_id)
+        if model == 'CHOCH_FVG' and self._choch_id is not None:
+            refs = (self._range_id, self._reclaim_id, self._choch_id, gap_id)
         candidate = TradeCandidate(direction, price, structural, target, candle.close_time,
                                    refs, sweep_extreme=manipulation.extreme)
         candidate_id = self._emit('TRADE_CANDIDATE', candle.timeframe, candidate, refs)
@@ -320,11 +376,12 @@ class StrategyV1:
         self._emit('RISK_APPROVED' if decision.plan is not None else 'BLOCKED',
                    candle.timeframe, decision, (candidate_id,))
         if decision.plan is None:
-            return
+            return False
         self.entry_plan = plan
         self.broker.submit(decision.plan, plan)
         self._setup_consumed = True
         self._emit('PENDING_ENTRY', candle.timeframe, plan, (candidate_id,))
+        return True
 
     # ------------------------------------------------------------------ policy
     def capital_policy(self):
