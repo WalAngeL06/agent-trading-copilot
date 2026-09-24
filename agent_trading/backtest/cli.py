@@ -3,10 +3,12 @@
 Every value lands in the production `StrategyProfile` or `CostModel`; nothing
 here decides anything about trading on its own.
 """
+import argparse
 from decimal import Decimal
 import json
 
 from ..strategy_v1 import StrategyProfile, TimeframeRoles
+from ..strategy_v1.config import BREAK_EVEN_TRIGGERS, ENTRY_MODELS
 from .config import CostModel
 
 # Price units, not ratios: BTC-sized by default and meaningless on another pair
@@ -62,7 +64,16 @@ def add_profile_arguments(parser):
     parser.add_argument('--break-even-r', default='1')
     parser.add_argument('--trailing-buffer', help='price units; defaults to the stop buffer')
     parser.add_argument('--no-trailing', action='store_true')
-    parser.add_argument('--no-secondary-fvg', action='store_true')
+    parser.add_argument('--secondary-fvg', action=argparse.BooleanOptionalAction,
+                        default=True, help='tighter stop behind a secondary FVG')
+    parser.add_argument('--entry-models', default='HTF_FVG_REVERSAL',
+                        help=f"comma list of {', '.join(ENTRY_MODELS)} [U-DD-DEVIATION-001]")
+    parser.add_argument('--model2-htf-fvg', default='false', choices=('auto', 'true', 'false'),
+                        help='model 2 needs a touched HTF FVG; auto follows the gate')
+    parser.add_argument('--eq-scale-out', default='none',
+                        help="share of the original quantity closed at range EQ, or 'none'")
+    parser.add_argument('--break-even-trigger', default='R_MULTIPLE',
+                        choices=BREAK_EVEN_TRIGGERS)
     parser.add_argument('--partial-tp', default='',
                         help="R:FRACTION pairs, e.g. '1.0:0.20,2.0:0.20'")
     parser.add_argument('--runner-fraction', default='0.10')
@@ -95,7 +106,14 @@ def profile_from_args(args):
         break_even_r=Decimal(args.break_even_r),
         trailing_enabled=not args.no_trailing,
         trailing_buffer=_optional(args.trailing_buffer),
-        secondary_fvg_support_enabled=not args.no_secondary_fvg,
+        secondary_fvg_support_enabled=args.secondary_fvg,
+        entry_models=tuple(model.strip() for model in args.entry_models.split(',')
+                           if model.strip()),
+        model2_requires_htf_fvg={'auto': None, 'true': True,
+                                 'false': False}[args.model2_htf_fvg],
+        eq_scale_out_fraction=(None if args.eq_scale_out.strip().lower() == 'none'
+                               else Decimal(args.eq_scale_out)),
+        break_even_trigger=args.break_even_trigger,
         partial_take_profits=partials(args.partial_tp),
         runner_fraction=Decimal(args.runner_fraction))
 

@@ -24,6 +24,12 @@ ENTRY_ZONES = ('DIRECTIONAL_FVG', 'BULLISH_FVG')
 # CLOSE_BELOW_PRIMARY_LOW is the long-only spelling of the same rule.
 PRIMARY_FAILURE_MODES = ('CLOSE_BEYOND_PRIMARY_EDGE', 'CLOSE_BELOW_PRIMARY_LOW')
 TRAILING_MODES = ('CONFIRMED_HIGHER_LOW',)
+# [U-DD-DEVIATION-001] DD model 1 (entry-timeframe CHoCH) and model 2 (HTF FVG
+# reversal). This order is also the order they are tried in.
+ENTRY_MODELS = ('CHOCH_FVG', 'HTF_FVG_REVERSAL')
+# RANGE_EQ moves the stop to entry at the range EQ; R_MULTIPLE is the
+# inherited 1R favourable-excursion break-even.
+BREAK_EVEN_TRIGGERS = ('RANGE_EQ', 'R_MULTIPLE')
 
 
 @dataclass(frozen=True)
@@ -141,6 +147,14 @@ class StrategyProfile:
     primary_failure_mode: str = 'CLOSE_BEYOND_PRIMARY_EDGE'
     # [H]-SV1-PENDING-EXPIRY-001: None disables expiry.
     pending_expiry_bars: int | None = None
+    # [U-DD-DEVIATION-001] Entry models; the first one ready takes the trade.
+    entry_models: tuple = ('HTF_FVG_REVERSAL',)
+    # Model 2 needs the deviation to touch an HTF FVG. None follows the gate:
+    # true under GUIDE_HTF_CONTEXT, false under BIAS_LONG_PERMISSION (no zones).
+    model2_requires_htf_fvg: bool | None = False
+    # Share of the ORIGINAL quantity closed at the range EQ; None disables.
+    eq_scale_out_fraction: Decimal | None = None
+    break_even_trigger: str = 'R_MULTIPLE'
 
     def __post_init__(self):
         if self.direction not in DIRECTIONS:
@@ -167,6 +181,18 @@ class StrategyProfile:
                 not isinstance(self.trailing_buffer, Decimal)
                 or not self.trailing_buffer.is_finite() or self.trailing_buffer <= 0):
             raise ValueError('trailing_buffer must be a positive finite Decimal or None')
+        models = tuple(self.entry_models)
+        if (not models or len(set(models)) != len(models)
+                or any(model not in ENTRY_MODELS for model in models)):
+            raise ValueError('entry_models must name CHOCH_FVG and/or HTF_FVG_REVERSAL once each')
+        object.__setattr__(self, 'entry_models', models)
+        requirement = self.model2_requires_htf_fvg
+        if requirement is not None and type(requirement) is not bool:
+            raise ValueError('model2_requires_htf_fvg must be True, False or None')
+        if requirement is True and self.direction_gate == 'BIAS_LONG_PERMISSION':
+            raise ValueError('BIAS_LONG_PERMISSION builds no HTF zones for model 2 to require')
+        if self.break_even_trigger not in BREAK_EVEN_TRIGGERS:
+            raise ValueError('unknown break-even trigger')
         self._validate_exits()
         if not isinstance(self.timeframes, TimeframeRoles):
             raise ValueError('timeframes must be TimeframeRoles')
@@ -205,7 +231,11 @@ class StrategyProfile:
             if level.r_multiple in seen:
                 raise ValueError('duplicate partial take profit R level')
             seen.add(level.r_multiple)
-        total = sum((level.close_fraction for level in levels), Decimal(0))
+        eq = self.eq_scale_out_fraction
+        if eq is not None and (not isinstance(eq, Decimal) or not eq.is_finite()
+                               or not 0 < eq <= 1):
+            raise ValueError('eq_scale_out_fraction must be a Decimal within (0, 1] or None')
+        total = sum((level.close_fraction for level in levels), eq or Decimal(0))
         if total > 1 - runner:
             raise ValueError('partial close fractions exceed the non-runner allocation')
         # Ascending R is the execution order; normalise it once, here.
@@ -230,7 +260,12 @@ class StrategyProfile:
                 'trailing_enabled': self.trailing_enabled,
                 'trailing_mode': self.trailing_mode,
                 'trailing_buffer': None if self.trailing_buffer is None
-                                   else str(self.trailing_buffer)}
+                                   else str(self.trailing_buffer),
+                'entry_models': list(self.entry_models),
+                'model2_requires_htf_fvg': self.effective_model2_requires_htf_fvg,
+                'eq_scale_out_fraction': None if self.eq_scale_out_fraction is None
+                                         else str(self.eq_scale_out_fraction),
+                'break_even_trigger': self.break_even_trigger}
 
     @property
     def effective_trailing_buffer(self):
@@ -242,6 +277,13 @@ class StrategyProfile:
         """HTF level tolerance, defaulting to the range boundary proximity."""
         return (self.boundary_proximity if self.htf_zone_tolerance is None
                 else self.htf_zone_tolerance)
+
+    @property
+    def effective_model2_requires_htf_fvg(self):
+        """Model 2's HTF FVG condition, defaulting to what the gate can provide."""
+        if self.model2_requires_htf_fvg is not None:
+            return self.model2_requires_htf_fvg
+        return self.direction_gate == 'GUIDE_HTF_CONTEXT'
 
     @property
     def directions(self):
