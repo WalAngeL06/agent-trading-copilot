@@ -777,9 +777,14 @@ class ChochGapTests(unittest.TestCase):
         self.assertIsNone(self.book.choch_gap('LONG', self.profile, self.choch, at(12)))
 
     def test_a_touched_gap_gives_way_to_the_next_one(self):
-        self.gap('left', 126, 130, 11)
-        self.gap('later', 131, 133, 12)
-        self.book.process(bar(15, 130.5, 130.5, 129.5, 130))
+        # A long gap below a trading bar stays fresh; one the bar wicks into
+        # is only TOUCHED, so the other containing gap is chosen.
+        # (Executed version: a bar touching the lower gap also closes below the
+        # upper gap's lower edge and invalidates it, so the fixture stacks the
+        # second gap below the first.)
+        self.gap('left', 128, 130, 11)
+        self.gap('later', 124, 126, 12)
+        self.book.process(bar(15, 129.5, 129.5, 128.5, 129))
         self.assertEqual(self.book.choch_gap('LONG', self.profile, self.choch, at(15)).gap_id,
                          'later')
 

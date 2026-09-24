@@ -1,6 +1,7 @@
 # DD deviation models - design, 2026-09-25 [U-DD-DEVIATION-001]
 
-Status: approved by the owner on 2026-09-25, not yet implemented.
+Status: approved by the owner on 2026-09-25. Implemented and made the default
+on 2026-09-25 (plan: `docs/superpowers/plans/2026-09-25-dd-deviation-models.md`).
 
 ## Source
 
@@ -99,8 +100,11 @@ turns ambiguous. The extreme may keep moving while the manipulation is still
 - At each evaluation Model 1 is tried before Model 2 [H]. The first model to
   produce a RiskEngine-approved plan submits it.
 - A later-ready model never replaces a resting or open order.
-- The plan, the `TRADE_CANDIDATE`/`ENTRY_PLAN` events and the trade record carry
-  `entry_model`.
+- The plan, the `ENTRY_PLAN`/`PENDING_ENTRY` events and the trade record carry
+  `entry_model`. `TradeCandidate` is shared with `trading_brain` and stays
+  unchanged; a model 1 candidate references its `CHOCH_CONFIRMED` event instead.
+- In the implementation the models are tried on every entry bar. That covers
+  the CHoCH bar, every gap publication and the arming bar alike.
 
 ### Superseded gate
 

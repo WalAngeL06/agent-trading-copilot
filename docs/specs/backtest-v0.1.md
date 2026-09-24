@@ -165,6 +165,20 @@ Both figures predate the 2026-09-24 broker trailing fix; after it the same
 single run gives 1 trade and 10112.627090374. The first 30-pair result is in
 PROJECT_STATE, 2026-09-24.
 
+**DD reporting [U-DD-DEVIATION-001] (2026-09-25).**
+- **Trades.** Every trade names the DD model behind it (`entry_model`:
+  `CHOCH_FVG` or `HTF_FVG_REVERSAL`), in `trades.csv`, `trades_detail.json` and
+  `sweep_trades.csv`. The pooled sweep summary splits trades `by_entry_model`.
+- **Funnel.** It adds `choch_confirmations` and `range_eq_exits`.
+- **Slices.** A `RANGE_EQ` slice counts as a partial, and `RANGE_EQ_BREAK_EVEN`
+  counts as break-even.
+- **Flags.** The DD knobs have flags: `--entry-models`, `--model2-htf-fvg
+  auto|true|false`, `--eq-scale-out` (or `none`), `--break-even-trigger` and
+  `--secondary-fvg/--no-secondary-fvg`.
+- **Legacy engine.** It is `--entry-models HTF_FVG_REVERSAL --model2-htf-fvg false
+  --eq-scale-out none --break-even-trigger R_MULTIPLE --secondary-fvg
+  --runner-fraction 0.10`.
+
 **Caveats.** The list is chosen by today's volume, so the past is seen through
 survivors and delisted pairs are absent. Pooled trades are not independent
 (pairs move together) and windows differ per pair (young listings have less

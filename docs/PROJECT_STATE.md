@@ -1,4 +1,71 @@
-# Current project state - 2026-09-24
+# Current project state - 2026-09-25
+
+## DD deviation models are the default - 2026-09-25 [U-DD-DEVIATION-001]
+
+The owner asked for the engine to trade the DD Finance deviation school. The
+source was two sketches, plus the DD model texts:
+- an accumulation range after a downtrend, deviating below the range;
+- a distribution range after an uptrend, deviating above it.
+
+**Owner decisions.**
+- **Exits:** 30% at the range EQ with the stop moved to entry, 50% at the
+  opposite boundary, and a 20% trailed runner.
+- **Entry models:** model 1 (15m CHoCH) and model 2 (HTF FVG reversal); the first
+  one ready takes the trade.
+- **Model 2 condition:** it only runs when the sweep touched a fresh 4H FVG.
+- **Stop:** behind the deviation wick.
+
+Design: [dd-deviation-models-2026-09-25.md](specs/dd-deviation-models-2026-09-25.md).
+Plan: `docs/superpowers/plans/2026-09-25-dd-deviation-models.md`.
+
+- **Built with TDD in six commits**, with the defaults flipped last. The shipped
+  scenarios pin the pre-DD knobs (`LEGACY`) and keep covering that path. With
+  those knobs, the BTC reference reproduces the pre-DD result exactly.
+- **BTC reference under DD** (`runs/eval-dd`): 1 short from model 1, +1.06R,
+  ending equity 10105.791611256. 30% closed at EQ and the rest on the trailed
+  stop.
+- **30 pairs under DD** (`runs/sweep-okx-tr-dd`, price scaling, no costs): 49
+  trades, one per confirmed manipulation. The trailing rules show zero
+  violations.
+
+  | Group | Trades | Win rate | Avg R | Total R | PF |
+  |---|---|---|---|---|---|
+  | CORE | 43 | 0.488 | +0.284 | +12.22 | 1.56 |
+  | CORE long | 19 | 0.632 | +0.846 | +16.07 | 3.30 |
+  | CORE short | 24 | 0.375 | -0.161 | -3.86 | 0.74 |
+  | CORE model 1 (CHoCH) | 31 | 0.484 | +0.262 | +8.12 | 1.51 |
+  | CORE model 2 (HTF FVG) | 12 | 0.500 | +0.342 | +4.10 | 1.68 |
+  | YOUNG | 6 | 0.333 | +0.501 | +3.00 | 1.75 |
+  | XAUT | 0 | - | - | - | - |
+
+  **Against the pre-DD engine after the trailing fix** (92 trades, CORE +0.098R
+  average):
+  - there are fewer trades, with a larger average;
+  - the edge survives hypothetical costs: CORE is +0.225R at 0.05% per side and
+    +0.165R at 0.1%, where the pre-DD engine was -0.023R at 0.1%.
+
+  **Exits.**
+  - The median trade is a full -1R. The stop sits behind the wick, and
+    break-even waits for EQ.
+  - 23 of the 49 trades reached EQ, and 6 reached the opposite boundary.
+
+  **Also:**
+  - Shorts still lose, under both models.
+  - Risk blocks: 71 `MIN_REWARD_RISK` (the wick stop is wider) and 23
+    `INSUFFICIENT_EQUITY`.
+- **This is not a profitability claim.** 43 CORE trades that are not
+  independent, one window (clustered in 2026-04 and 2026-07), a
+  survivorship-biased list, and no costs. No threshold was tuned.
+- **The local PAPER agent trades DD.**
+  - Its panel settings (`config/strategy.json`, gitignored) were aligned to the
+    DD stop and runner. They used to have secondary FVG support on and a 10%
+    runner; now support is off and the runner is 20%.
+  - A PAPER session saved before this change starts fresh (`SESSION_FORMAT` 2).
+  - The panel's settings screen does not show the new knobs yet.
+  - Panel partials above 50% now exceed the allocation, because the EQ slice
+    takes 30%.
+- **Checks:** 813 Python tests, 15 frontend tests and the production build
+  pass.
 
 ## Broker trailing fix and the first 30-pair result - 2026-09-24
 

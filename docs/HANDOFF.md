@@ -1,4 +1,26 @@
-# Current handoff - broker trailing fix and 30-pair result, 2026-09-24
+# Current handoff - DD deviation models, 2026-09-25
+
+Claude; branch `main`. The owner asked the engine to trade the DD Finance
+deviation school. Four decisions set the design:
+- exits: EQ 30% with break-even, boundary 50%, and a 20% runner;
+- entries: model 1 (CHoCH) and model 2 (HTF FVG), the first one ready wins;
+- model 2 only when the sweep touched a 4H FVG;
+- the stop behind the wick.
+
+The spec and plan were written, then implemented with TDD in six commits; the
+defaults were flipped last. The legacy behaviour is pinned in the shipped
+scenarios and reproduces exactly.
+
+**30 pairs under DD:** 49 trades, CORE +0.284R on average (+12.22R in total).
+Longs are strong and shorts negative, and the result survives a hypothetical
+0.1% fee per side. The local panel settings were aligned to DD.
+
+**Next:** owner review of the short side and of the live PAPER behaviour, and
+panel fields for the DD knobs. 813 Python tests pass. No push in this turn.
+
+---
+
+# Previous handoff - broker trailing fix and 30-pair result, 2026-09-24
 
 Claude; branch `main`. The 30-pair data came back from the VPS. The first sweep
 ended every trade on a stop and no trade reached its target. Root cause: two

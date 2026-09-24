@@ -137,7 +137,9 @@ was selected.
 `trailing_buffer` (None reuses `stop_buffer`) are configuration. [H]-SV1-TRAIL-001.
 
 Trailing starts only after the trade's own break-even protection is reached,
-which the broker announces once per trade as `BREAK_EVEN_PROTECTED`; the broker
+which comes from `break_even_trigger`: `RANGE_EQ` (the default since
+[U-DD-DEVIATION-001], at the range EQ) or `R_MULTIPLE` (the inherited 1R rule).
+The broker announces it once per trade as `BREAK_EVEN_PROTECTED`; the broker
 clears break-even and the recovery chain on every `submit`. From then on, each
 closed entry candle considers entry-timeframe swing lows that **formed at or
 after the fill** and were **already confirmed on an earlier bar**. The best
@@ -179,7 +181,8 @@ realised partials never re-derive it, so a target price cannot drift.
 
 Configuration is validated, never repaired: `r_multiple > 0`,
 `0 < close_fraction <= 1`, `0 <= runner_fraction <= 1`, no duplicate R levels,
-and `sum(close_fraction) <= 1 - runner_fraction`. Levels are sorted ascending
+and `sum(close_fraction) + eq_scale_out_fraction <= 1 - runner_fraction`
+(the DD range-EQ slice draws on the same allocation). Levels are sorted ascending
 once, at construction, and that is the execution order. `StrategyProfile.as_dict`
 emits the whole exit plan as JSON-ready strings for the future bot/UI layer; no
 UI is implemented here.
@@ -188,8 +191,9 @@ UI is implemented here.
 configured quantity step. At the frozen RangeHigh the broker closes
 `remaining_quantity - runner_target_quantity` (never negative) so exactly the
 configured runner survives, then **cancels every unfilled R level** so a stale
-2R/3R instruction can never nibble the runner. Defaults give the familiar
-90% realised / 10% runner. `runner_fraction = 0` closes everything at RangeHigh;
+2R/3R instruction can never nibble the runner. The DD defaults close 30% at
+the range EQ, 50% at the boundary and keep a 20% runner; the legacy profile
+gives 90% realised / 10% runner. `runner_fraction = 0` closes everything at RangeHigh;
 `runner_fraction = 1` closes nothing and forbids partials; partials summing to
 `1 - runner_fraction` leave nothing for RangeHigh to close, which is valid and
 emits `RUNNER_OPEN` with no exit record.
@@ -222,6 +226,51 @@ The shipped project names are kept; the requested names map onto them:
 | RUNNER_OPEN | `RUNNER_OPEN` |
 | RUNNER_STOPPED | `RUNNER_STOPPED` |
 | PAPER_TRADE_CLOSED | `PAPER_ORDER_CLOSED` |
+
+## DD deviation entries and scale-out [U-DD-DEVIATION-001]
+
+Design: [dd-deviation-models-2026-09-25.md](dd-deviation-models-2026-09-25.md).
+The owner approved it on 2026-09-25, and it is the default since then.
+
+**Entry models.** `entry_models` (default: both) are tried on every entry bar,
+model 1 first. The first plan the RiskEngine approves rests, and each gap is
+tried once.
+- `CHOCH_FVG` (DD model 1). `ChochTracker` follows the deviation extreme on the
+  entry timeframe from the sweep's range bar until the reclaim
+  ([H]-DD-EXTREME-001). The level is the most recent opposite entry swing formed
+  before that extreme, and the first body close beyond it emits
+  `CHOCH_CONFIRMED` ([H]-DD-CHOCH-001). The entry is the first fresh gap whose
+  three candles include the CHoCH bar.
+- `HTF_FVG_REVERSAL` (DD model 2). The entry is the first fresh gap published
+  after the reclaim, as before. Under the guide gate the HTF verdict must also
+  include an `HTF_FVG` zone ([H]-DD-MODEL2-001). `model2_requires_htf_fvg=None`
+  follows the gate; the superseded gate has no zones and keeps the pre-DD entry.
+
+**Stop.** `secondary_fvg_support_enabled` defaults to false, so the stop sits
+behind the deviation wick (`MANIPULATION_SWEEP_LOW/HIGH`).
+
+**Scale-out.**
+- `eq_scale_out_fraction` (0.30 of the original quantity) closes at the range
+  EQ frozen in `EntryPlan.range_eq`, as a `RANGE_EQ` slice with the event
+  `RANGE_EQ_PARTIAL_EXIT`. On the same bar it comes before the R partials and
+  the boundary.
+- `break_even_trigger='RANGE_EQ'` moves the stop to entry there, with the reason
+  `RANGE_EQ_BREAK_EVEN`, instead of at 1R.
+- An EQ that is not strictly between the entry and the target is skipped;
+  break-even then waits for the boundary ([H]-DD-EQ-SKIP-001).
+- With `runner_fraction` 0.20 the boundary closes 50% and the last 20% trails.
+
+**Legacy.** These settings reproduce the pre-DD engine exactly (checked on the
+BTC reference):
+- `entry_models=('HTF_FVG_REVERSAL',)`
+- `model2_requires_htf_fvg=False`
+- `secondary_fvg_support_enabled=True`
+- `eq_scale_out_fraction=None`
+- `break_even_trigger='R_MULTIPLE'`
+- `runner_fraction=0.10`
+
+The shipped test scenarios pin them as `strategy_v1_fixtures.LEGACY`. A PAPER
+session saved before this change is not resumed (`SESSION_FORMAT` 2).
 
 ## Pending-entry cancellation - reachability
 

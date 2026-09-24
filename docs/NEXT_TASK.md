@@ -1,23 +1,24 @@
-# Next task - interpret the first 30-pair result
+# Next task - review the DD deviation models with the owner
 
-Updated 2026-09-24. Do not create new worktrees or sibling Agent Trading folders.
+Updated 2026-09-25. Do not create new worktrees or sibling Agent Trading folders.
 Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
 
-1. Strategy, highest value. The first 30-pair result, after the broker trailing
-   fix, is in [PROJECT_STATE](PROJECT_STATE.md) (2026-09-24). Interpret it with
-   the owner before changing any threshold. The questions it raises:
-   (a) shorts lose on the CORE pairs (37 trades, -5.78R) while longs win (45,
-   +13.82R). Is the premium short rule too loose, or is this one window's
-   market?
-   (b) costs: at a hypothetical 0.1% per side the edge is gone. Measure with
-   OKX TR's real fees for limit entries and stop exits;
-   (c) [U-MULTI-SETUP-001] still lets one manipulation re-arm up to 5 times.
-   Decide whether a stopped-out setup may re-enter;
-   (d) then as planned: the guide's CHoCH body confirmation and
-   breaker/order-block entries (sections 5-6), and the symmetric range anchor
-   (gap report section 10).
+1. Strategy, highest value. The DD deviation models are the default
+   [U-DD-DEVIATION-001]; the first 30-pair result is in
+   [PROJECT_STATE](PROJECT_STATE.md) (2026-09-25). Review it with the owner
+   before changing any threshold.
+   (a) Shorts still lose on the CORE pairs under both models (24 trades,
+   -3.86R) while longs win (19, +16.07R).
+   (b) Measure with OKX TR's real fees (limit entries, stop exits).
+   (c) The panel settings screen does not show the DD knobs (entry models, EQ
+   share, break-even trigger). Add them; until then, panel partials above 50%
+   are rejected.
+   (d) Then: breaker/S-R flip entries (DD model 1's second option), DXY for
+   model 3 if a feed appears, and the symmetric range anchor (gap report
+   section 10).
    Rerun: `python -m agent_trading.backtest.sweep --data data/okx_tr_usdt_top30
-   --output runs/<name>`, about 15 minutes.
+   --output runs/<name>`, about 15 minutes. Add the legacy flags from the
+   backtest spec to compare with the pre-DD engine.
 2. VPS, together with the owner: the DigitalOcean VPS runs, tr.okx.com is
    reachable there, and the multi-pair download was done on 2026-09-21. The
    product deployment still needs a domain pointing at it; then run the draft
