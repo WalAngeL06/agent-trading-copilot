@@ -136,14 +136,22 @@ was selected.
 `trailing_enabled` (default true), `trailing_mode` (`CONFIRMED_HIGHER_LOW`) and
 `trailing_buffer` (None reuses `stop_buffer`) are configuration. [H]-SV1-TRAIL-001.
 
-Trailing starts only after break-even protection is reached, which the broker
-announces once as `BREAK_EVEN_PROTECTED`. From then on, each closed entry
-candle considers entry-timeframe swing lows that were **already confirmed on an
-earlier bar**. The best eligible proposal is `confirmed higher low -
-trailing_buffer`, accepted only when it is strictly tighter than the current
-stop and not below the entry. `RiskEngine.tighten_stop` still applies, so
+Trailing starts only after the trade's own break-even protection is reached,
+which the broker announces once per trade as `BREAK_EVEN_PROTECTED`; the broker
+clears break-even and the recovery chain on every `submit`. From then on, each
+closed entry candle considers entry-timeframe swing lows that **formed at or
+after the fill** and were **already confirmed on an earlier bar**. The best
+eligible proposal is `confirmed higher low - trailing_buffer`, accepted only
+when it is strictly tighter than the current stop, not below the entry, and
+strictly below the close of the bar it is set on. A short mirrors all of it with
+lower highs. `RiskEngine.tighten_stop` still applies, so
 `new_stop >= current_stop` holds in one place and a loosening proposal is a
 no-op. The RangeHigh target never moves.
+
+Fixed on 2026-09-24 after the first 30-pair sweep: the broker used to keep
+break-even across trades and to accept any swing since the start of the run, so
+a stop could jump to structure far beyond price (AVAX-USDT, a long at 9.17 had
+its stop moved to 34.98) and the next bar's open closed the trade.
 
 Swings confirmed on the current bar are deliberately not used for that bar: the
 broker runs before the swing engine, so a stop can never tighten on structure

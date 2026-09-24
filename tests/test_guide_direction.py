@@ -209,6 +209,13 @@ class GuideShortExitTests(unittest.TestCase):
         for record in self.long.broker.trailing_updates:
             self.assertEqual(record.structural_reference, 'CONFIRMED_HIGHER_LOW')
 
+    def test_every_trail_follows_structure_confirmed_after_its_fill(self):
+        for run in (self.strategy, self.long):
+            filled = run.broker.trades[0].filled_at
+            self.assertTrue(run.broker.trailing_updates)
+            for record in run.broker.trailing_updates:
+                self.assertGreater(record.confirmed_at, filled)
+
     def test_both_runs_end_with_the_same_equity(self):
         self.assertEqual(self.strategy.broker.equity, self.long.broker.equity)
 

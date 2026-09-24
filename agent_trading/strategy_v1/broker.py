@@ -315,8 +315,11 @@ class PendingLimitPaperBroker:
         """Tighten to `confirmed structure -/+ trailing_buffer` after break-even.
 
         A long follows confirmed higher lows, a short confirmed lower highs.
-        Only confirmed structure is eligible, never past break-even once
-        break-even is reached, and `tighten_stop` still enforces monotonicity.
+        Only structure the trade itself made is eligible: the swing forms at or
+        after the fill and was confirmed on an earlier bar. A proposal must be
+        strictly tighter than the stop, never past break-even, and on the
+        market side of this bar's close, so a stop is never set where price
+        already trades beyond it. `tighten_stop` still enforces monotonicity.
         A runner keeps receiving these updates after the boundary exit.
         """
         if (not self.profile.trailing_enabled or self.break_even_at is None
@@ -326,16 +329,18 @@ class PendingLimitPaperBroker:
         buffer = self.profile.effective_trailing_buffer
         best = best_swing = None
         for swing in (swing_lows if long_ else swing_highs):
-            if swing.confirmed_at > candle.close_time:
-                continue                      # never act on unconfirmed structure
+            if swing.confirmed_at > candle.close_time or swing.swing_time < trade.filled_at:
+                continue            # unconfirmed, or structure from before this trade
             proposed = exact_difference(swing.price,
                                         buffer if long_ else buffer.copy_negate())
             if long_:
-                if proposed <= trade.stop or proposed < trade.entry:
-                    continue                  # only tighten, never past break-even
+                if (proposed <= trade.stop or proposed < trade.entry
+                        or proposed >= candle.close):
+                    continue        # only tighten, never past break-even or price
                 closer = best is None or proposed > best
             else:
-                if proposed >= trade.stop or proposed > trade.entry:
+                if (proposed >= trade.stop or proposed > trade.entry
+                        or proposed <= candle.close):
                     continue
                 closer = best is None or proposed < best
             if closer:

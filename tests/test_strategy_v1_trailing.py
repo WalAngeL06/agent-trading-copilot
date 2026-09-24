@@ -1,7 +1,8 @@
 """Strategy V1 structural trailing and pending-entry cancellation.
 
-Trailing is LONG only, confirmed structure only, after break-even only, and can
-never loosen a stop. Every default here is provisional [H]-SV1-TRAIL-001.
+Trailing uses confirmed structure the trade itself made, only after that trade's
+own break-even, never puts the stop beyond the close it is set on, and can never
+loosen a stop. Every default here is provisional [H]-SV1-TRAIL-001.
 """
 import unittest
 from dataclasses import replace
@@ -9,7 +10,7 @@ from decimal import Decimal
 
 from agent_trading.market import bar_duration
 from agent_trading.swing import ConfirmedSwing, SwingSide
-from agent_trading.trading_brain.models import FVG, SwingLow, TradeCandidate
+from agent_trading.trading_brain.models import FVG, SwingHigh, SwingLow, TradeCandidate
 from agent_trading.trading_brain.risk import RiskEngine
 from agent_trading.trading_brain.risk_models import SupportingZone
 from agent_trading.strategy_v1 import PendingLimitPaperBroker, StrategyProfile, StrategyV1
@@ -25,6 +26,12 @@ def swing_low(price, swing_time, delay=STEP):
     raw = ConfirmedSwing(SYMBOL, '15m', SwingSide.LOW, D(str(price)), swing_time,
                          swing_time + delay, 1, D('1'), D('1'))
     return SwingLow(raw)
+
+
+def swing_high(price, swing_time, delay=STEP):
+    raw = ConfirmedSwing(SYMBOL, '15m', SwingSide.HIGH, D(str(price)), swing_time,
+                         swing_time + delay, 1, D('1'), D('1'))
+    return SwingHigh(raw)
 
 
 def confirmed_low(price, now, bars_ago=2):
@@ -62,6 +69,24 @@ def open_long(profile=None):
     """Submit and fill at the configured EQ entry of 128."""
     broker, start = _submit(profile or scenario_profile())
     broker.process(candle('15m', start + STEP, 129, 129.5, 128, 128.5))
+    return broker, start + STEP
+
+
+def open_short():
+    """The long fixture reflected about 128: entry 128, stop 138, target 116."""
+    profile = scenario_profile(direction='BOTH')
+    risk = RiskEngine(profile.risk_config())
+    broker = PendingLimitPaperBroker(risk, D('10000'), profile)
+    start = bias_candles()[0].close_time
+    primary = TrackedFvg('p1', FVG('SHORT', D('126'), D('130'), (start, start, start), start))
+    candidate = TradeCandidate('SHORT', D('128'), D('137'), D('116'), start, (),
+                               sweep_extreme=D('137'))
+    decision = risk.evaluate(candidate, D('10000'), (), symbol=SYMBOL, timeframe='15m')
+    assert decision.plan is not None, 'short trailing fixture must be approvable'
+    plan = EntryPlan(primary, 'FVG_EQ', D('128'), D('116'), 'MANIPULATION_SWEEP_HIGH',
+                     None, None, None, start)
+    broker.submit(decision.plan, plan)
+    broker.process(candle('15m', start + STEP, 127, 128, 126.5, 127.5))
     return broker, start + STEP
 
 
@@ -270,6 +295,70 @@ class PerTradeStateTests(unittest.TestCase):
         _submit(scenario_profile(), broker=broker, at=moment)
         self.assertEqual((broker.primary_failed_at, broker.secondary_reacted_at,
                           broker.recovery_at), (None, None, None))
+
+
+class TrailingStructureTests(unittest.TestCase):
+    """Trailing follows the trade's own structure and stays on the market side.
+
+    Found in the 30-pair sweep: every trailing update referenced a swing
+    confirmed before the fill, often far beyond price, so the next bar's open
+    closed the trade (AVAX-USDT: a long at 9.17 had its stop moved to 34.98).
+    """
+
+    def _protected_long(self):
+        broker, moment = open_long()
+        _events, moment = protect(broker, moment)
+        self.assertEqual(broker.trades[-1].stop, D('128'))
+        return broker, moment
+
+    def _protected_short(self):
+        broker, moment = open_short()
+        self.assertEqual(broker.trades[-1].stop, D('138'))
+        moment = moment + STEP
+        broker.process(candle('15m', moment, 128, 128.5, 117.5, 118))      # 1R: break-even
+        self.assertEqual(broker.trades[-1].stop, D('128'))
+        return broker, moment
+
+    def test_a_long_never_trails_to_structure_formed_before_the_fill(self):
+        broker, moment = self._protected_long()
+        older = swing_low(131, broker.trades[-1].filled_at - 3 * STEP)   # below the close
+        events = broker.process(candle('15m', moment + STEP, 138, 139, 136, 137), (older,))
+        self.assertEqual([e.kind for e in events], [])
+        self.assertEqual(broker.trades[-1].stop, D('128'))
+
+    def test_a_short_never_trails_to_structure_formed_before_the_fill(self):
+        broker, moment = self._protected_short()
+        older = swing_high(125, broker.trades[-1].filled_at - 3 * STEP)  # above the close
+        events = broker.process(candle('15m', moment + STEP, 118, 120, 117, 119), (), (older,))
+        self.assertEqual([e.kind for e in events], [])
+        self.assertEqual(broker.trades[-1].stop, D('128'))
+
+    def test_the_reported_case_a_swing_far_beyond_price_is_ignored(self):
+        broker, moment = self._protected_long()
+        ancient = swing_low(400, broker.trades[-1].filled_at - 40 * STEP)
+        events = broker.process(candle('15m', moment + STEP, 138, 139, 136, 137), (ancient,))
+        self.assertEqual([e.kind for e in events], [])
+        self.assertEqual(broker.trades[-1].stop, D('128'))
+
+    def test_a_long_stop_is_never_placed_above_the_close(self):
+        broker, moment = self._protected_long()
+        own = swing_low(137, moment)                  # 137 - 1 = 136, above the 135 close
+        events = broker.process(candle('15m', moment + STEP, 138, 138.5, 134.5, 135), (own,))
+        self.assertEqual([e.kind for e in events], [])
+        self.assertEqual(broker.trades[-1].stop, D('128'))
+
+    def test_a_short_stop_is_never_placed_below_the_close(self):
+        broker, moment = self._protected_short()
+        own = swing_high(119, moment)                 # 119 + 1 = 120, below the 121 close
+        events = broker.process(candle('15m', moment + STEP, 118, 121.5, 117.5, 121), (), (own,))
+        self.assertEqual([e.kind for e in events], [])
+        self.assertEqual(broker.trades[-1].stop, D('128'))
+
+    def test_a_stop_beyond_the_close_gives_way_to_the_next_valid_structure(self):
+        broker, moment = self._protected_long()
+        lows = (swing_low(131, moment - STEP), swing_low(137, moment))
+        broker.process(candle('15m', moment + STEP, 138, 138.5, 134.5, 135), lows)
+        self.assertEqual(broker.trades[-1].stop, D('130'))
 
 
 class PendingCancellationTests(unittest.TestCase):
