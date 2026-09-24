@@ -109,6 +109,9 @@ releases the setup slot once nothing is pending or open, emitting
 broker now resets its per-trade protection state on every `submit`, and the
 recorder derives break-even and trailing counts from the trade's own
 `stop_updates`, so a later trade can never inherit an earlier one's history.
+Correction 2026-09-24: the broker reset described here was never in the code
+until then; it landed with the trailing fix recorded in the strategy spec,
+"Structural trailing".
 
 **C - longer frozen data.** `python -m agent_trading.backtest.fetch` now pages
 backwards with `after`, because the shipped adapter caps one call at 300 bars.
@@ -158,6 +161,9 @@ first entry-timeframe close in the window (500 and 100 at a BTC price of
 price-unit flags are refused in that mode; `--scale none` keeps them absolute.
 On the local BTC data `--scale none` reproduces the single-run result exactly
 (2 trades, 10096.402343948), and price scaling gives 2 trades, 10095.3721872805.
+Both figures predate the 2026-09-24 broker trailing fix; after it the same
+single run gives 1 trade and 10112.627090374. The first 30-pair result is in
+PROJECT_STATE, 2026-09-24.
 
 **Caveats.** The list is chosen by today's volume, so the past is seen through
 survivors and delisted pairs are absent. Pooled trades are not independent

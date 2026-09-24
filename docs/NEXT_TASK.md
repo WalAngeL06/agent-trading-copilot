@@ -1,23 +1,28 @@
-# Next task - first VPS deployment and the multi-pair run
+# Next task - interpret the first 30-pair result
 
-Updated 2026-09-21. Do not create new worktrees or sibling Agent Trading folders.
+Updated 2026-09-24. Do not create new worktrees or sibling Agent Trading folders.
 Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
 
-1. Strategy, highest value: the sample is still two trades on one symbol.
-   Widen it before tuning anything. In order:
-   (a) run the multi-pair research set, now built in code [U-MULTI-PAIR-001]:
-   the top 30 OKX TR USDT pairs by 24h volume, downloaded on the VPS with the
-   steps in [deploy-vps.md](deploy-vps.md) ("Çoklu parite verisi ve tarama"),
-   then swept locally with `python -m agent_trading.backtest.sweep`; analyse the
-   per-pair and pooled results before changing any threshold;
-   (b) implement the guide's CHoCH body confirmation and breaker/order-block
-   entries (sections 5-6), the last entry rules still missing;
-   (c) revisit the symmetric range anchor, measured and deferred in the gap
-   report section 10.
-2. VPS, together with the owner: the owner provides an Ubuntu VPS and a domain
-   pointing at it and confirms tr.okx.com is reachable there. Then run the draft
-   deployment from [deploy-vps.md](deploy-vps.md), fix what the first real run
-   reveals, and start the multi-pair download of item 1(a) in the same session.
+1. Strategy, highest value. The first 30-pair result, after the broker trailing
+   fix, is in [PROJECT_STATE](PROJECT_STATE.md) (2026-09-24). Interpret it with
+   the owner before changing any threshold. The questions it raises:
+   (a) shorts lose on the CORE pairs (37 trades, -5.78R) while longs win (45,
+   +13.82R). Is the premium short rule too loose, or is this one window's
+   market?
+   (b) costs: at a hypothetical 0.1% per side the edge is gone. Measure with
+   OKX TR's real fees for limit entries and stop exits;
+   (c) [U-MULTI-SETUP-001] still lets one manipulation re-arm up to 5 times.
+   Decide whether a stopped-out setup may re-enter;
+   (d) then as planned: the guide's CHoCH body confirmation and
+   breaker/order-block entries (sections 5-6), and the symmetric range anchor
+   (gap report section 10).
+   Rerun: `python -m agent_trading.backtest.sweep --data data/okx_tr_usdt_top30
+   --output runs/<name>`, about 15 minutes.
+2. VPS, together with the owner: the DigitalOcean VPS runs, tr.okx.com is
+   reachable there, and the multi-pair download was done on 2026-09-21. The
+   product deployment still needs a domain pointing at it; then run the draft
+   deployment from [deploy-vps.md](deploy-vps.md) and fix what the first real
+   run reveals.
 3. Network: the application connects to OKX through ATK/MCP whenever network
    access is available; the 2026-09-16
    [diagnosis](fresh-atk-runtime-diagnosis.md) verified every public layer. This

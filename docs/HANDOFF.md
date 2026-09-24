@@ -1,4 +1,22 @@
-# Current handoff - multi-pair fetch and sweep, 2026-09-21
+# Current handoff - broker trailing fix and 30-pair result, 2026-09-24
+
+Claude; branch `main`. The 30-pair data came back from the VPS. The first sweep
+ended every trade on a stop and no trade reached its target. Root cause: two
+broker bugs. Per-trade state was never reset between trades, and trailing moved
+stops onto stale structure beyond price. Both were fixed with TDD in two
+commits; the verified VPS runbook is a third.
+
+Rerun: 92 trades. CORE pairs average +0.098R (+8.04R in total); longs carry it
+and shorts lose (-5.78R); a hypothetical 0.1% per side erases it. The older BTC
+figures in these docs predate the fix. Details are in PROJECT_STATE,
+2026-09-24.
+
+Next: interpret the result with the owner before any change (the short side,
+costs, multi-setup re-entries). 761 Python tests pass. No push in this turn.
+
+---
+
+# Previous handoff - multi-pair fetch and sweep, 2026-09-21
 
 Claude; branch `main`. The owner chose USDT pairs, the top 30 by 24h volume, and
 a download on the VPS. Built with TDD in four local commits: listing reads in

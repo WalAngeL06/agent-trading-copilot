@@ -1,4 +1,50 @@
-# Current project state - 2026-09-21
+# Current project state - 2026-09-24
+
+## Broker trailing fix and the first 30-pair result - 2026-09-24
+
+The multi-pair data came back from the VPS: the top 30 OKX TR USDT pairs,
+30/30 complete, no gaps, as_of 2026-09-21T18:13:01Z (`data/okx_tr_usdt_top30`,
+gitignored). Its first sweep ended every trade on a stop and never reached a
+target. That exposed two broker bugs which had shaped every trade result so
+far, including the BTC direction result recorded below.
+
+- Per-trade state leaked. Break-even and the recovery chain were set once per
+  broker and never cleared, so after a pair's first break-even every later trade
+  trailed from its first bar (164 of 195 trades). The backtest spec claimed a
+  reset on `submit` that the code never had.
+- Trailing used stale structure. `_trail` accepted any swing since the start of
+  the run and took the most extreme one, so a stop could jump far beyond price
+  and the next open closed the trade (AVAX-USDT: a long at 9.17 had its stop
+  moved to 34.98). All 182 trailing updates were of this kind.
+- Fixed with TDD in [broker.py](../agent_trading/strategy_v1/broker.py): the
+  state is cleared on every `submit`, a swing must form at or after the fill,
+  and a trailed stop must sit strictly on the market side of the bar's close.
+  The live PAPER agent runs the same broker. On the rerun a read-only check
+  finds no violation of any of the three rules, and the 13 trades that closed
+  before any break-even are identical to the old run.
+- BTC reference (`runs/eval-direction-fixed`): 1 short, +1.13R, ending equity
+  10112.627090374, instead of 2 shorts and 10096.402343948. Its stop now follows
+  four fresh lower highs instead of jumping to one from 2026-07-01.
+- 30 pairs after the fix (`runs/sweep-okx-tr-fixed`, price scaling, no costs):
+  92 trades instead of 195. Groups were fixed before looking: 22 CORE pairs
+  with full 1H and 15m history, 7 YOUNG listings, and XAUT apart.
+
+  | Group | Trades | Win rate | Avg R | Median R | Total R | PF |
+  |---|---|---|---|---|---|---|
+  | CORE | 82 | 0.415 | +0.098 | -0.002 | +8.04 | 1.26 |
+  | CORE long | 45 | 0.489 | +0.307 | 0.000 | +13.82 | 1.97 |
+  | CORE short | 37 | 0.324 | -0.156 | -0.059 | -5.78 | 0.66 |
+  | YOUNG | 10 | 0.200 | -0.046 | -0.007 | -0.46 | 0.85 |
+  | XAUT | 0 | - | - | - | - | - |
+
+  12 trades reached the opposite boundary and left a runner. 51 of the 82 CORE
+  trades reached break-even, which is why the median sits at zero. With a
+  hypothetical fee of 0.05% per side the CORE average falls to +0.037R, and at
+  0.1% to -0.023R. Trades cluster in 2026-04 (24) and 2026-07 (26). Under
+  multi-setup one manipulation still produced up to 5 trades (22 with the bug).
+- This is not a profitability claim: 82 pooled trades that are not independent,
+  one window, a survivorship-biased list and no costs. No threshold was changed.
+- 761 Python tests pass.
 
 ## Multi-pair research set, built and waiting for the VPS - 2026-09-21 [U-MULTI-PAIR-001]
 
