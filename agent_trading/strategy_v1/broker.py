@@ -368,11 +368,13 @@ class PendingLimitPaperBroker:
                 or trade.status != 'OPEN'):
             return ()
         long_ = trade.direction == 'LONG'
-        buffer = self.profile.effective_trailing_buffer
         best = best_swing = None
-        for swing in (swing_lows if long_ else swing_highs):
+        for swing in reversed(swing_lows if long_ else swing_highs):
+            if swing.confirmed_at < trade.filled_at:
+                break               # every earlier swing was confirmed before the fill
             if swing.confirmed_at > candle.close_time or swing.swing_time < trade.filled_at:
                 continue            # unconfirmed, or structure from before this trade
+            buffer = self.profile.trailing_buffer_at(swing.price)
             proposed = exact_difference(swing.price,
                                         buffer if long_ else buffer.copy_negate())
             if long_:

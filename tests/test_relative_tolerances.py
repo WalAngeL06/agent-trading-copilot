@@ -9,8 +9,10 @@ from agent_trading.swing import SwingSide
 from agent_trading.trading_brain.models import TradeCandidate
 from agent_trading.trading_brain.risk import RiskEngine
 from agent_trading.trading_brain.risk_models import RiskConfig
+from agent_trading.strategy_v1 import StrategyProfile
 
-from strategy_v1_fixtures import bias_candles
+from strategy_v1_fixtures import bias_candles, candle, scenario_profile
+from test_strategy_v1_trailing import STEP, confirmed_low, open_long, protect
 
 START = bias_candles()[0].close_time
 
@@ -91,6 +93,45 @@ class StopBufferTests(unittest.TestCase):
         for bad in (D('0'), D('1'), D('-0.001')):
             with self.subTest(bad=bad), self.assertRaises(ValueError):
                 RiskConfig(stop_buffer_ratio=bad)
+
+
+class ProfileRatioTests(unittest.TestCase):
+    def test_the_ratios_are_optional_and_validated(self):
+        self.assertIsNone(StrategyProfile().boundary_proximity_ratio)
+        self.assertIsNone(StrategyProfile().stop_buffer_ratio)
+        for name in ('boundary_proximity_ratio', 'stop_buffer_ratio'):
+            for bad in (D('0'), D('1'), D('NaN')):
+                with self.subTest(name=name, bad=bad), self.assertRaises(ValueError):
+                    StrategyProfile(**{name: bad})
+
+    def test_the_htf_band_and_the_trail_follow_the_ratios(self):
+        profile = StrategyProfile(boundary_proximity_ratio=D('0.005'), stop_buffer_ratio=D('0.001'))
+        self.assertEqual(profile.effective_htf_zone_tolerance_ratio, D('0.005'))
+        self.assertEqual(profile.trailing_buffer_at(D('127')), D('0.127'))
+        self.assertEqual(profile.risk_config().stop_buffer_ratio, D('0.001'))
+        explicit = StrategyProfile(boundary_proximity_ratio=D('0.005'), htf_zone_tolerance=D('3'),
+                                   stop_buffer_ratio=D('0.001'), trailing_buffer=D('2'))
+        self.assertIsNone(explicit.effective_htf_zone_tolerance_ratio)
+        self.assertEqual(explicit.trailing_buffer_at(D('127')), D('2'))
+        data = profile.as_dict()
+        self.assertEqual((data['boundary_proximity_ratio'], data['stop_buffer_ratio']),
+                         ('0.005', '0.001'))
+
+    def test_the_trail_buffer_is_a_share_of_the_swing(self):
+        broker, moment = open_long(scenario_profile(stop_buffer_ratio=D('0.01')))
+        protect(broker, moment)
+        broker.process(candle('15m', moment + 2 * STEP, 138, 139, 136, 137),
+                       (confirmed_low(131, moment + 2 * STEP),))
+        self.assertEqual(broker.trades[-1].stop, D('129.69'))           # 131 - 1.31
+
+    def test_the_strategy_hands_the_ratios_to_its_engines(self):
+        from agent_trading.strategy_v1 import StrategyV1
+        from guide_fixtures import guide_profile
+        strategy = StrategyV1('BTC-USDT', guide_profile(boundary_proximity_ratio=D('0.005'),
+                                                        stop_buffer_ratio=D('0.001')))
+        self.assertEqual(strategy.range.proximity_ratio, D('0.005'))
+        self.assertEqual(strategy.context.tolerance_ratio, D('0.005'))
+        self.assertEqual(strategy.risk.config.stop_buffer_ratio, D('0.001'))
 
 
 if __name__ == '__main__':

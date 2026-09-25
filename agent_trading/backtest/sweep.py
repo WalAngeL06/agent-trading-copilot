@@ -3,9 +3,8 @@
 Every subdirectory of the data root is one dataset: one pair, or one window of
 a pair. The backtest engine runs on each exactly as it does for a single run
 and writes its usual artifacts into a folder named after the dataset. This
-module adds only the loop, the per-pair scaling of the two knobs quoted in
-price units [H]-SWEEP-SCALE-001, and a summary across datasets. It never
-reaches the network.
+module adds only the loop, price-relative tolerances [H]-SWEEP-SCALE-001, and
+a summary across datasets. It never reaches the network.
 
     python -m agent_trading.backtest.sweep --data data/okx_tr_usdt_top30 \\
         --output runs/sweep-okx-tr
@@ -20,7 +19,6 @@ import json
 from pathlib import Path
 
 from ..strategy_v1.config import ENTRY_MODELS
-from ..trading_brain.risk import exact_product
 from . import engine, report
 from .cli import (add_cost_arguments, add_profile_arguments, costs_from_args,
                   explicit_absolute_flags, profile_from_args)
@@ -35,20 +33,22 @@ SCHEMA = 'strategy-v1-sweep-v0.1'
 DEFAULT_PROXIMITY_RATIO, DEFAULT_STOP_BUFFER_RATIO = '0.005', '0.001'
 ROW_COLUMNS = ('dataset', 'symbol', 'status', 'reason', 'window_start', 'window_end',
                'reference_price', 'price_drift', 'boundary_proximity', 'stop_buffer',
+               'proximity_ratio', 'stop_buffer_ratio',
                'ranges_confirmed', 'manipulations', 'htf_context_checks', 'htf_allowed',
                'setups', 'risk_blocked', 'trades', 'wins', 'losses', 'win_rate', 'total_r',
                'net_pnl', 'ending_equity', 'max_drawdown_percent')
 
 
-def scale_profile(profile, reference, proximity_ratio, stop_buffer_ratio):
-    """[H]-SWEEP-SCALE-001 Both price-unit knobs as a share of the reference.
+def scale_profile(profile, proximity_ratio, stop_buffer_ratio):
+    """[H]-SWEEP-SCALE-001 [U-RR-TRAIL-001] Tolerances as a share of the price tested.
 
-    The HTF zone tolerance and the trailing buffer default to these two, so
-    they follow automatically. 0.005 and 0.001 are 500 and 100 at a BTC price
-    of 100,000, the values the single-pair research used.
+    The range touch, the HTF level band, the stop buffer and the trailing
+    buffer are each measured on their own price, so a pair keeps the same
+    relative tolerance however far its price moves. 0.005 and 0.001 are 500 and
+    100 at a BTC price of 100,000, the values the single-pair research used.
     """
-    return replace(profile, boundary_proximity=exact_product(reference, proximity_ratio),
-                   stop_buffer=exact_product(reference, stop_buffer_ratio))
+    return replace(profile, boundary_proximity_ratio=proximity_ratio,
+                   stop_buffer_ratio=stop_buffer_ratio)
 
 
 def reference_price(dataset, entry_timeframe):
@@ -99,7 +99,7 @@ def sweep_dataset(directory, args, base_profile, scale, output_root):
                window_end=entry[-1].close_time.isoformat())
     try:                                    # a dataset that loads but cannot run is FAILED
         reference = reference_price(dataset, roles.entry)
-        profile = (scale_profile(base_profile, reference, scale['proximity_ratio'],
+        profile = (scale_profile(base_profile, scale['proximity_ratio'],
                                  scale['stop_buffer_ratio'])
                    if scale['mode'] == 'price' else base_profile)
         result = engine.run(replace(config, profile=profile), dataset)
@@ -114,8 +114,11 @@ def sweep_dataset(directory, args, base_profile, scale, output_root):
                 if record.status == 'CLOSED' and record.r_multiple is not None]
     row.update(status='COMPLETED', reference_price=plain(reference),
                price_drift=plain((entry[-1].close / entry[0].close).quantize(Decimal('1e-6'))),
-               boundary_proximity=plain(profile.boundary_proximity),
-               stop_buffer=plain(profile.stop_buffer),
+               boundary_proximity=(None if scale['mode'] == 'price'
+                                   else plain(profile.boundary_proximity)),
+               stop_buffer=None if scale['mode'] == 'price' else plain(profile.stop_buffer),
+               proximity_ratio=_text(profile.boundary_proximity_ratio),
+               stop_buffer_ratio=_text(profile.stop_buffer_ratio),
                ranges_confirmed=strategy.counts['RANGE_CONFIRMED'],
                manipulations=strategy.counts['MANIPULATION_CONFIRMED'],
                htf_context_checks=len(verdicts),
@@ -168,8 +171,6 @@ def pooled(records):
 
 def _limitations(root, scale):
     tags = ['POOLED_TRADES_NOT_INDEPENDENT', 'DATASET_WINDOWS_DIFFER']
-    if scale['mode'] == 'price':
-        tags.append('FIXED_REFERENCE_PRICE')
     universe = Path(root) / 'universe.json'
     if universe.is_file():
         try:
@@ -217,11 +218,11 @@ def build_parser():
     parser.add_argument('--start', help='ISO-8601 window start (inclusive)')
     parser.add_argument('--end', help='ISO-8601 window end (inclusive)')
     parser.add_argument('--scale', default='price', choices=('price', 'none'),
-                        help='price: scale the price-unit knobs per dataset [H]-SWEEP-SCALE-001')
+                        help='price: tolerances as a share of the price tested [H]-SWEEP-SCALE-001')
     parser.add_argument('--proximity-ratio', default=DEFAULT_PROXIMITY_RATIO,
-                        help='boundary proximity as a share of the reference price')
+                        help='touch and HTF level tolerance as a share of that price')
     parser.add_argument('--stop-buffer-ratio', default=DEFAULT_STOP_BUFFER_RATIO,
-                        help='stop buffer as a share of the reference price')
+                        help='stop and trailing buffer as a share of the invalidation or swing')
     add_profile_arguments(parser)
     add_cost_arguments(parser)
     return parser
@@ -270,7 +271,8 @@ def main(argv=None):
         'schema_version': SCHEMA, 'label': args.label, 'data_root': str(args.data),
         'scale': ({'mode': 'price', 'proximity_ratio': plain(scale['proximity_ratio']),
                    'stop_buffer_ratio': plain(scale['stop_buffer_ratio']),
-                   'reference': 'first entry-timeframe close inside the window'}
+                   'applied_to': 'the price tested: range boundary, HTF level, '
+                                 'invalidation, swing'}
                   if scale['mode'] == 'price' else
                   {'mode': 'none', 'boundary_proximity': plain(base_profile.boundary_proximity),
                    'stop_buffer': plain(base_profile.stop_buffer)}),

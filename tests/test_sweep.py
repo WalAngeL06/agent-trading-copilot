@@ -70,12 +70,13 @@ class PeekSymbolTests(unittest.TestCase):
 
 
 class ScaleTests(unittest.TestCase):
-    def test_both_price_knobs_scale_with_the_reference_price(self):
-        profile = sweep.scale_profile(StrategyProfile(), D('127'), D('0.005'), D('0.001'))
-        self.assertEqual((profile.boundary_proximity, profile.stop_buffer),
-                         (D('0.635'), D('0.127')))
-        self.assertEqual(profile.effective_htf_zone_tolerance, D('0.635'))
-        self.assertEqual(profile.effective_trailing_buffer, D('0.127'))
+    def test_price_scaling_sets_ratios_of_the_price_being_tested(self):
+        # [U-RR-TRAIL-001] measured on each price, not fixed at the first close
+        profile = sweep.scale_profile(StrategyProfile(), D('0.005'), D('0.001'))
+        self.assertEqual((profile.boundary_proximity_ratio, profile.stop_buffer_ratio),
+                         (D('0.005'), D('0.001')))
+        self.assertEqual(profile.effective_htf_zone_tolerance_ratio, D('0.005'))
+        self.assertEqual(profile.trailing_buffer_at(D('127')), D('0.127'))
 
 
 class SweepTests(unittest.TestCase):
@@ -145,12 +146,14 @@ class SweepTests(unittest.TestCase):
         self.assertEqual(written['metrics'], json.loads(json.dumps(direct.summary)))
         self.assertEqual(self.rows()['AAA']['ending_equity'], direct.summary['ending_equity'])
 
-    def test_price_scaling_reads_the_first_entry_close(self):
+    def test_price_scaling_records_the_ratios(self):
         self.add('AAA', long_candles(), 'AAA-USDT')
         self.assertEqual(self.run_sweep(), 0)
         row = self.rows()['AAA']
-        self.assertEqual((row['reference_price'], row['boundary_proximity'], row['stop_buffer']),
-                         ('127', '0.635', '0.127'))
+        self.assertEqual((row['reference_price'], row['proximity_ratio'], row['stop_buffer_ratio'],
+                          row['boundary_proximity'], row['stop_buffer']),
+                         ('127', '0.005', '0.001', None, None))
+        self.assertNotIn('FIXED_REFERENCE_PRICE', self.summary()['limitations'])
 
     def test_the_reference_is_the_first_entry_close_inside_the_window(self):
         self.add('AAA', long_candles(), 'AAA-USDT')

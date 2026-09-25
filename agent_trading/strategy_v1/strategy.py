@@ -47,7 +47,8 @@ class StrategyV1:
         self.bias = BiasEngine(symbol, roles.bias, self.profile.swing)
         # [U-RANGE-GUIDE-002] None means the superseded permission gate.
         self.context = (HtfContext(roles.bias, self.profile.effective_htf_zone_tolerance,
-                                   self.profile.htf_confluence_required)
+                                   self.profile.htf_confluence_required,
+                                   tolerance_ratio=self.profile.effective_htf_zone_tolerance_ratio)
                         if self.profile.direction_gate == 'GUIDE_HTF_CONTEXT' else None)
         self.range_swing = SwingEngine(symbol, roles.range, self.profile.swing)
         self.range_structure = StructureEngine(symbol, roles.range)
@@ -55,7 +56,8 @@ class StrategyV1:
                                  allow_reseek=self.profile.range_reseek_enabled,
                                  allow_retire=self.profile.range_retire_enabled,
                                  deviation_ratio=self.profile.range_deviation_ratio,
-                                 require_eq_visit=self.profile.range_require_eq_visit)
+                                 require_eq_visit=self.profile.range_require_eq_visit,
+                                 proximity_ratio=self.profile.boundary_proximity_ratio)
         self.manipulation = ManipulationEngine()
         self.entry_swing = SwingEngine(symbol, roles.entry, self.profile.swing)
         self.gaps = GapEngine()

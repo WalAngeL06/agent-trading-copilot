@@ -8,6 +8,7 @@ from decimal import Decimal
 
 from ..market import bar_duration
 from ..swing import SwingConfig
+from ..trading_brain.risk import exact_product
 from ..trading_brain.risk_models import RiskConfig
 
 ENTRY_LEVELS = ('FVG_LOW', 'FVG_EQ', 'FVG_HIGH')
@@ -111,6 +112,11 @@ class StrategyProfile:
     swing: SwingConfig = field(default_factory=SwingConfig)
     equity: Decimal = Decimal('10000')
     stop_buffer: Decimal = Decimal('100')
+    # [U-RR-TRAIL-001] [H]-REL-TOL-001 Optional price-relative tolerances. When
+    # set they replace boundary_proximity / stop_buffer at every use, as a share
+    # of the price being tested: range boundary, HTF level, invalidation, swing.
+    boundary_proximity_ratio: Decimal | None = None
+    stop_buffer_ratio: Decimal | None = None
     risk_fraction: Decimal = Decimal('.01')
     quantity_step: Decimal = Decimal('.00000001')
     min_reward_risk: Decimal = Decimal('1')
@@ -185,6 +191,11 @@ class StrategyProfile:
                 not isinstance(self.trailing_buffer, Decimal)
                 or not self.trailing_buffer.is_finite() or self.trailing_buffer <= 0):
             raise ValueError('trailing_buffer must be a positive finite Decimal or None')
+        for name in ('boundary_proximity_ratio', 'stop_buffer_ratio'):
+            value = getattr(self, name)
+            if value is not None and (not isinstance(value, Decimal) or not value.is_finite()
+                                      or not 0 < value < 1):
+                raise ValueError(f'{name} must be a Decimal within (0, 1) or None')
         models = tuple(self.entry_models)
         if (not models or len(set(models)) != len(models)
                 or any(model not in ENTRY_MODELS for model in models)):
@@ -265,6 +276,10 @@ class StrategyProfile:
                 'trailing_mode': self.trailing_mode,
                 'trailing_buffer': None if self.trailing_buffer is None
                                    else str(self.trailing_buffer),
+                'boundary_proximity_ratio': None if self.boundary_proximity_ratio is None
+                                            else str(self.boundary_proximity_ratio),
+                'stop_buffer_ratio': None if self.stop_buffer_ratio is None
+                                     else str(self.stop_buffer_ratio),
                 'entry_models': list(self.entry_models),
                 'model2_requires_htf_fvg': self.effective_model2_requires_htf_fvg,
                 'eq_scale_out_fraction': None if self.eq_scale_out_fraction is None
@@ -281,6 +296,19 @@ class StrategyProfile:
         """HTF level tolerance, defaulting to the range boundary proximity."""
         return (self.boundary_proximity if self.htf_zone_tolerance is None
                 else self.htf_zone_tolerance)
+
+    @property
+    def effective_htf_zone_tolerance_ratio(self):
+        """HTF level band as a share of the level, unless an absolute tolerance is set."""
+        return None if self.htf_zone_tolerance is not None else self.boundary_proximity_ratio
+
+    def trailing_buffer_at(self, price):
+        """Trailing buffer for a swing at `price`: explicit, relative, or the stop buffer."""
+        if self.trailing_buffer is not None:
+            return self.trailing_buffer
+        if self.stop_buffer_ratio is not None:
+            return exact_product(price, self.stop_buffer_ratio)
+        return self.stop_buffer
 
     @property
     def effective_model2_requires_htf_fvg(self):
@@ -303,4 +331,5 @@ class StrategyProfile:
                           min_reward_risk=self.min_reward_risk,
                           max_stop_distance=self.max_stop_distance,
                           risk_per_trade=self.risk_fraction, stop_buffer=self.stop_buffer,
-                          quantity_step=self.quantity_step)
+                          quantity_step=self.quantity_step,
+                          stop_buffer_ratio=self.stop_buffer_ratio)
