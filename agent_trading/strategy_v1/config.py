@@ -295,7 +295,11 @@ class StrategyProfile:
                 'direction': self.direction,
                 'direction_gate': self.direction_gate,
                 'htf_confluence_required': self.htf_confluence_required,
-                'htf_zone_tolerance': str(self.effective_htf_zone_tolerance),
+                # Exactly one of the two is set: the band the HTF context applies.
+                'htf_zone_tolerance': (None if self.effective_htf_zone_tolerance_ratio is not None
+                                       else str(self.effective_htf_zone_tolerance)),
+                'htf_zone_tolerance_ratio': (None if self.effective_htf_zone_tolerance_ratio is None
+                                             else str(self.effective_htf_zone_tolerance_ratio)),
                 'timeframes': {'bias': self.timeframes.bias, 'range': self.timeframes.range,
                                'entry': self.timeframes.entry},
                 'range_reseek_enabled': self.range_reseek_enabled,

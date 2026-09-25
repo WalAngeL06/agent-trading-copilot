@@ -117,6 +117,18 @@ class ProfileRatioTests(unittest.TestCase):
         self.assertEqual((data['boundary_proximity_ratio'], data['stop_buffer_ratio']),
                          ('0.005', '0.001'))
 
+    def test_the_view_names_the_htf_band_that_is_used(self):
+        relative = StrategyProfile(boundary_proximity_ratio=D('0.005')).as_dict()
+        self.assertEqual((relative['htf_zone_tolerance'], relative['htf_zone_tolerance_ratio']),
+                         (None, '0.005'))
+        absolute = StrategyProfile().as_dict()
+        self.assertEqual((absolute['htf_zone_tolerance'], absolute['htf_zone_tolerance_ratio']),
+                         ('500', None))
+        explicit = StrategyProfile(boundary_proximity_ratio=D('0.005'),
+                                   htf_zone_tolerance=D('3')).as_dict()
+        self.assertEqual((explicit['htf_zone_tolerance'], explicit['htf_zone_tolerance_ratio']),
+                         ('3', None))
+
     def test_the_trail_buffer_is_a_share_of_the_swing(self):
         broker, moment = open_long(scenario_profile(stop_buffer_ratio=D('0.01')))
         protect(broker, moment)
