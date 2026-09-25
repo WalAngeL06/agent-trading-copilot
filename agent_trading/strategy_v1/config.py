@@ -24,7 +24,10 @@ DIRECTION_GATES = ('GUIDE_HTF_CONTEXT', 'BIAS_LONG_PERMISSION')
 ENTRY_ZONES = ('DIRECTIONAL_FVG', 'BULLISH_FVG')
 # CLOSE_BELOW_PRIMARY_LOW is the long-only spelling of the same rule.
 PRIMARY_FAILURE_MODES = ('CLOSE_BEYOND_PRIMARY_EDGE', 'CLOSE_BELOW_PRIMARY_LOW')
-TRAILING_MODES = ('CONFIRMED_HIGHER_LOW',)
+# [U-RR-TRAIL-001] CONFIRMED_HIGHER_LOW follows the ATR swing engine's
+# confirmed swings; INTERNAL_PIVOT follows guide section 2 pivots; ATR_TIERS
+# closes the open position in tiers as price pulls back from its peak.
+TRAILING_MODES = ('CONFIRMED_HIGHER_LOW', 'INTERNAL_PIVOT', 'ATR_TIERS')
 # [U-DD-DEVIATION-001] DD model 1 (entry-timeframe CHoCH) and model 2 (HTF FVG
 # reversal). This order is also the order they are tried in.
 ENTRY_MODELS = ('CHOCH_FVG', 'HTF_FVG_REVERSAL')
@@ -144,6 +147,8 @@ class StrategyProfile:
     trailing_mode: str = 'CONFIRMED_HIGHER_LOW'
     # None reuses stop_buffer so the two cannot silently drift apart.
     trailing_buffer: Decimal | None = None
+    # [H]-PIVOT-N-001 N bars on each side of an INTERNAL_PIVOT pivot.
+    trailing_pivot_bars: int = 3
     # R-multiple partial exits, independent of EQ and the boundary.
     # [U-RR-TRAIL-001] The ladder closes 30% of the original position at 2R.
     partial_take_profits: tuple = (PartialTakeProfit(Decimal('2'), Decimal('0.30')),)
@@ -189,6 +194,8 @@ class StrategyProfile:
             raise ValueError('htf_zone_tolerance must be a nonnegative finite Decimal or None')
         if self.trailing_mode not in TRAILING_MODES:
             raise ValueError('unknown trailing mode')
+        if type(self.trailing_pivot_bars) is not int or not 1 <= self.trailing_pivot_bars <= 10:
+            raise ValueError('trailing_pivot_bars must be an integer between 1 and 10')
         if self.trailing_buffer is not None and (
                 not isinstance(self.trailing_buffer, Decimal)
                 or not self.trailing_buffer.is_finite() or self.trailing_buffer <= 0):
@@ -278,6 +285,7 @@ class StrategyProfile:
                 'trailing_mode': self.trailing_mode,
                 'trailing_buffer': None if self.trailing_buffer is None
                                    else str(self.trailing_buffer),
+                'trailing_pivot_bars': self.trailing_pivot_bars,
                 'boundary_proximity_ratio': None if self.boundary_proximity_ratio is None
                                             else str(self.boundary_proximity_ratio),
                 'stop_buffer_ratio': None if self.stop_buffer_ratio is None

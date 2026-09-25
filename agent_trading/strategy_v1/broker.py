@@ -20,8 +20,11 @@ from .models import PositionExit, PositionLedger, StopProtection
 
 # The structural exit is the opposite range boundary of the setup.
 BOUNDARY_EXIT = {'LONG': 'RANGE_HIGH', 'SHORT': 'RANGE_LOW'}
-# One trailing mode today; the record names the side it actually followed.
-TRAIL_REFERENCE = {'LONG': 'CONFIRMED_HIGHER_LOW', 'SHORT': 'CONFIRMED_LOWER_HIGH'}
+# The record names the structure the trail actually followed, per mode and side.
+TRAIL_REFERENCE = {('CONFIRMED_HIGHER_LOW', 'LONG'): 'CONFIRMED_HIGHER_LOW',
+                   ('CONFIRMED_HIGHER_LOW', 'SHORT'): 'CONFIRMED_LOWER_HIGH',
+                   ('INTERNAL_PIVOT', 'LONG'): 'INTERNAL_PIVOT_LOW',
+                   ('INTERNAL_PIVOT', 'SHORT'): 'INTERNAL_PIVOT_HIGH'}
 
 
 def floor_to_step(value, step):
@@ -368,7 +371,7 @@ class PendingLimitPaperBroker:
         A runner keeps receiving these updates after the boundary exit.
         """
         if (not self.profile.trailing_enabled or self.break_even_at is None
-                or trade.status != 'OPEN'):
+                or trade.status != 'OPEN' or self.profile.trailing_mode == 'ATR_TIERS'):
             return ()
         long_ = trade.direction == 'LONG'
         best = best_swing = None
@@ -400,7 +403,8 @@ class PendingLimitPaperBroker:
             return ()
         self._store(trailed)
         record = StopProtection('TRAILING_STOP_UPDATED', before, trailed.stop,
-                                TRAIL_REFERENCE[trade.direction], best_swing.price,
+                                TRAIL_REFERENCE[(self.profile.trailing_mode, trade.direction)],
+                                best_swing.price,
                                 best_swing.confirmed_at, candle.close_time)
         self.trailing_updates += (record,)
         return (BrokerEvent('TRAILING_STOP_UPDATED', candle.close_time, record),)

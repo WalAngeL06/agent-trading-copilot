@@ -26,6 +26,7 @@ from .broker import PendingLimitPaperBroker
 from .choch import ChochTracker
 from .config import ENTRY_MODELS, StrategyProfile
 from .context import HtfContext
+from .pivots import PivotTracker
 from .entry import FvgBook, entry_price, protecting_swing
 from .models import CapitalPolicy, EntryPlan, StrategyEvent
 
@@ -66,6 +67,11 @@ class StrategyV1:
         self.choch = ChochTracker(bar_duration(roles.range) // bar_duration(roles.entry))
         self._choch_id = None
         self._tried_gaps = set()          # one entry attempt per gap, whatever the model
+        # [U-RR-TRAIL-001] INTERNAL_PIVOT trails on guide section 2 pivots instead
+        # of the ATR swing engine's swings.
+        self.entry_pivots = (PivotTracker(self.profile.trailing_pivot_bars)
+                             if self.profile.trailing_mode == 'INTERNAL_PIVOT' else None)
+        self.entry_pivot_lows = self.entry_pivot_highs = ()
         self.risk = RiskEngine(self.profile.risk_config())
         self.broker = PendingLimitPaperBroker(self.risk, self.profile.equity, self.profile)
         self.entry_swing_lows = self.entry_swing_highs = ()
@@ -198,8 +204,10 @@ class StrategyV1:
                     self._emit('CAPITAL_POLICY', candle.timeframe, self.capital_policy())
 
     def _entry(self, candle):
-        for change in self.broker.process(candle, self.entry_swing_lows,
-                                          self.entry_swing_highs):
+        lows, highs = ((self.entry_pivot_lows, self.entry_pivot_highs)
+                       if self.entry_pivots is not None
+                       else (self.entry_swing_lows, self.entry_swing_highs))
+        for change in self.broker.process(candle, lows, highs):
             self._emit(change.kind, candle.timeframe, change.payload)
         # [U-MULTI-SETUP-001] Once nothing is pending or open the setup slot is
         # free again. Bias, range and manipulation state are left untouched.
@@ -221,6 +229,16 @@ class StrategyV1:
                     high = SwingHigh(raw)
                     self.entry_swing_highs += (high,)
                     self._emit('ENTRY_SWING_HIGH', candle.timeframe, high)
+        if self.entry_pivots is not None:
+            for pivot in self.entry_pivots.process(candle):
+                if pivot.side == 'LOW':
+                    self.entry_pivot_lows += (pivot,)
+                    self._emit('ENTRY_PIVOT_LOW', candle.timeframe, pivot,
+                               sources=pivot.source_ids)
+                else:
+                    self.entry_pivot_highs += (pivot,)
+                    self._emit('ENTRY_PIVOT_HIGH', candle.timeframe, pivot,
+                               sources=pivot.source_ids)
         if 'CHOCH_FVG' in self.profile.entry_models:
             confirmation = self.choch.process(candle, self.manipulation.active,
                                               self.entry_swing_highs, self.entry_swing_lows,

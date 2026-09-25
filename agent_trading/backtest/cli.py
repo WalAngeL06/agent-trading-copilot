@@ -8,7 +8,7 @@ from decimal import Decimal
 import json
 
 from ..strategy_v1 import StrategyProfile, TimeframeRoles
-from ..strategy_v1.config import BREAK_EVEN_TRIGGERS, ENTRY_MODELS
+from ..strategy_v1.config import BREAK_EVEN_TRIGGERS, ENTRY_MODELS, TRAILING_MODES
 from .config import CostModel
 
 # Price units, not ratios: BTC-sized by default and meaningless on another pair
@@ -64,6 +64,10 @@ def add_profile_arguments(parser):
     parser.add_argument('--break-even-r', default='1')
     parser.add_argument('--trailing-buffer', help='price units; defaults to the stop buffer')
     parser.add_argument('--no-trailing', action='store_true')
+    parser.add_argument('--trailing-mode', default='CONFIRMED_HIGHER_LOW', choices=TRAILING_MODES,
+                        help='what the trail follows after break-even [U-RR-TRAIL-001]')
+    parser.add_argument('--pivot-bars', type=int, default=3,
+                        help='N bars on each side of an INTERNAL_PIVOT pivot')
     parser.add_argument('--secondary-fvg', action=argparse.BooleanOptionalAction,
                         default=False, help='tighter stop behind a secondary FVG')
     parser.add_argument('--entry-models', default=','.join(ENTRY_MODELS),
@@ -105,6 +109,8 @@ def profile_from_args(args):
         min_reward_risk=Decimal(args.min_reward_risk),
         break_even_r=Decimal(args.break_even_r),
         trailing_enabled=not args.no_trailing,
+        trailing_mode=args.trailing_mode,
+        trailing_pivot_bars=args.pivot_bars,
         trailing_buffer=_optional(args.trailing_buffer),
         secondary_fvg_support_enabled=args.secondary_fvg,
         entry_models=tuple(model.strip() for model in args.entry_models.split(',')
