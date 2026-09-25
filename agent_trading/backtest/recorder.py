@@ -11,7 +11,8 @@ from .format import plain
 
 BREAK_EVEN_REASONS = ('BREAK_EVEN', 'RECOVERY_BREAK_EVEN', 'RANGE_EQ_BREAK_EVEN')
 EXIT_REASONS = {'RUNNER': 'RUNNER_STOP', 'STOP': 'STOP_LOSS', 'RANGE_HIGH': 'RANGE_HIGH',
-                'PARTIAL_TP': 'PARTIAL_TP', 'RANGE_EQ': 'RANGE_EQ', 'RANGE_LOW': 'RANGE_LOW'}
+                'PARTIAL_TP': 'PARTIAL_TP', 'RANGE_EQ': 'RANGE_EQ', 'RANGE_LOW': 'RANGE_LOW',
+                'ATR_TIER': 'ATR_TIER'}
 
 
 def add(left, right):

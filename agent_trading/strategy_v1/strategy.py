@@ -207,7 +207,8 @@ class StrategyV1:
         lows, highs = ((self.entry_pivot_lows, self.entry_pivot_highs)
                        if self.entry_pivots is not None
                        else (self.entry_swing_lows, self.entry_swing_highs))
-        for change in self.broker.process(candle, lows, highs):
+        # The swing engine has not seen this candle yet: its ATR is the previous bar's.
+        for change in self.broker.process(candle, lows, highs, atr=self.entry_swing.state.atr):
             self._emit(change.kind, candle.timeframe, change.payload)
         # [U-MULTI-SETUP-001] Once nothing is pending or open the setup slot is
         # free again. Bias, range and manipulation state are left untouched.

@@ -80,7 +80,7 @@ class EntryPlan:
 @dataclass(frozen=True)
 class PositionExit:
     """One realised slice of a single logical trade."""
-    kind: str                  # PARTIAL_TP | RANGE_EQ | RANGE_HIGH | RANGE_LOW | RUNNER | STOP
+    kind: str                  # PARTIAL_TP | RANGE_EQ | RANGE_HIGH | RANGE_LOW | ATR_TIER | RUNNER | STOP
     quantity: Decimal
     exit_price: Decimal
     realized_pnl: Decimal

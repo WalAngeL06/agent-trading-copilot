@@ -28,6 +28,10 @@ PRIMARY_FAILURE_MODES = ('CLOSE_BEYOND_PRIMARY_EDGE', 'CLOSE_BELOW_PRIMARY_LOW')
 # confirmed swings; INTERNAL_PIVOT follows guide section 2 pivots; ATR_TIERS
 # closes the open position in tiers as price pulls back from its peak.
 TRAILING_MODES = ('CONFIRMED_HIGHER_LOW', 'INTERNAL_PIVOT', 'ATR_TIERS')
+# [H]-ATR-TIERS-001 (ATR multiple of the pull-back from the peak, share of the
+# OPEN position closed there). The owner's example values; tunable.
+ATR_TIERS = ((Decimal('0.75'), Decimal('0.25')), (Decimal('1.25'), Decimal('0.50')),
+             (Decimal('1.5'), Decimal('1')))
 # [U-DD-DEVIATION-001] DD model 1 (entry-timeframe CHoCH) and model 2 (HTF FVG
 # reversal). This order is also the order they are tried in.
 ENTRY_MODELS = ('CHOCH_FVG', 'HTF_FVG_REVERSAL')
@@ -149,6 +153,7 @@ class StrategyProfile:
     trailing_buffer: Decimal | None = None
     # [H]-PIVOT-N-001 N bars on each side of an INTERNAL_PIVOT pivot.
     trailing_pivot_bars: int = 3
+    trailing_atr_tiers: tuple = ATR_TIERS
     # R-multiple partial exits, independent of EQ and the boundary.
     # [U-RR-TRAIL-001] The ladder closes 30% of the original position at 2R.
     partial_take_profits: tuple = (PartialTakeProfit(Decimal('2'), Decimal('0.30')),)
@@ -196,6 +201,21 @@ class StrategyProfile:
             raise ValueError('unknown trailing mode')
         if type(self.trailing_pivot_bars) is not int or not 1 <= self.trailing_pivot_bars <= 10:
             raise ValueError('trailing_pivot_bars must be an integer between 1 and 10')
+        try:
+            tiers = tuple((Decimal(str(multiple)), Decimal(str(share)))
+                          for multiple, share in self.trailing_atr_tiers)
+        except (TypeError, ValueError, ArithmeticError):
+            raise ValueError('trailing_atr_tiers must be (ATR multiple, share) pairs') from None
+        if not tiers:
+            raise ValueError('trailing_atr_tiers needs at least one tier')
+        previous = Decimal(0)
+        for multiple, share in tiers:
+            if not multiple.is_finite() or multiple <= previous:
+                raise ValueError('ATR tier multiples must be positive and strictly ascending')
+            if not share.is_finite() or not 0 < share <= 1:
+                raise ValueError('ATR tier shares must be within (0, 1]')
+            previous = multiple
+        object.__setattr__(self, 'trailing_atr_tiers', tiers)
         if self.trailing_buffer is not None and (
                 not isinstance(self.trailing_buffer, Decimal)
                 or not self.trailing_buffer.is_finite() or self.trailing_buffer <= 0):
@@ -286,6 +306,8 @@ class StrategyProfile:
                 'trailing_buffer': None if self.trailing_buffer is None
                                    else str(self.trailing_buffer),
                 'trailing_pivot_bars': self.trailing_pivot_bars,
+                'trailing_atr_tiers': [[str(multiple), str(share)]
+                                       for multiple, share in self.trailing_atr_tiers],
                 'boundary_proximity_ratio': None if self.boundary_proximity_ratio is None
                                             else str(self.boundary_proximity_ratio),
                 'stop_buffer_ratio': None if self.stop_buffer_ratio is None

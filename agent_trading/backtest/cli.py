@@ -20,6 +20,19 @@ ABSOLUTE_PRICE_FLAGS = (('boundary_proximity', '--boundary-proximity'),
                         ('htf_zone_tolerance', '--htf-zone-tolerance'))
 
 
+def tiers(text):
+    """--atr-tiers '0.75:0.25,1.25:0.5,1.5:1': ATR multiple and share of the open position."""
+    pairs = []
+    for chunk in text.split(','):
+        if not chunk.strip():
+            continue
+        multiple, _, share = chunk.partition(':')
+        if not share:
+            raise ValueError('each ATR tier must be MULTIPLE:SHARE')
+        pairs.append((multiple.strip(), share.strip()))
+    return tuple(pairs)
+
+
 def partials(text):
     """--partial-tp '1.0:0.20,2.0:0.20' or a JSON list."""
     if not text:
@@ -68,6 +81,8 @@ def add_profile_arguments(parser):
                         help='what the trail follows after break-even [U-RR-TRAIL-001]')
     parser.add_argument('--pivot-bars', type=int, default=3,
                         help='N bars on each side of an INTERNAL_PIVOT pivot')
+    parser.add_argument('--atr-tiers', default='0.75:0.25,1.25:0.5,1.5:1',
+                        help='ATR_TIERS as MULTIPLE:SHARE of the open position')
     parser.add_argument('--secondary-fvg', action=argparse.BooleanOptionalAction,
                         default=False, help='tighter stop behind a secondary FVG')
     parser.add_argument('--entry-models', default=','.join(ENTRY_MODELS),
@@ -111,6 +126,7 @@ def profile_from_args(args):
         trailing_enabled=not args.no_trailing,
         trailing_mode=args.trailing_mode,
         trailing_pivot_bars=args.pivot_bars,
+        trailing_atr_tiers=tiers(args.atr_tiers),
         trailing_buffer=_optional(args.trailing_buffer),
         secondary_fvg_support_enabled=args.secondary_fvg,
         entry_models=tuple(model.strip() for model in args.entry_models.split(',')

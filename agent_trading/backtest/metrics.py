@@ -17,7 +17,8 @@ SETUP_EVENTS = {'setups': 'TRADE_CANDIDATE', 'pending_entries': 'PENDING_ENTRY',
                 'break_even_moves': 'BREAK_EVEN_PROTECTED',
                 'trailing_updates': 'TRAILING_STOP_UPDATED',
                 'choch_confirmations': 'CHOCH_CONFIRMED',
-                'range_eq_exits': 'RANGE_EQ_PARTIAL_EXIT'}
+                'range_eq_exits': 'RANGE_EQ_PARTIAL_EXIT',
+                'atr_tier_exits': 'ATR_TIER_EXIT'}
 
 
 def _mean(values):

@@ -64,6 +64,9 @@ class PendingLimitPaperBroker:
         self.secondary_reacted_at = None
         self.recovery_at = None
         self.break_even_at = None
+        # [U-RR-TRAIL-001] ATR tiers: the best price since the fill, tiers fired.
+        self.peak = None
+        self.tiers_done = 0
 
     # ------------------------------------------------------------------ entry
     def submit(self, plan, entry_plan):
@@ -91,7 +94,7 @@ class PendingLimitPaperBroker:
         self._pending_bars = 0
         return BrokerEvent('PAPER_ORDER_CANCELLED', observed_at, reason)
 
-    def process(self, candle, swing_lows=(), swing_highs=()):
+    def process(self, candle, swing_lows=(), swing_highs=(), atr=None):
         """`swing_lows`/`swing_highs` are entry-timeframe swings confirmed on
         EARLIER candles.
 
@@ -109,7 +112,7 @@ class PendingLimitPaperBroker:
         self._last_candle = candle
         result = []
         result.extend(self._fill(candle))
-        result.extend(self._manage(candle, swing_lows, swing_highs))
+        result.extend(self._manage(candle, swing_lows, swing_highs, atr))
         return tuple(result)
 
     def _fill(self, candle):
@@ -156,6 +159,7 @@ class PendingLimitPaperBroker:
                            candle.close_time, approved.candidate, filled_at=candle.close_time,
                            approved_plan=approved, ledger=ledger)
         self.trades += (trade,)
+        self.peak = approved.entry
         return (BrokerEvent('RISK_APPROVED', candle.close_time, decision),
                 BrokerEvent('PAPER_ORDER_OPENED', candle.close_time, trade))
 
@@ -192,7 +196,7 @@ class PendingLimitPaperBroker:
                          closed_at=observed_at, pnl=ledger.total_realized_pnl)
         return self._store(closed)
 
-    def _manage(self, candle, swing_lows=(), swing_highs=()):
+    def _manage(self, candle, swing_lows=(), swing_highs=(), atr=None):
         if not self.trades or self.trades[-1].status != 'OPEN':
             return ()
         trade = self.trades[-1]
@@ -221,7 +225,11 @@ class PendingLimitPaperBroker:
             trade = self._store(recovered)
             result.append(BrokerEvent('PAPER_STOP_UPDATED', candle.close_time, recovered))
         result.extend(self._protection(trade, candle, before))
-        result.extend(self._trail(self.trades[-1], candle, swing_lows, swing_highs))
+        if self.profile.trailing_mode == 'ATR_TIERS':
+            result.extend(self._atr_tiers(self.trades[-1], candle, atr))
+        else:
+            result.extend(self._trail(self.trades[-1], candle, swing_lows, swing_highs))
+        self._track_peak(self.trades[-1], candle)
         return tuple(result)
 
     def _stop_out(self, trade, candle):
@@ -408,6 +416,51 @@ class PendingLimitPaperBroker:
                                 best_swing.confirmed_at, candle.close_time)
         self.trailing_updates += (record,)
         return (BrokerEvent('TRAILING_STOP_UPDATED', candle.close_time, record),)
+
+    def _track_peak(self, trade, candle):
+        """Best price since the fill, for ATR tiers [H]-ATR-TIERS-001. The fill bar
+        is skipped: its extreme may have printed before the order filled."""
+        if trade.status != 'OPEN' or self.peak is None or candle.close_time <= trade.filled_at:
+            return
+        self.peak = (max(self.peak, candle.high) if trade.direction == 'LONG'
+                     else min(self.peak, candle.low))
+
+    def _atr_tiers(self, trade, candle, atr):
+        """[U-RR-TRAIL-001] After break-even, each tier closes its share of the open
+        position once price trades `multiple x ATR` back from the peak.
+
+        Tiers fire in order, at most once each, several on one bar if price gets
+        there. A tier fills at its level, or at the open when the bar opened
+        beyond it. The protective stop is not moved in this mode.
+        """
+        if (not self.profile.trailing_enabled or self.break_even_at is None
+                or trade.status != 'OPEN' or atr is None or atr <= 0 or self.peak is None):
+            return ()
+        long_ = trade.direction == 'LONG'
+        events, tiers = [], self.profile.trailing_atr_tiers
+        while self.tiers_done < len(tiers):
+            multiple, share = tiers[self.tiers_done]
+            distance = exact_product(atr, multiple)
+            level = exact_difference(self.peak, distance if long_ else distance.copy_negate())
+            if candle.low > level if long_ else candle.high < level:
+                break
+            self.tiers_done += 1
+            trade = self.trades[-1]
+            remaining = trade.ledger.remaining_quantity
+            quantity = (remaining if share >= 1 else
+                        floor_to_step(exact_product(remaining, share), self.profile.quantity_step))
+            if quantity <= 0:
+                continue
+            price = candle.open if (candle.open < level if long_ else candle.open > level) else level
+            trade, record = self._realise(trade, 'ATR_TIER', quantity, price, candle.close_time,
+                                          target_price=level)
+            trade = self._store(trade)
+            events.append(BrokerEvent('ATR_TIER_EXIT', candle.close_time, record))
+            if trade.ledger.remaining_quantity <= 0:
+                events.append(BrokerEvent('PAPER_ORDER_CLOSED', candle.close_time,
+                                          self._close(trade, candle.close_time)))
+                break
+        return tuple(events)
 
     def _recovery(self, trade, candle):
         """PRIMARY fails -> SECONDARY holds -> price returns to entry -> BE.
