@@ -70,9 +70,11 @@ NO_EQ = dict(eq_scale_out_fraction=None)
 
 
 class PartialConfigTests(unittest.TestCase):
-    def test_an_empty_partial_list_is_the_default_and_is_valid(self):
+    def test_the_default_ladder_takes_thirty_percent_at_two_r(self):
+        # [U-RR-TRAIL-001] an empty list stays valid
         profile = StrategyProfile()
-        self.assertEqual(profile.partial_take_profits, ())
+        self.assertEqual(profile.partial_take_profits, (PartialTakeProfit(D('2'), D('0.30')),))
+        self.assertEqual(StrategyProfile(partial_take_profits=()).partial_take_profits, ())
         # [U-DD-DEVIATION-001] 30% at EQ, 50% at the boundary, a 20% runner.
         self.assertEqual(profile.runner_fraction, D('0.20'))
 
@@ -116,7 +118,8 @@ class PartialConfigTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 StrategyProfile(runner_fraction=value, **NO_EQ)
         StrategyProfile(runner_fraction=D('0'), **NO_EQ)
-        StrategyProfile(runner_fraction=D('1'), **NO_EQ)
+        # [U-RR-TRAIL-001] a full runner leaves no room for the default 2R slice
+        StrategyProfile(runner_fraction=D('1'), partial_take_profits=(), **NO_EQ)
 
     def test_a_full_runner_forbids_any_partial(self):
         with self.assertRaises(ValueError):

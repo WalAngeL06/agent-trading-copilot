@@ -204,9 +204,12 @@ class PendingLimitPaperBroker:
         trade = self.trades[-1]
         if trade.status != 'OPEN':
             return tuple(result)
-        managed = (self.risk.manage(trade, candle)        # inherited 1R break-even
-                   if self.profile.break_even_trigger == 'R_MULTIPLE'
-                   else self._range_break_even(trade, candle))
+        trigger = self.profile.break_even_trigger
+        managed = trade
+        if trigger in ('R_MULTIPLE', 'EQ_OR_R_MULTIPLE'):
+            managed = self.risk.manage(managed, candle)        # inherited 1R break-even
+        if trigger in ('RANGE_EQ', 'EQ_OR_R_MULTIPLE'):
+            managed = self._range_break_even(managed, candle)
         if managed != trade:
             trade = self._store(managed)
             result.append(BrokerEvent('PAPER_STOP_UPDATED', candle.close_time, managed))

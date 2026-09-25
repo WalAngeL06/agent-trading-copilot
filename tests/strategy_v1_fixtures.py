@@ -183,7 +183,8 @@ def acceptance_candles():
 # exits and keep covering them; DD scenarios live in dd_fixtures.py.
 LEGACY = dict(entry_models=('HTF_FVG_REVERSAL',), model2_requires_htf_fvg=False,
               secondary_fvg_support_enabled=True, eq_scale_out_fraction=None,
-              break_even_trigger='R_MULTIPLE', runner_fraction=D('0.10'))
+              break_even_trigger='R_MULTIPLE', runner_fraction=D('0.10'),
+              partial_take_profits=())
 
 
 def scenario_profile(**overrides):

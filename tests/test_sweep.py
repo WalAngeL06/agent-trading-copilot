@@ -31,7 +31,7 @@ from test_backtest import dump
 # and exits so they keep measuring the sweep, not the strategy.
 LEGACY_FLAGS = ('--entry-models', 'HTF_FVG_REVERSAL', '--model2-htf-fvg', 'false',
                 '--eq-scale-out', 'none', '--break-even-trigger', 'R_MULTIPLE',
-                '--secondary-fvg', '--runner-fraction', '0.10')
+                '--secondary-fvg', '--runner-fraction', '0.10', '--partial-tp', '')
 GRID = ('--scale', 'none', '--boundary-proximity', '5', '--stop-buffer', '1') + LEGACY_FLAGS
 
 

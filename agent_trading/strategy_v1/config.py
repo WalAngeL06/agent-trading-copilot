@@ -29,8 +29,9 @@ TRAILING_MODES = ('CONFIRMED_HIGHER_LOW',)
 # reversal). This order is also the order they are tried in.
 ENTRY_MODELS = ('CHOCH_FVG', 'HTF_FVG_REVERSAL')
 # RANGE_EQ moves the stop to entry at the range EQ; R_MULTIPLE is the
-# inherited 1R favourable-excursion break-even.
-BREAK_EVEN_TRIGGERS = ('RANGE_EQ', 'R_MULTIPLE')
+# inherited 1R favourable-excursion break-even; EQ_OR_R_MULTIPLE
+# [U-RR-TRAIL-001] does whichever of the two comes first.
+BREAK_EVEN_TRIGGERS = ('RANGE_EQ', 'R_MULTIPLE', 'EQ_OR_R_MULTIPLE')
 
 
 @dataclass(frozen=True)
@@ -143,8 +144,9 @@ class StrategyProfile:
     trailing_mode: str = 'CONFIRMED_HIGHER_LOW'
     # None reuses stop_buffer so the two cannot silently drift apart.
     trailing_buffer: Decimal | None = None
-    # Optional R-multiple partial exits. Empty is the Strategy V1 default.
-    partial_take_profits: tuple = ()
+    # R-multiple partial exits, independent of EQ and the boundary.
+    # [U-RR-TRAIL-001] The ladder closes 30% of the original position at 2R.
+    partial_take_profits: tuple = (PartialTakeProfit(Decimal('2'), Decimal('0.30')),)
     # Fraction of the ORIGINAL position left running past the boundary exit.
     # [U-DD-DEVIATION-001] 20%: 30% at EQ, 50% at the boundary, 20% trailed.
     runner_fraction: Decimal = Decimal('0.20')
@@ -164,7 +166,7 @@ class StrategyProfile:
     model2_requires_htf_fvg: bool | None = None
     # Share of the ORIGINAL quantity closed at the range EQ; None disables.
     eq_scale_out_fraction: Decimal | None = Decimal('0.30')
-    break_even_trigger: str = 'RANGE_EQ'
+    break_even_trigger: str = 'EQ_OR_R_MULTIPLE'
 
     def __post_init__(self):
         if self.direction not in DIRECTIONS:

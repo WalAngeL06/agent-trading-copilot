@@ -47,7 +47,7 @@ class DdProfileTests(unittest.TestCase):
                             partial_take_profits=({'r_multiple': '1', 'close_fraction': '0.60'},))
 
     def test_the_break_even_trigger_is_validated(self):
-        self.assertEqual(BREAK_EVEN_TRIGGERS, ('RANGE_EQ', 'R_MULTIPLE'))
+        self.assertEqual(BREAK_EVEN_TRIGGERS, ('RANGE_EQ', 'R_MULTIPLE', 'EQ_OR_R_MULTIPLE'))
         with self.assertRaises(ValueError):
             StrategyProfile(break_even_trigger='TWO_R')
 
@@ -68,7 +68,8 @@ class DdDefaultTests(unittest.TestCase):
         self.assertIsNone(profile.model2_requires_htf_fvg)
         self.assertTrue(profile.effective_model2_requires_htf_fvg)
         self.assertEqual(profile.eq_scale_out_fraction, D('0.30'))
-        self.assertEqual(profile.break_even_trigger, 'RANGE_EQ')
+        # [U-RR-TRAIL-001] break-even at EQ or 1R, whichever comes first
+        self.assertEqual(profile.break_even_trigger, 'EQ_OR_R_MULTIPLE')
         self.assertFalse(profile.secondary_fvg_support_enabled)
         self.assertEqual(profile.runner_fraction, D('0.20'))
 

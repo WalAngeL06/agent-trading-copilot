@@ -72,10 +72,10 @@ def add_profile_arguments(parser):
                         help='model 2 needs a touched HTF FVG; auto follows the gate')
     parser.add_argument('--eq-scale-out', default='0.30',
                         help="share of the original quantity closed at range EQ, or 'none'")
-    parser.add_argument('--break-even-trigger', default='RANGE_EQ',
+    parser.add_argument('--break-even-trigger', default='EQ_OR_R_MULTIPLE',
                         choices=BREAK_EVEN_TRIGGERS)
-    parser.add_argument('--partial-tp', default='',
-                        help="R:FRACTION pairs, e.g. '1.0:0.20,2.0:0.20'")
+    parser.add_argument('--partial-tp', default='2:0.30',
+                        help="R:FRACTION pairs, e.g. '1.0:0.20,2.0:0.20'; '' for none")
     parser.add_argument('--runner-fraction', default='0.20')
 
 
