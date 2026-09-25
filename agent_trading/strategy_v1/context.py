@@ -51,11 +51,17 @@ class HtfVerdict:
 
 
 class HtfContext:
-    def __init__(self, timeframe, tolerance=Decimal('0'), require_zone=True):
+    def __init__(self, timeframe, tolerance=Decimal('0'), require_zone=True, tolerance_ratio=None):
         if not isinstance(tolerance, Decimal) or not tolerance.is_finite() or tolerance < 0:
             raise ValueError('tolerance must be a nonnegative finite Decimal')
+        if tolerance_ratio is not None and (not isinstance(tolerance_ratio, Decimal)
+                                            or not tolerance_ratio.is_finite()
+                                            or not 0 < tolerance_ratio < 1):
+            raise ValueError('tolerance_ratio must be a Decimal within (0, 1) or None')
         self.timeframe = timeframe
         self.tolerance = tolerance
+        # [U-RR-TRAIL-001] When set, a Valid level's band is this share of its price.
+        self.tolerance_ratio = tolerance_ratio
         self.require_zone = require_zone
         self.gaps = GapEngine()
         self.open_gaps = ()
@@ -114,7 +120,9 @@ class HtfContext:
         for level, kind in ((self.valid_high, 'HTF_VALID_HIGH'), (self.valid_low, 'HTF_VALID_LOW')):
             if level is None:
                 continue
-            band = (level.price - self.tolerance, level.price + self.tolerance)
+            pad = (self.tolerance if self.tolerance_ratio is None
+                   else level.price * self.tolerance_ratio)
+            band = (level.price - pad, level.price + pad)
             if band[0] <= upper and band[1] >= lower:
                 found.append(HtfZone(kind, band[0], band[1], level.confirmed_at, self.timeframe))
         return tuple(found)

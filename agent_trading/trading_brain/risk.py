@@ -138,8 +138,10 @@ class RiskEngine:
                 return self._blocked(candidate, candidate.observed_at, evidence, 'MISSING_SWEEP_EXTREME')
             if not positive_decimal(invalidation):
                 return self._blocked(candidate, candidate.observed_at, evidence, 'INVALID_SWEEP_EXTREME')
-            stop = exact_difference(invalidation, config.stop_buffer if candidate.direction == 'LONG'
-                                    else config.stop_buffer.copy_negate())
+            buffer = (config.stop_buffer if config.stop_buffer_ratio is None
+                      else exact_product(invalidation, config.stop_buffer_ratio))
+            stop = exact_difference(invalidation, buffer if candidate.direction == 'LONG'
+                                    else buffer.copy_negate())
             evidence = replace(evidence, initial_stop=stop)
         return self._approve_geometry(candidate, candidate.entry, candidate.tp, equity, candidate.observed_at, evidence)
 

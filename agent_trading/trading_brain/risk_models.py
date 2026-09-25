@@ -14,8 +14,15 @@ class RiskConfig:
     risk_per_trade: Decimal = Decimal('.01')
     stop_buffer: Decimal = Decimal('100')
     quantity_step: Decimal = Decimal('.00000001')
+    # [U-RR-TRAIL-001] When set, the stop buffer is this share of the
+    # invalidation price instead of the absolute `stop_buffer`.
+    stop_buffer_ratio: Decimal | None = None
 
     def __post_init__(self):
+        ratio = self.stop_buffer_ratio
+        if ratio is not None and (not isinstance(ratio, Decimal) or not ratio.is_finite()
+                                  or not 0 < ratio < 1):
+            raise ValueError('stop_buffer_ratio must be a Decimal within (0, 1) or None')
         if self.profile not in ('STRUCTURE_BE', 'FIXED_SL_TP'):
             raise ValueError('unknown stop-management profile')
         for name in ('break_even_r', 'min_reward_risk', 'risk_per_trade',

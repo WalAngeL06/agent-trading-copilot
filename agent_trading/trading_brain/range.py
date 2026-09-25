@@ -15,13 +15,23 @@ from decimal import Decimal
 from ..swing import SwingSide
 from .models import ValidLow, ValidHigh, SwingLow, SwingHigh, RangeState
 
+def _check_ratio(name, value):
+    """[U-RR-TRAIL-001] An optional share of a price: None or 0 < ratio < 1."""
+    if value is not None and (not isinstance(value, Decimal) or not value.is_finite()
+                              or not 0 < value < 1):
+        raise ValueError(f'{name} must be a Decimal within (0, 1) or None')
+    return value
+
 class RangeEngine:
     def __init__(self, proximity, allow_reseek=False, allow_retire=False,
-                 deviation_ratio=Decimal('0.5'), require_eq_visit=True):
+                 deviation_ratio=Decimal('0.5'), require_eq_visit=True, proximity_ratio=None):
         if (not isinstance(deviation_ratio, Decimal) or not deviation_ratio.is_finite()
                 or deviation_ratio < 0):
             raise ValueError('deviation_ratio must be a nonnegative finite Decimal')
         self.proximity = proximity
+        # [U-RR-TRAIL-001] When set, the touch tolerance is this share of the
+        # boundary price instead of the absolute `proximity`.
+        self.proximity_ratio = _check_ratio('proximity_ratio', proximity_ratio)
         self.allow_reseek = allow_reseek
         self.allow_retire = allow_retire
         self.deviation_ratio = deviation_ratio
@@ -41,18 +51,22 @@ class RangeEngine:
             return 'BODY_CLOSE_ABOVE_DEVIATION_LIMIT'
         return None
 
+    def _near(self, boundary):
+        """Touch tolerance: absolute, or a share of the boundary price."""
+        return self.proximity if self.proximity_ratio is None else boundary * self.proximity_ratio
+
     def _register_touch(self, raw):
         """A boundary swing becomes a pending touch; EQ decides whether it counts."""
         state = self.state
         if (state.phase == 'WAIT_LOW_TOUCH' and raw.side is SwingSide.LOW
                 and raw.swing_time > state.high.confirmed_at
-                and state.range_low <= raw.price <= min(state.range_low + self.proximity,
+                and state.range_low <= raw.price <= min(state.range_low + self._near(state.range_low),
                                                         state.range_high)):
             self.pending_touch = raw
             return True
         if (state.phase == 'WAIT_HIGH_TOUCH' and raw.side is SwingSide.HIGH
                 and raw.swing_time > state.low_touch.confirmed_at
-                and max(state.range_high - self.proximity,
+                and max(state.range_high - self._near(state.range_high),
                         state.range_low) <= raw.price <= state.range_high):
             self.pending_touch = raw
             return True
