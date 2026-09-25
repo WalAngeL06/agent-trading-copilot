@@ -155,10 +155,19 @@ dataset, and adds `sweep_summary.json`, `sweep_symbols.csv` and
 that loads but cannot run is FAILED. Reruns are byte-identical.
 
 **Scaling [H]-SWEEP-SCALE-001.** `boundary_proximity` and `stop_buffer` are price
-units. Under the default `--scale price` they become 0.005 and 0.001 of the
-first entry-timeframe close in the window (500 and 100 at a BTC price of
-100,000); the HTF tolerance and the trailing buffer follow them. Explicit
-price-unit flags are refused in that mode; `--scale none` keeps them absolute.
+units.
+- **Before 2026-09-25**, the default `--scale price` turned them into 0.005 and
+  0.001 of the first entry-timeframe close in the window: 500 and 100 at a BTC
+  price of 100,000.
+- **Since 2026-09-25** [U-RR-TRAIL-001], the mode sets the profile's
+  `boundary_proximity_ratio` and `stop_buffer_ratio` instead. The range touch,
+  the HTF level band, the stop buffer and the trailing buffer are each measured
+  as a share of the price they test. A pair whose price moved far no longer
+  drifts: under the old rule, XPL's touch tolerance had grown to 3.7% of its
+  price by the end of the window. Rows report `proximity_ratio` and
+  `stop_buffer_ratio`.
+- **In both versions**, explicit price-unit flags are refused in this mode, and
+  `--scale none` keeps absolute units.
 On the local BTC data `--scale none` reproduces the single-run result exactly
 (2 trades, 10096.402343948), and price scaling gives 2 trades, 10095.3721872805.
 Both figures predate the 2026-09-24 broker trailing fix; after it the same
@@ -179,8 +188,18 @@ PROJECT_STATE, 2026-09-24.
   --eq-scale-out none --break-even-trigger R_MULTIPLE --secondary-fvg
   --runner-fraction 0.10`.
 
+**R ladder and trailing flags [U-RR-TRAIL-001] (2026-09-25).**
+- **New defaults.** `--partial-tp` defaults to `2:0.30` and
+  `--break-even-trigger` to `EQ_OR_R_MULTIPLE`.
+- **Trailing flags.** `--trailing-mode` takes `CONFIRMED_HIGHER_LOW`,
+  `INTERNAL_PIVOT` or `ATR_TIERS`. `--pivot-bars` (default 3) and
+  `--atr-tiers` (default `0.75:0.25,1.25:0.5,1.5:1`) tune the two new modes.
+- **Reporting.** ATR tier exits are `ATR_TIER` slices, and the funnel counts
+  them as `atr_tier_exits`.
+- **Legacy engine.** It now also needs `--partial-tp ''`.
+
 **Caveats.** The list is chosen by today's volume, so the past is seen through
 survivors and delisted pairs are absent. Pooled trades are not independent
 (pairs move together) and windows differ per pair (young listings have less
-history). The scaling reference is fixed at the window start, so a pair that
-moved a lot drifts from it; `price_drift` in each row shows by how much.
+history). `price_drift` in each row shows how far a pair's price moved over
+its window.

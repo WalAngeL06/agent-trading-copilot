@@ -272,6 +272,44 @@ BTC reference):
 The shipped test scenarios pin them as `strategy_v1_fixtures.LEGACY`. A PAPER
 session saved before this change is not resumed (`SESSION_FORMAT` 2).
 
+## R ladder and trailing modes [U-RR-TRAIL-001]
+
+Design: [rr-trailing-scaling-2026-09-25.md](rr-trailing-scaling-2026-09-25.md).
+The owner approved it on 2026-09-25.
+
+**R ladder** (default).
+- **Break-even.** `break_even_trigger='EQ_OR_R_MULTIPLE'` moves the stop to
+  entry at the inherited 1R or at the range EQ, whichever comes first. The
+  reason is `BREAK_EVEN` or `RANGE_EQ_BREAK_EVEN`.
+- **2R.** `partial_take_profits` defaults to 30% of the original quantity at
+  2R. It is independent of the EQ 30% and of the boundary exit down to the 20%
+  runner. A 2R level at or beyond the boundary is left to the boundary exit.
+- **Example.** A trade that reaches 2R and then falls back ends at +0.6R
+  instead of -1R.
+
+**Trailing modes.**
+- **Start.** Every mode starts once the trade's own stop is at entry.
+- **`CONFIRMED_HIGHER_LOW`.** The default until the comparison is reviewed.
+  The trail follows the ATR swing engine's confirmed swings.
+- **`INTERNAL_PIVOT`.** Guide section 2 pivots on the entry timeframe: a bar
+  strictly below (above) the `trailing_pivot_bars` bars on each side,
+  confirmed at bar i+N. They are emitted as `ENTRY_PIVOT_LOW/HIGH`. The trail
+  rules are unchanged: formed after the fill, tighten only, never past entry
+  or the close.
+- **`ATR_TIERS`.** Once price pulls back a multiple of the entry-timeframe ATR
+  (the previous bar's) from the peak since the fill, each tier closes its share
+  of the open position. The defaults are 25% at 0.75, 50% at 1.25 and the rest
+  at 1.5 ATR. The protective stop is not moved in this mode. The peak and the
+  fired tiers belong to one trade and reset on `submit`.
+
+**Price-relative tolerances.**
+- **Fields.** `boundary_proximity_ratio` and `stop_buffer_ratio` are optional.
+  When set, they replace the absolute values at every use, measured on the
+  price being tested: boundary, HTF level, invalidation, swing. An explicit
+  absolute `htf_zone_tolerance` or `trailing_buffer` still wins.
+- **Who uses them.** The multi-pair sweep does. The live BTC profile keeps its
+  absolute 500 / 100.
+
 ## Pending-entry cancellation - reachability
 
 Two cancellation reasons are reachable and tested:

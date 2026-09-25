@@ -1,4 +1,36 @@
-# Current handoff - DD deviation models, 2026-09-25
+# Current handoff - R ladder, trailing modes, relative tolerances, 2026-09-25
+
+Claude; branch `main`. The owner reviewed the DD trade report and asked for:
+- a check of the range detection;
+- an R ladder: break-even at 1R or EQ, and 30% at 2R;
+- trailing on internal structure and on ATR tiers, compared;
+- the scaling fix first.
+
+**Build.** Five TDD commits, plus a view fix.
+
+**Range check.** The range engine itself was sound; the sweep's tolerances
+had drifted. On 26 of 30 pairs the touch tolerance had grown to 0.6-3.6% of
+price. Measured on the current price, the DD engine takes 11 trades instead of
+49, so the earlier 49-trade result is superseded.
+
+**Comparison, 30 pairs:**
+- S0 (DD as shipped): +3.17R over 11 trades;
+- S1 (ladder, current trail): +1.03R / 13;
+- S2 (pivots N=2): -1.65R / 14;
+- S3 (pivots N=3): -0.15R / 13;
+- S4 (ATR tiers): -1.21R / 15.
+
+The ladder removed every trade that reached 1R or 2R and then lost 1R. It also
+closed two trades early that would have reached EQ: STRK at break-even, and OKB
+on the trail that starts after it. With so few trades the methods cannot be
+ranked.
+
+**Next:** the owner picks the default trailing method, then the report page
+is regenerated. 851 Python tests pass. No push in this turn.
+
+---
+
+# Previous handoff - DD deviation models, 2026-09-25
 
 Claude; branch `main`. The owner asked the engine to trade the DD Finance
 deviation school. Four decisions set the design:

@@ -1,24 +1,35 @@
-# Next task - review the DD deviation models with the owner
+# Next task - choose the trailing method and review the touch tolerance
 
 Updated 2026-09-25. Do not create new worktrees or sibling Agent Trading folders.
 Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
 
-1. Strategy, highest value. The DD deviation models are the default
-   [U-DD-DEVIATION-001]; the first 30-pair result is in
-   [PROJECT_STATE](PROJECT_STATE.md) (2026-09-25). Review it with the owner
-   before changing any threshold.
-   (a) Shorts still lose on the CORE pairs under both models (24 trades,
-   -3.86R) while longs win (19, +16.07R).
-   (b) Measure with OKX TR's real fees (limit entries, stop exits).
-   (c) The panel settings screen does not show the DD knobs (entry models, EQ
-   share, break-even trigger). Add them; until then, panel partials above 50%
-   are rejected.
-   (d) Then: breaker/S-R flip entries (DD model 1's second option), DXY for
-   model 3 if a feed appears, and the symmetric range anchor (gap report
-   section 10).
+1. Strategy, highest value. The DD models, the R ladder and three trailing
+   methods are built [U-DD-DEVIATION-001] [U-RR-TRAIL-001]. The comparison is
+   in [PROJECT_STATE](PROJECT_STATE.md) (2026-09-25). Review it with the
+   owner before changing any threshold.
+   (a) The owner chooses the default trailing method:
+       - `CONFIRMED_HIGHER_LOW`, the current default;
+       - `INTERNAL_PIVOT`, with N=2 or N=3;
+       - `ATR_TIERS`.
+       Then regenerate the trade report for that run.
+   (b) The touch tolerance. At a correctly measured 0.5% of price, a year of
+   30 pairs gives 60 ranges and 11-15 trades. Ask the owner whether a
+   volatility-aware tolerance (a share of the range height or of ATR) matches
+   their chart reading better.
+   (c) Shorts still lose (S1: 5 trades, -1.78R).
+   (d) Measure with OKX TR's real fees (limit entries, stop exits).
+   (e) The panel settings screen does not show the DD and ladder knobs (entry
+   models, EQ share, break-even trigger, trailing method). Add them. Until
+   then, panel partials above 50% are rejected.
+   (f) Then:
+       - breaker/S-R flip entries (DD model 1's second option);
+       - DXY for model 3, if a feed appears;
+       - the symmetric range anchor (gap report section 10).
    Rerun: `python -m agent_trading.backtest.sweep --data data/okx_tr_usdt_top30
-   --output runs/<name>`, about 15 minutes. Add the legacy flags from the
-   backtest spec to compare with the pre-DD engine.
+   --output runs/<name>`, about 15 minutes.
+       - For the DD-as-shipped exits, add `--partial-tp ''
+         --break-even-trigger RANGE_EQ`.
+       - For the pre-DD engine, add the legacy flags from the backtest spec.
 2. VPS, together with the owner: the DigitalOcean VPS runs, tr.okx.com is
    reachable there, and the multi-pair download was done on 2026-09-21. The
    product deployment still needs a domain pointing at it; then run the draft

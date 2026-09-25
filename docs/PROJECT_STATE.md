@@ -1,5 +1,70 @@
 # Current project state - 2026-09-25
 
+## R ladder, trailing modes and price-relative tolerances - 2026-09-25 [U-RR-TRAIL-001]
+
+The owner reviewed the DD trade report and asked for four things:
+- **Range check.** Check the range detection itself.
+- **R ladder.** Independent of EQ and RH, because a trade that reached 2R
+  should not end on a stop. Break-even at 1R, or at EQ if EQ comes first, and
+  30% closed at 2R. The EQ 30% and the boundary exit stay.
+- **Trailing.** Two methods, built and compared: the internal structure's last
+  low/high, with no multiplier; and ATR tiers, where a pull-back of 0.75 / 1.25
+  / 1.5 ATR from the peak closes 25% / 50% / the rest of the open position.
+  Trailing starts once the stop is at entry.
+- **Scaling first.** Fix the tolerance drift before comparing.
+
+Design: [rr-trailing-scaling-2026-09-25.md](specs/rr-trailing-scaling-2026-09-25.md).
+Plan: `docs/superpowers/plans/2026-09-25-rr-trailing-scaling.md`.
+
+- **Range check.** The range engine follows the guide, and the DOGE range the
+  owner questioned is valid. The flaw was in the sweep's scaling.
+  - Tolerances were fixed at 0.5% and 0.1% of each pair's first price, so on a
+    pair that fell they grew as a share of price.
+  - Measured against the median price, the touch tolerance was 0.6% to 3.6% of
+    price on 26 of 30 pairs (XPL 3.6%, AVAX 1.5%, BTC 0.73%).
+  - Now every tolerance is measured on the price it tests.
+  - Not addressed: the guide's impulse precondition before a range.
+- **Effect.** The same DD engine (S0 below) now confirms 60 ranges instead of
+  159 and takes 11 trades instead of 49.
+  - On the 26 inflated pairs, trades fall from 46 to 7. On the other 4 they
+    rise from 3 to 4.
+  - The 49-trade result in the next section came mostly from the inflated
+    tolerance, and is superseded.
+- **Built with TDD in five commits**, plus a view fix (`d342a4e`): every
+  pair's run config had shown the absolute HTF band of 500.
+- **Comparison** (30 pairs, `runs/sweep-rr-s0` to `s4`, no costs, the same
+  corrected tolerances):
+
+  | Run | Exits | Trades | Win rate | Avg R | Total R | PF | Max DD (R) | Total R at 0.1% per side |
+  |---|---|---|---|---|---|---|---|---|
+  | S0 | DD as shipped: break-even at EQ, no 2R | 11 | 0.364 | +0.288 | +3.17 | 1.45 | -4.00 | +1.70 |
+  | S1 | R ladder, trail on confirmed swings (default) | 13 | 0.462 | +0.079 | +1.03 | 1.17 | -4.90 | -0.56 |
+  | S2 | R ladder, internal pivots N=2 | 14 | 0.500 | -0.118 | -1.65 | 0.73 | -4.68 | -3.31 |
+  | S3 | R ladder, internal pivots N=3 | 13 | 0.462 | -0.012 | -0.15 | 0.97 | -4.80 | -1.77 |
+  | S4 | R ladder, ATR tiers | 15 | 0.533 | -0.080 | -1.21 | 0.83 | -4.67 | -2.98 |
+
+  - **The ladder does what was asked.**
+    - In S0, 2 trades reached 1R (one of them 2R) and then closed at -1R.
+      With the ladder there are none.
+    - DOGE 2025-12-12 went from -1R to +1.57R.
+  - **It has a cost.**
+    - STRK 2026-04-09 came back to entry after 1R and then reached EQ: +3.10R
+      in S0, 0 with the ladder.
+    - OKB 2026-04-29 went from +2.99R to +0.80R: the trail closed it before
+      EQ.
+  - **Tighter trails cut the winners.** FIL 2025-10-09 made +2.95R in S0
+    and +2.46R with N=3 pivots. It made +1.05R with ATR tiers, and +0.72R with
+    N=2 pivots, which closed it before EQ.
+  - **Too few trades to rank the methods.** With 11 to 15 trades, one trade
+    moves the total by 2 to 3R. No threshold was tuned.
+  - **Invariants.** No run trails before the fill, before break-even, or past
+    the close.
+- **Open:** the default trailing method is the owner's choice.
+  - The R ladder is the default, and the local panel settings
+    (`config/strategy.json`) carry its 2R slice.
+  - The trade report page is regenerated once the method is chosen.
+- **Checks:** 851 Python tests pass.
+
 ## DD deviation models are the default - 2026-09-25 [U-DD-DEVIATION-001]
 
 The owner asked for the engine to trade the DD Finance deviation school. The
@@ -26,7 +91,8 @@ Plan: `docs/superpowers/plans/2026-09-25-dd-deviation-models.md`.
   stop.
 - **30 pairs under DD** (`runs/sweep-okx-tr-dd`, price scaling, no costs): 49
   trades, one per confirmed manipulation. The trailing rules show zero
-  violations.
+  violations. Superseded the same day: these figures used tolerances that had
+  drifted with price (see the section above).
 
   | Group | Trades | Win rate | Avg R | Total R | PF |
   |---|---|---|---|---|---|

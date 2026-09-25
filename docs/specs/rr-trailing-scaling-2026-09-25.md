@@ -1,6 +1,9 @@
 # RR ladder, trailing modes and price-relative tolerances - design, 2026-09-25 [U-RR-TRAIL-001]
 
-Status: approved by the owner on 2026-09-25, not yet implemented.
+Status: approved by the owner on 2026-09-25. Implemented on 2026-09-25 (plan:
+`docs/superpowers/plans/2026-09-25-rr-trailing-scaling.md`). The R ladder is
+the default; the default trailing mode awaits the owner's review of the
+comparison.
 
 ## Why
 
