@@ -156,6 +156,27 @@ class RiskApprovalTests(unittest.TestCase):
                          'ZERO_POSITION_SIZE')
         self.assertEqual(approve(engine(), candidate(sweep_extreme=D('100.99'))).reason, 'INSUFFICIENT_EQUITY')
 
+    def test_the_equity_cap_sizes_a_tight_stop_down_instead_of_blocking_it(self):
+        # [U-FUNNEL-001] Spot has no leverage. A 0.01 stop at a 10 budget needs
+        # 1000 units (100,000 notional) against 1000 equity: the capped plan
+        # buys what the equity affords and risks less than the budget.
+        tight = candidate(sweep_extreme=D('100.99'))            # stop 99.99
+        self.assertEqual(approve(engine(), tight).reason, 'INSUFFICIENT_EQUITY')
+        risk = engine(cap_to_equity=True)
+        decision = approve(risk, tight)
+        self.assertEqual(decision.status, 'APPROVED')
+        self.assertEqual((decision.plan.quantity, decision.plan.risk_amount),
+                         (D('10'), D('0.1')))
+        self.assertTrue(decision.evidence.equity_capped)
+        fill = risk.revalidate_fill(decision.plan, D('100'), D('500'), decision.plan.approved_at)
+        self.assertEqual((fill.status, fill.plan.quantity), ('APPROVED', D('5')))
+        self.assertTrue(fill.evidence.equity_capped)
+        loose = approve(risk)
+        self.assertEqual(loose.plan.quantity, D('1'))              # 10 budget / 10 risk
+        self.assertFalse(loose.evidence.equity_capped)
+        with self.assertRaises(ValueError):
+            RiskConfig(cap_to_equity='yes')
+
     def test_max_stop_distance_is_optional_and_inclusive(self):
         self.assertEqual(approve(engine(max_stop_distance=D('9'))).reason, 'MAX_STOP_DISTANCE')
         self.assertEqual(approve(engine(max_stop_distance=D('10'))).status, 'APPROVED')

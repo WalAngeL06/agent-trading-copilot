@@ -102,6 +102,7 @@ class BacktestConfig:
                     'boundary_proximity': str(self.profile.boundary_proximity),
                     'stop_buffer': str(self.profile.stop_buffer),
                     'risk_fraction': str(self.profile.risk_fraction),
+                    'size_cap_to_equity': self.profile.size_cap_to_equity,
                     'quantity_step': str(self.profile.quantity_step),
                     'min_reward_risk': str(self.profile.min_reward_risk),
                     'max_stop_distance': None if self.profile.max_stop_distance is None

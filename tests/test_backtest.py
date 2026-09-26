@@ -574,6 +574,8 @@ class CliTests(unittest.TestCase):
         self.assertEqual((default.direction, default.direction_gate),
                          ('BOTH', 'GUIDE_HTF_CONTEXT'))
         self.assertTrue(default.htf_confluence_required)
+        self.assertTrue(default.size_cap_to_equity)
+        self.assertFalse(profile(['--no-equity-cap']).size_cap_to_equity)
         tuned = profile(['--direction', 'SHORT_ONLY', '--htf-zone-tolerance', '250',
                          '--no-htf-confluence'])
         self.assertEqual(tuned.direction, 'SHORT_ONLY')

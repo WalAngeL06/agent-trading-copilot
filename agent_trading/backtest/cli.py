@@ -69,6 +69,9 @@ def add_profile_arguments(parser):
     parser.add_argument('--no-htf-confluence', action='store_true',
                         help='keep premium/discount but drop the guide 4.3 zone rule')
     parser.add_argument('--risk-per-trade', default='.01')
+    parser.add_argument('--equity-cap', action=argparse.BooleanOptionalAction, default=True,
+                        help='size a stop tighter than the budget allows down to the equity '
+                             'instead of blocking it [U-FUNNEL-001]')
     parser.add_argument('--min-reward-risk', default='1')
     parser.add_argument('--stop-buffer', default=None,
                         help=f'price units; default {DEFAULT_STOP_BUFFER}')
@@ -121,6 +124,7 @@ def profile_from_args(args):
         equity=Decimal(args.starting_equity),
         stop_buffer=Decimal(args.stop_buffer or DEFAULT_STOP_BUFFER),
         risk_fraction=Decimal(args.risk_per_trade),
+        size_cap_to_equity=args.equity_cap,
         min_reward_risk=Decimal(args.min_reward_risk),
         break_even_r=Decimal(args.break_even_r),
         trailing_enabled=not args.no_trailing,

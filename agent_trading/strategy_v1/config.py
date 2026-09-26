@@ -126,6 +126,10 @@ class StrategyProfile:
     boundary_proximity_ratio: Decimal | None = None
     stop_buffer_ratio: Decimal | None = None
     risk_fraction: Decimal = Decimal('.01')
+    # [U-FUNNEL-001] A stop tighter than the risk budget allows is traded with
+    # the whole equity (smaller risk) instead of being skipped. Off restores
+    # the INSUFFICIENT_EQUITY block.
+    size_cap_to_equity: bool = True
     quantity_step: Decimal = Decimal('.00000001')
     min_reward_risk: Decimal = Decimal('1')
     max_stop_distance: Decimal | None = None
@@ -230,6 +234,8 @@ class StrategyProfile:
                 or any(model not in ENTRY_MODELS for model in models)):
             raise ValueError('entry_models must name CHOCH_FVG and/or HTF_FVG_REVERSAL once each')
         object.__setattr__(self, 'entry_models', models)
+        if type(self.size_cap_to_equity) is not bool:
+            raise ValueError('size_cap_to_equity must be True or False')
         requirement = self.model2_requires_htf_fvg
         if requirement is not None and type(requirement) is not bool:
             raise ValueError('model2_requires_htf_fvg must be True, False or None')
@@ -368,4 +374,5 @@ class StrategyProfile:
                           max_stop_distance=self.max_stop_distance,
                           risk_per_trade=self.risk_fraction, stop_buffer=self.stop_buffer,
                           quantity_step=self.quantity_step,
-                          stop_buffer_ratio=self.stop_buffer_ratio)
+                          stop_buffer_ratio=self.stop_buffer_ratio,
+                          cap_to_equity=self.size_cap_to_equity)

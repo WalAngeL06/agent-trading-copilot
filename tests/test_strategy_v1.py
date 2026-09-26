@@ -566,6 +566,14 @@ class CustomizationTests(unittest.TestCase):
         self.assertEqual(profile.entry_level, 'FVG_LOW')
         self.assertEqual(profile.boundary_proximity, D('7'))
 
+    def test_strategy_v1_caps_the_size_to_the_equity_by_default(self):
+        # [U-FUNNEL-001] A tight stop is traded smaller, never skipped.
+        self.assertTrue(StrategyProfile().size_cap_to_equity)
+        self.assertTrue(StrategyProfile().risk_config().cap_to_equity)
+        self.assertFalse(StrategyProfile(size_cap_to_equity=False).risk_config().cap_to_equity)
+        with self.assertRaises(ValueError):
+            StrategyProfile(size_cap_to_equity='yes')
+
     def test_invalid_configuration_is_rejected(self):
         for kwargs in ({'entry_level_ratio': D('1.5')}, {'stop_buffer': D('0')},
                        {'risk_fraction': D('0')}, {'pending_expiry_bars': 0},

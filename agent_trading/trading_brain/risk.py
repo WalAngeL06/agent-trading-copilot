@@ -83,6 +83,10 @@ class RiskEngine:
         units = ratio.numerator // ratio.denominator
         return exact_product(Decimal(units), step)
 
+    def _affordable(self, entry, equity):
+        """[U-FUNNEL-001] The largest quantity on the step grid the equity pays for."""
+        return self._quantity(entry, equity)
+
     @staticmethod
     def _support(zones, candidate, symbol, timeframe):
         if not isinstance(symbol, str) or not symbol.strip() or not isinstance(timeframe, str) or not timeframe.strip():
@@ -161,7 +165,12 @@ class RiskEngine:
         risk = exact_difference(entry, stop) if candidate.direction == 'LONG' else exact_difference(stop, entry)
         reward = exact_difference(tp, entry) if candidate.direction == 'LONG' else exact_difference(entry, tp)
         quantity = self._quantity(risk, evidence.risk_budget) if risk > 0 else None
-        evidence = replace(evidence, risk_distance=risk, reward_distance=reward,
+        capped = (self.config.cap_to_equity and quantity is not None
+                  and exact_product(quantity, entry) > equity)
+        if capped:
+            quantity = self._affordable(entry, equity)
+        evidence = replace(evidence, equity_capped=capped,
+                           risk_distance=risk, reward_distance=reward,
                            reward_risk_ratio=reward / risk if risk > 0 else None,
                            position_size=quantity, risk_amount=exact_product(quantity, risk) if quantity is not None else None)
         support_failed = (require_support_intact and evidence.initial_stop_source == 'SUPPORTING_ZONE'

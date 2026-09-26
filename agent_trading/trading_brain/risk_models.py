@@ -17,8 +17,14 @@ class RiskConfig:
     # [U-RR-TRAIL-001] When set, the stop buffer is this share of the
     # invalidation price instead of the absolute `stop_buffer`.
     stop_buffer_ratio: Decimal | None = None
+    # [U-FUNNEL-001] Spot has no leverage. On, a plan whose risk-sized
+    # quantity costs more than the equity buys what the equity affords and
+    # risks less than the budget; off, it is blocked as INSUFFICIENT_EQUITY.
+    cap_to_equity: bool = False
 
     def __post_init__(self):
+        if type(self.cap_to_equity) is not bool:
+            raise ValueError('cap_to_equity must be True or False')
         ratio = self.stop_buffer_ratio
         if ratio is not None and (not isinstance(ratio, Decimal) or not ratio.is_finite()
                                   or not 0 < ratio < 1):
@@ -74,6 +80,8 @@ class RiskEvidence:
     position_size: Decimal | None = None
     risk_amount: Decimal | None = None
     blocked_reason: str | None = None
+    # [U-FUNNEL-001] True when the equity, not the risk budget, set the size.
+    equity_capped: bool = False
     symbol: str | None = None
     timeframe: str | None = None
     zone_source_ids: tuple[str, ...] = ()
