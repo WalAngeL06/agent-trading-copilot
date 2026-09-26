@@ -1,4 +1,89 @@
-# Current project state - 2026-09-25
+# Current project state - 2026-09-26
+
+## Funnel audit: why so few trades - 2026-09-26 [U-FUNNEL-001]
+
+The owner rejected the 2026-09-25 comparison. They argued that a year on 30
+pairs cannot give only 11 to 15 trades, and that the win rate cannot be that
+low. The S1 run was audited stage by stage, read-only first:
+- 1,615 range candidates;
+- 60 confirmed ranges;
+- 157 deviations;
+- 54 approved by the HTF context;
+- 13 trades.
+
+- **Range touches, the largest loss.**
+  - A touch counted only as a swing inside [RL, RL + 0.5%] or
+    [RH - 0.5%, RH], never past the level.
+  - Guide 4.1 calls a wick beyond a boundary a sweep, not an invalidation.
+    Guide 3.2 asks for two touches per side and calls a second high that
+    stays under the first only "ideal".
+  - 1,365 candidates died waiting for their first low touch.
+  - A replay of the 1H range stage alone reproduces the sweeps exactly: 60
+    confirmed now, and 159 with the old drifting tolerance.
+    - A touch may pass the level up to the deviation limit (A): 141.
+    - A touch band of 20% of the range height (B): 165.
+    - Both: 237.
+- **Tight stops were blocked (fixed, `c008a69`).**
+  - At 1% risk without leverage, any stop tighter than 1% needs more
+    notional than the equity. The RiskEngine blocked such trades as
+    `INSUFFICIENT_EQUITY`.
+  - That hit 13 candidates from 9 setups, median R:R 7.8. 7 setups never
+    traded; the others fell through to a later, worse gap.
+  - Strategy V1 now buys what the equity affords. The R-multiples are
+    unchanged, and `--no-equity-cap` restores the block.
+- **Inverted HTF frame.**
+  - 40 of 157 deviations got `NO_HTF_FRAME`. In 38 of them the latest 4H
+    Valid High sat below the latest Valid Low (one level stale after a
+    trend leg), mostly with price outside both.
+  - The gate then refuses both directions. The guide does not cover this
+    case.
+- **Candidates born below their floor.**
+  - 411 of 1,615 candidates are born with price already below RL.
+  - In 266 of them the Valid High was confirmed by breaking the RL swing
+    itself: the known anchor gap (gap report section 10).
+- **Not a defect.**
+  - 35 of the 37 `MIN_REWARD_RISK` blocks are one OKB setup retrying gaps
+    high in its range.
+- **Win rate.** 13 trades cannot measure it.
+  - All 6 losers went through their stop without reaching EQ first: genuine
+    breakouts, not early stops.
+  - 2 of them were re-entries on the same deviation.
+  - 1 filled 44 hours after its plan, because pending entries never expire.
+- **What-if runs.**
+  - Each row adds one change to the one above. The rule changes were
+    patched in memory for these runs only; nothing but the equity cap is
+    committed.
+  - Same 30 pairs and year, no costs; the last column is total R at a
+    hypothetical 0.1% per side.
+
+  | Run | Change | Ranges | Deviations | HTF OK | Trades | Win rate | Avg R | Total R | PF | Total R at 0.1% |
+  |---|---|---|---|---|---|---|---|---|---|---|
+  | S1 | before the fixes (2026-09-25) | 60 | 157 | 54 | 13 | 0.462 | +0.079 | +1.03 | 1.17 | -0.56 |
+  | E1 | equity cap (committed) | 60 | 157 | 54 | 18 | 0.444 | +0.027 | +0.49 | 1.05 | -3.26 |
+  | E2 | E1 + a touch may pass the level (A) | 141 | 452 | 176 | 59 | 0.593 | +0.094 | +5.54 | 1.26 | -4.32 |
+  | E3 | E2 + inverted 4H frame re-anchored | 141 | 452 | 196 | 66 | 0.561 | +0.041 | +2.70 | 1.10 | -8.19 |
+  | E4 | E3 + band of 20% of the height (AB) | 237 | 1001 | 380 | 120 | 0.492 | +0.008 | +0.96 | 1.02 | -17.64 |
+- **Payoff, not win rate, limits the edge.**
+  - With enough trades the win rate is 56-59% (CORE 61-64%), so the owner's
+    doubt about the 13-trade win rate was right.
+  - The average win is +0.8R against a full -1R loss. Only 3 of the 59 E2
+    trades reached the opposite boundary: break-even at 1R or EQ and the
+    trail close most winners early.
+  - YOUNG pairs lose under every rule (E2: 9 trades, win rate 33%).
+  - Costs of 0.1% per side turn every row negative.
+- **Review page.**
+  - [Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce) shows each of the 287 candidates that at
+    least one rule confirms, on the 1H chart.
+  - For each one it shows which rules confirm it.
+  - The owner labels each one: real range, not a range, or unsure. There is
+    also a note per pair for ranges the engine never proposed.
+  - Labels are stored in the page's database (`labels`, `pairnotes`) for
+    Claude to read.
+- **Open: owner decisions.**
+  - The touch rule, after labelling.
+  - The inverted HTF frame.
+  - A pending-entry expiry.
+- **Checks:** 853 Python tests pass.
 
 ## R ladder, trailing modes and price-relative tolerances - 2026-09-25 [U-RR-TRAIL-001]
 

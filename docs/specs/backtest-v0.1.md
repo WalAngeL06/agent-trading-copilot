@@ -198,6 +198,9 @@ PROJECT_STATE, 2026-09-24.
   them as `atr_tier_exits`.
 - **Legacy engine.** It now also needs `--partial-tp ''`.
 
+**Equity cap [U-FUNNEL-001] (2026-09-26).** `--equity-cap` is on by default;
+`--no-equity-cap` restores the pre-2026-09-26 `INSUFFICIENT_EQUITY` block.
+
 **Caveats.** The list is chosen by today's volume, so the past is seen through
 survivors and delisted pairs are absent. Pooled trades are not independent
 (pairs move together) and windows differ per pair (young listings have less

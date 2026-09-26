@@ -1,4 +1,34 @@
-# Current handoff - R ladder, trailing modes, relative tolerances, 2026-09-25
+# Current handoff - funnel audit, 2026-09-26
+
+Claude; branch `main`. The owner rejected the 2026-09-25 result: too few
+trades and an implausible win rate. An audit of the 30-pair funnel found:
+- **Range touches.** They could not pass the level, which is stricter than
+  the guide: 60 ranges, against 141 when a touch may pass up to the
+  deviation limit.
+- **Tight stops.** They were blocked as `INSUFFICIENT_EQUITY` (fixed in
+  `c008a69`, TDD).
+- **HTF frame.** When it inverts, every direction is refused.
+- **Birth below RL.** A quarter of the candidates are born with price
+  already below RL.
+
+**What-if runs** (rule changes patched in memory, not committed):
+- E1 equity cap: 18 trades, +0.49R.
+- E2 + a touch may pass the level: 59 trades, win rate 59%, +5.54R.
+- E3 + inverted HTF frame re-anchored: 66 trades, +2.70R.
+- E4 + a band of 20% of the height: 120 trades, +0.96R.
+
+With enough trades the win rate is 56-59%. The edge is thin for another
+reason: the average win is +0.8R against a full -1R loss.
+
+**Review page:** [Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce), where the owner labels
+the 287 ranges.
+
+**Next:** read the labels, then let the owner choose the touch rule and the
+HTF frame fix. 853 Python tests pass. No push in this turn.
+
+---
+
+# Previous handoff - R ladder, trailing modes, relative tolerances, 2026-09-25
 
 Claude; branch `main`. The owner reviewed the DD trade report and asked for:
 - a check of the range detection;

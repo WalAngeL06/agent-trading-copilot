@@ -1,4 +1,4 @@
-# Next task - choose the trailing method and review the touch tolerance
+# Next task - read the owner's range labels and settle the touch rule
 
 Updated 2026-09-25. Do not create new worktrees or sibling Agent Trading folders.
 Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
@@ -7,6 +7,18 @@ Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
    methods are built [U-DD-DEVIATION-001] [U-RR-TRAIL-001]. The comparison is
    in [PROJECT_STATE](PROJECT_STATE.md) (2026-09-25). Review it with the
    owner before changing any threshold.
+   (0) [U-FUNNEL-001] The 2026-09-26 audit found why so few trades were
+       taken; see [PROJECT_STATE](PROJECT_STATE.md) (2026-09-26).
+       - Read the labels from the review page ([Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce),
+         collections `labels` and `pairnotes`).
+       - Score each touch rule against them. The rules are: current, A =
+         overshoot to the deviation limit, B = band 20% of the height, AB,
+         and E = the old drifting tolerance.
+       - Implement the chosen rule with TDD as a profile option, then make
+         it the default.
+       - Then ask the owner about the inverted HTF frame (re-anchor on the
+         fresher level and the extreme since it) and a pending-entry expiry.
+       - The what-if harness is in the scratchpad (`whatif_sweep.py`).
    (a) The owner chooses the default trailing method:
        - `CONFIRMED_HIGHER_LOW`, the current default;
        - `INTERNAL_PIVOT`, with N=2 or N=3;

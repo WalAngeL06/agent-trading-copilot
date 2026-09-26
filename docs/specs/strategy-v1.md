@@ -97,6 +97,13 @@ candle open when it gapped past it. Geometry, reward/risk and size are
 re-approved at the actual fill through the shipped `RiskEngine.revalidate_fill`.
 Intrabar order is never inferred: stop is resolved before target.
 
+**Size cap [U-FUNNEL-001].** Without leverage, a plan whose risk-sized
+quantity costs more than the equity is traded with the quantity the equity
+affords, and so risks less than the budget. Before 2026-09-26 it was blocked as
+`INSUFFICIENT_EQUITY`, which removed the tightest stops, the best reward/risk.
+`size_cap_to_equity=False` restores the block. The evidence records
+`equity_capped`. R-multiples are unaffected: R is measured on the capped risk.
+
 ## Stops
 
 Preferred chain: `PRIMARY_FVG` -> closest eligible fresh `SECONDARY_FVG` strictly
