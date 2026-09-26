@@ -1,4 +1,25 @@
-# Current handoff - funnel audit, 2026-09-26
+# Current handoff - range detection redesign, 2026-09-26
+
+Claude; branch `main`.
+
+**Round 1.** The owner labelled the funnel audit's ranges: 3 of 50 real.
+"RH yanlış" and "RL ihlal ediliyor" point at the anchor. The engine pairs the
+first Valid Low and Valid High, has no impulse precondition and no sideways
+check.
+
+**Prototype.** A guide-anchored detector, in
+`docs/research/range-anchor-prototype/`, with the design in
+[range-anchor-2026-09-26.md](specs/range-anchor-2026-09-26.md). It finds 527
+ranges, including the three the owner approved.
+
+**Round 2** is on [Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce), collection `labels_v2`.
+
+**Next:** read `labels_v2`, calibrate, then implement it as a `RangeEngine`
+mode with TDD and rerun the sweep. No push in this turn.
+
+---
+
+# Previous handoff - funnel audit, 2026-09-26
 
 Claude; branch `main`. The owner rejected the 2026-09-25 result: too few
 trades and an implausible win rate. An audit of the 30-pair funnel found:

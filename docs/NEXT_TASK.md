@@ -1,4 +1,4 @@
-# Next task - read the owner's range labels and settle the touch rule
+# Next task - calibrate the guide-anchored range detector from round-2 labels
 
 Updated 2026-09-25. Do not create new worktrees or sibling Agent Trading folders.
 Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
@@ -7,6 +7,15 @@ Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
    methods are built [U-DD-DEVIATION-001] [U-RR-TRAIL-001]. The comparison is
    in [PROJECT_STATE](PROJECT_STATE.md) (2026-09-25). Review it with the
    owner before changing any threshold.
+   (00) [U-RANGE-ANCHOR-001] Round 1 labels rejected the engine's ranges (3
+        of 50 real). A guide-anchored prototype is under review; see
+        [range-anchor-2026-09-26.md](specs/range-anchor-2026-09-26.md).
+        - Read `labels_v2` from [Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce).
+        - Calibrate its thresholds.
+        - Implement it as a `RangeEngine` mode with TDD, keeping the `RANGE_*`
+          events.
+        - Rerun the 30-pair sweep.
+        This supersedes choosing a touch rule in (0).
    (0) [U-FUNNEL-001] The 2026-09-26 audit found why so few trades were
        taken; see [PROJECT_STATE](PROJECT_STATE.md) (2026-09-26).
        - Read the labels from the review page ([Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce),

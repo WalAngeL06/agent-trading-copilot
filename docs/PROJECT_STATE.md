@@ -1,5 +1,26 @@
 # Current project state - 2026-09-26
 
+## Range detection redesign in review - 2026-09-26 [U-RANGE-ANCHOR-001]
+
+- **Round 1 labels.** The owner labelled 50 of the audit page's ranges: 3
+  real, 1 unsure, 46 not.
+  - Their notes: RH on the wrong swing, RL violated by closes, and shapes
+    that are not sideways.
+  - The cause is the anchor: the first Valid Low and Valid High, with no
+    impulse and no sideways check.
+- **The prototype follows the guide.** Design:
+  [range-anchor-2026-09-26.md](specs/range-anchor-2026-09-26.md).
+  - An impulse of at least 6 ATR comes first.
+  - The move's true extreme is the reference boundary.
+  - No close past the reference during formation.
+  - Two touches per side, each followed by an EQ visit.
+- **Result.** 527 ranges on 30 pairs, including the three the owner
+  approved, at their levels.
+  - Claude's random check of 12: 8 clear, 4 short borderline boxes.
+- **Round 2 of labelling** is on the same page ([Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce),
+  collection `labels_v2`). The engine is unchanged until the owner has
+  reviewed it.
+
 ## Funnel audit: why so few trades - 2026-09-26 [U-FUNNEL-001]
 
 The owner rejected the 2026-09-25 comparison. They argued that a year on 30
