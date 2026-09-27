@@ -10,7 +10,9 @@ Normal work stays in `C:/Users/Serdar Arif/Desktop/Agent Trading` on `main`.
    (00) [U-RANGE-ANCHOR-001] Round 1 labels rejected the engine's ranges (3
         of 50 real). A guide-anchored prototype is under review; see
         [range-anchor-2026-09-26.md](specs/range-anchor-2026-09-26.md).
-        - Read `labels_v2` from [Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce).
+        - Read `labels_v3` from [Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce): round 3, prototype
+          v3 at 5% under and 10% over. Settle with the owner the conflict
+          between their touch answers and the round-1 approvals.
         - Calibrate its thresholds.
         - Implement it as a `RangeEngine` mode with TDD, keeping the `RANGE_*`
           events.

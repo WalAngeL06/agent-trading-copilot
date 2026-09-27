@@ -12,7 +12,16 @@ check.
 [range-anchor-2026-09-26.md](specs/range-anchor-2026-09-26.md). It finds 527
 ranges, including the three the owner approved.
 
-**Round 2** is on [Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce), collection `labels_v2`.
+**Round 2** (`labels_v2`): 2 real of 13, with the touches criticised.
+
+**Touch rules.** The owner's four answers are: the wick must reach the level;
+a wick past it before confirmation breaks the range; the level is the wick
+tip; and a wick at EQ is enough.
+
+**Prototype v3.** It finds 105 ranges at 5% under and 10% over. It rejects
+all ten round-2 rejections, but also all five earlier approvals.
+
+**Round 3** is on [Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce), collection `labels_v3`.
 
 **Next:** read `labels_v2`, calibrate, then implement it as a `RangeEngine`
 mode with TDD and rerun the sweep. No push in this turn.

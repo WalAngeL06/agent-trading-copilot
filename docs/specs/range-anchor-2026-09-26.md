@@ -69,12 +69,56 @@ Per 1H stream, causal: a swing is used from its confirmation on.
   - Each range records its height in ATRs at the reference (`hAtr`,
     quartiles 2.8 / 3.6 / 5.0), for a possible filter.
 
+## Round 2 and the owner's touch rules (2026-09-27)
+
+- **Round 2 labels.** 13 labels (`labels_v2`): 2 real, 1 unsure, 10 not.
+  - The notes name the touches: "rh temas hatalı", "temas invalid",
+    "2. yeşil temas invalid".
+  - The boxes were in the right places, but touches were counted wrongly.
+- **The prototype's touch errors.** Three kinds:
+  - A swing that stopped short of the level counted (BNB 2025-08-14: 825
+    against RL 820.3, 9.6% of the height).
+  - Wicks past a level during formation counted (21-28% of the height).
+  - Levels sat on spike tips.
+- **The owner's answers.** Asked directly on 2026-09-27:
+  1. A touch needs the wick to reach the level.
+  2. A wick past a level before confirmation breaks the range.
+  3. A level sits at the wick tip, even a long spike.
+  4. A wick reaching EQ is enough for the EQ return.
+- **Prototype v3** (`detector3.py`, `run3.py`) applies these rules.
+  - Touches are read from candle wicks, not swings.
+  - A wick stopping more than `under` of the height short is no touch.
+  - Before confirmation, a wick more than `over` past either level ends the
+    candidate.
+  - Touches of one side with no EQ visit between them are one touch.
+- **Settings against the labels.** Five approved ranges (rounds 1 and 2) and
+  the ten round-2 rejections:
+
+  | under / over | Ranges | Approved found | Rejected still found |
+  |---|---|---|---|
+  | v2 (15% band, wick past counts) | 527 | 5 / 5 | 10 / 10 |
+  | 3% / 10% | 74 | 0 / 5 | 0 / 10 |
+  | 5% / 10% | 105 | 0 / 5 | 0 / 10 |
+  | 5% / 15% | 160 | 0 / 5 | 0 / 10 |
+  | 5% / 20% | 240 | 0 / 5 | 1 / 10 |
+  | 7% / 20% | 281 | 0 / 5 | 1 / 10 |
+
+- **The conflict.** The answers and the round-1 approvals cannot both hold:
+  - On LTC 2026-05-18 RH is touched four times, but RL (53.18) never again:
+    the lows turn at 53.42-53.50.
+  - On ADA 2026-06-24 the second RH touch comes only with the breakout.
+  - Round 1 judged whole boxes; the answers are about touches. The strict
+    rules were kept, and round 3 lets the owner judge their result.
+- **Round 3.** 5% / 10% gives 105 ranges on 29 pairs, on the same page
+  ([Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce), collection `labels_v3`).
+  - Claude's check of 8 random ones: the touches reach the lines. Some
+    boxes last only a day or two.
+
 ## Next
 
-1. **Owner labels round 2.** On the same page, collection `labels_v2`,
-   shown in a fixed shuffled order.
-2. **Calibrate from the labels**, for example a minimum height in ATRs or a
-   minimum life.
+1. **Owner labels round 3** (`labels_v3`) and settles the conflict above.
+2. **Calibrate from the labels**, for example the tolerances, a minimum height
+   in ATRs or a minimum life.
 3. **Implement as a `RangeEngine` mode with TDD.** It keeps the
    `RANGE_*` event vocabulary, so manipulation, HTF and entries are
    unchanged. Then rerun the 30-pair sweep.

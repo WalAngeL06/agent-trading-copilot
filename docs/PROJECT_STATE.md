@@ -17,9 +17,16 @@
 - **Result.** 527 ranges on 30 pairs, including the three the owner
   approved, at their levels.
   - Claude's random check of 12: 8 clear, 4 short borderline boxes.
-- **Round 2 of labelling** is on the same page ([Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce),
-  collection `labels_v2`). The engine is unchanged until the owner has
-  reviewed it.
+- **Round 2 of labelling** (collection `labels_v2`, 2026-09-27): 2 real of
+  13. The notes point at the touches.
+  - The owner then answered four questions: a touch needs the wick to reach
+    the level; a wick past a level before confirmation breaks the range; a
+    level sits at the wick tip; and a wick reaching EQ is enough.
+  - Prototype v3 applies these rules. At 5% under and 10% over it finds 105
+    ranges and none of the ten rejected ones. It also drops all five approved
+    ones, whose touches do not reach the lines.
+- **Round 3** is on the same page ([Range Kontrolü](https://claude.ai/artifact/PUkS2Mwvv2qLuBsc2oJvce), collection
+  `labels_v3`). The engine is unchanged until the owner has reviewed it.
 
 ## Funnel audit: why so few trades - 2026-09-26 [U-FUNNEL-001]
 
