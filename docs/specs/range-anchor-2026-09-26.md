@@ -122,3 +122,22 @@ Per 1H stream, causal: a swing is used from its confirmation on.
 3. **Implement as a `RangeEngine` mode with TDD.** It keeps the
    `RANGE_*` event vocabulary, so manipulation, HTF and entries are
    unchanged. Then rerun the 30-pair sweep.
+
+## Round 3 (2026-09-27)
+
+- **Labels** (`labels_v3`, 30): 18 real, 3 unsure, 9 not, against 3 of 50 in
+  round 1.
+- **The separator is a close outside the levels during formation.** All 18
+  real ranges have none; the four rejected with "RL ihlali" / "RL altı
+  kapanış" have at least one, and so does the unsure FIL.
+  - Wicks past a level up to 10% of the height were accepted.
+- **Prototype v4** (`detector4.py`, `run4.py`) adds that rule: 91 ranges. It
+  keeps all 18 real ones and drops those four and FIL (72% real among the
+  labelled ranges it keeps).
+- **The remaining rejections are shape judgements.** For example, on ADA
+  2025-11-21 the levels sit on liquidation spikes while the bodies stay in
+  the upper half. The owner suggested an AI check for this.
+- **Manipulation depth.** XLM 2026-01-08: pokes 0.1-14% of the height below
+  RL after confirmation are not manipulations for the owner. ENA 2026-04-29:
+  a 19% sweep that closed inside is one. The engine counts any tick past the
+  level as a sweep; a minimum depth near 15% fits both.
